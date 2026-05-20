@@ -258,7 +258,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
             <select class="finput" id="f-cat"><option value="">اختر التصنيف</option></select>
           </div>
           <div>
-            <label class="flabel">رقم الجوال <span class="req">*</span></label>
+            <label class="flabel">رقم الجوال</label>
             <input class="finput" id="f-phone" placeholder="05xxxxxxxx" type="tel">
           </div>
           <div>
@@ -268,6 +268,10 @@ tr:hover td{background:rgba(242,101,34,.04)}
           <div class="fl">
             <label class="flabel">الموقع / الحي</label>
             <input class="finput" id="f-loc" placeholder="حي النخيل، الشارع الرئيسي...">
+          </div>
+          <div class="fl">
+            <label class="flabel">📍 رابط الموقع على Google Maps</label>
+            <input class="finput" id="f-maps" placeholder="https://maps.app.goo.gl/..." dir="ltr">
           </div>
           <div class="fl">
             <label class="flabel">وصف المشروع</label>
@@ -576,11 +580,12 @@ function saveBiz(){
   const name  = document.getElementById("f-name").value.trim();
   const cat   = document.getElementById("f-cat").value;
   const phone = document.getElementById("f-phone").value.trim();
-  if(!name||!cat||!phone){ toast("⚠️ يرجى تعبئة الاسم والتصنيف والجوال",true); return; }
+  if(!name||!cat){ toast("⚠️ يرجى تعبئة اسم المشروع والتصنيف",true); return; }
   DB.push({
     id:Date.now(), name, category:cat, phone,
     whatsapp: document.getElementById("f-wa").value.trim(),
     location: document.getElementById("f-loc").value.trim(),
+    mapsUrl:  document.getElementById("f-maps").value.trim(),
     description: document.getElementById("f-desc").value.trim(),
     tags: document.getElementById("f-tags").value.split(",").map(t=>t.trim()).filter(Boolean),
     website: document.getElementById("f-web").value.trim(),
@@ -612,6 +617,7 @@ function openEdit(id){
     <div><label class="flabel">الجوال</label><input class="finput" id="e-phone" value="${esc(b.phone)}"></div>
     <div><label class="flabel">الواتساب</label><input class="finput" id="e-wa" value="${esc(b.whatsapp)}"></div>
     <div><label class="flabel">الموقع / الحي</label><input class="finput" id="e-loc" value="${esc(b.location)}"></div>
+    <div><label class="flabel">📍 رابط Google Maps</label><input class="finput" id="e-maps" value="${esc(b.mapsUrl)}" dir="ltr"></div>
     <div style="grid-column:1/-1"><label class="flabel">الوصف</label><textarea class="finput" id="e-desc" style="height:66px;resize:vertical">${esc(b.description)}</textarea></div>
     <div style="grid-column:1/-1"><label class="flabel">الكلمات المفتاحية</label><input class="finput" id="e-tags" value="${esc((b.tags||[]).join('، '))}"></div>
     <div style="grid-column:1/-1"><label class="flabel">🌐 الموقع الإلكتروني</label><input class="finput" id="e-web" value="${esc(b.website)}" dir="ltr"></div>
@@ -636,6 +642,7 @@ function saveEdit(){
   b.phone       = document.getElementById("e-phone").value.trim();
   b.whatsapp    = document.getElementById("e-wa").value.trim();
   b.location    = document.getElementById("e-loc").value.trim();
+  b.mapsUrl     = document.getElementById("e-maps").value.trim();
   b.description = document.getElementById("e-desc").value.trim();
   b.tags        = document.getElementById("e-tags").value.split(/[,،]/).map(t=>t.trim()).filter(Boolean);
   b.website     = document.getElementById("e-web").value.trim();
@@ -672,7 +679,7 @@ function askDel(id){
 
 // ── Form helpers ──────────────────────────
 function resetForm(){
-  ["f-name","f-phone","f-wa","f-loc","f-desc","f-tags","f-web","f-ig","f-tw","f-sc","f-tt","f-badge","f-adtext","f-adgrad"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  ["f-name","f-phone","f-wa","f-loc","f-maps","f-desc","f-tags","f-web","f-ig","f-tw","f-sc","f-tt","f-badge","f-adtext","f-adgrad"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
   document.getElementById("f-cat").value="";
   document.getElementById("f-promo").checked=false;
   document.getElementById("promo-details").style.display="none";
