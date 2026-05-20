@@ -4,6 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>لوحة تحكم — دليل صفوى</title>
+<script>
+// Auth — يجب أن يكون قبل الـ body لأن الزر يستدعيه مباشرة
+const ADMIN_PASSWORD = "safwa2025"; // غيّر كلمة المرور هنا
+(function(){
+  if(sessionStorage.getItem("sd_ok")==="1"){
+    document.addEventListener("DOMContentLoaded",()=>{
+      const lock = document.getElementById("lock");
+      if(lock) lock.style.display="none";
+    });
+  }
+})();
+function tryLogin(){
+  const val = document.getElementById("pw").value;
+  if(val === ADMIN_PASSWORD){
+    sessionStorage.setItem("sd_ok","1");
+    document.getElementById("lock").style.display="none";
+  } else {
+    document.getElementById("pw-err").style.display="block";
+    document.getElementById("pw").value="";
+    document.getElementById("pw").focus();
+  }
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -423,10 +446,6 @@ tr:hover td{background:rgba(242,101,34,.04)}
 
 <script>
 // ════════════════════════════════════════════
-// 🔑 غيّر كلمة المرور هنا
-const ADMIN_PASSWORD = "safwa2025";
-
-// ════════════════════════════════════════════
 // Supabase
 const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
@@ -476,22 +495,6 @@ let DB = load();
 let editId = null;
 let logoData = null;
 let imgData = null;
-
-// ── Auth ──────────────────────────────────
-(function(){
-  if(sessionStorage.getItem("sd_ok")==="1")
-    document.getElementById("lock").style.display="none";
-})();
-function tryLogin(){
-  if(document.getElementById("pw").value===ADMIN_PASSWORD){
-    sessionStorage.setItem("sd_ok","1");
-    document.getElementById("lock").style.display="none";
-  } else {
-    document.getElementById("pw-err").style.display="block";
-    document.getElementById("pw").value="";
-    document.getElementById("pw").focus();
-  }
-}
 
 // ── Storage ───────────────────────────────
 function load(){ try{ return JSON.parse(localStorage.getItem("safwa_biz")||"[]"); }catch{ return []; } }
