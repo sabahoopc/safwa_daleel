@@ -173,7 +173,7 @@ window.renderTbl = function renderTbl() {
   const list = DB.filter(b=>(!q||b.name.toLowerCase().includes(q)||(b.location||"").includes(q))&&(!cat||b.category===cat));
   document.getElementById("biz-label").textContent = list.length+" مشروع";
   document.getElementById("tbl-body").innerHTML = list.length===0
-    ? `<tr><td colspan="6"><div style="text-align:center;padding:36px;color:var(--mu)">لا توجد مشاريع</div></td></tr>`
+    ? `<tr><td colspan="7"><div style="text-align:center;padding:36px;color:var(--mu)">لا توجد مشاريع</div></td></tr>`
     : list.map(b=>`<tr>
       <td><div style="display:flex;align-items:center;gap:8px">
         <div class="r-logo" style="width:32px;height:32px;font-size:15px">${b.logoData?`<img src="${b.logoData}">`:getCat(b.category).icon}</div>
@@ -183,6 +183,11 @@ window.renderTbl = function renderTbl() {
       <td style="font-size:12px;color:var(--mu)">${b.phone||"—"}</td>
       <td style="font-size:12px;color:var(--mu);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.location||"—"}</td>
       <td><span class="${b.hidden?"badge-hidden":"badge-active"}">${b.hidden?"مخفي":"نشط"}</span></td>
+      <td>
+        <button type="button" class="btn btn-sm" style="${b.promoted?"background:#2a1005;border:1px solid #f26522;color:#f26522":"background:#0a1a0a;border:1px solid #2a5a2a;color:#4caf50"}" onclick="quickTogglePromo(${b.id})">
+          ${b.promoted?"⭐ إلغاء التمييز":"☆ تمييز"}
+        </button>
+      </td>
       <td><div class="td-actions">
         <button type="button" class="btn btn-ghost btn-sm" onclick="openEdit(${b.id})">✏️</button>
         <button type="button" class="btn btn-ghost btn-sm" onclick="toggleHide(${b.id})">${b.hidden?"👁️":"🙈"}</button>
@@ -356,7 +361,69 @@ window.renderPromo = function renderPromo() {
     </div>`).join("");
 }
 
-// ── Add / Save ────────────────────────────
+// ── Quick Promo Toggle ────────────────────
+window.quickTogglePromo = async function quickTogglePromo(id) {
+  const b = DB.find(x=>x.id===id); if(!b) return;
+
+  if (b.promoted) {
+    // إلغاء التمييز مباشرة
+    try {
+      await supa("businesses?id=eq."+id,"PATCH",{promoted:false,badge:null,ad_text:null,ad_grad:null});
+      b.promoted=false; b.badge=""; b.adText=""; b.adGrad="";
+      updateAll(); toast("تم إلغاء التمييز");
+    } catch(e) { toast("❌ فشل: "+e.message,true); }
+    return;
+  }
+
+  // تفعيل التمييز — نموذج سريع
+  const GRADS = [
+    ["🟢 أخضر","linear-gradient(135deg,#1a3a2a,#2d6a4a)"],
+    ["🔵 أزرق","linear-gradient(135deg,#1a1a3a,#2d3a8a)"],
+    ["🔴 أحمر","linear-gradient(135deg,#3a1a1a,#8a3a2d)"],
+    ["🟣 بنفسجي","linear-gradient(135deg,#2a1a3a,#6a2d8a)"],
+    ["🟠 برتقالي","linear-gradient(135deg,#1f1005,#4a2a05)"],
+    ["⚫ رمادي","linear-gradient(135deg,#1a1a1a,#3a3a3a)"],
+    ["🟤 بني","linear-gradient(135deg,#2a1a05,#5a3a10)"],
+  ];
+
+  document.getElementById("promo-quick-body").innerHTML = `
+    <div style="font-size:15px;font-weight:800;margin-bottom:4px">تفعيل الإعلان المميز</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:16px">${b.name}</div>
+    <label class="flabel">الشارة (تظهر على البطاقة)</label>
+    <input class="finput" id="pq-badge" placeholder="الأكثر تقييماً، عروض حصرية...">
+    <label class="flabel">نص البانر *</label>
+    <input class="finput" id="pq-text" placeholder="🔥 عرض خاص — تواصل الآن!">
+    <label class="flabel">لون البانر *</label>
+    <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px">
+      ${GRADS.map(([n,g])=>`<button type="button" onclick="document.getElementById('pq-grad').value='${g}';this.parentElement.querySelectorAll('button').forEach(b=>b.style.outline='none');this.style.outline='2px solid #fff'" style="background:${g};color:#fff;border:none;border-radius:7px;padding:7px 13px;font-size:12px;cursor:pointer;font-weight:600">${n}</button>`).join("")}
+    </div>
+    <input class="finput" id="pq-grad" placeholder="سيظهر هنا بعد اختيار اللون" dir="ltr" style="font-size:11px">
+    <div id="pq-err" style="color:#e05c5c;font-size:12px;display:none;margin-top:4px"></div>`;
+
+  document.getElementById("promo-quick-footer").innerHTML = `
+    <button type="button" class="btn btn-or" onclick="saveQuickPromo(${id})">⭐ تفعيل الإعلان المميز</button>
+    <button type="button" class="btn btn-ghost" onclick="closeM('promo-quick')">إلغاء</button>`;
+
+  openM("promo-quick");
+}
+
+window.saveQuickPromo = async function saveQuickPromo(id) {
+  const badge = document.getElementById("pq-badge").value.trim();
+  const text  = document.getElementById("pq-text").value.trim();
+  const grad  = document.getElementById("pq-grad").value.trim();
+  if (!text) { document.getElementById("pq-err").style.display="block"; document.getElementById("pq-err").textContent="⚠️ نص البانر مطلوب"; return; }
+  if (!grad) { document.getElementById("pq-err").style.display="block"; document.getElementById("pq-err").textContent="⚠️ اختر لون البانر"; return; }
+  try {
+    await supa("businesses?id=eq."+id,"PATCH",{promoted:true,badge:badge||null,ad_text:text,ad_grad:grad});
+    const b = DB.find(x=>x.id===id);
+    if(b){ b.promoted=true; b.badge=badge; b.adText=text; b.adGrad=grad; }
+    closeM("promo-quick");
+    updateAll();
+    toast("✅ تم تفعيل الإعلان المميز — يظهر فوراً في البانر");
+  } catch(e) { document.getElementById("pq-err").style.display="block"; document.getElementById("pq-err").textContent="❌ فشل: "+e.message; }
+}
+
+
 window.saveBiz = async function saveBiz() {
   const name = document.getElementById("f-name").value.trim();
   const cat  = document.getElementById("f-cat").value;
@@ -712,7 +779,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
       <select id="tbl-cat" onchange="renderTbl()"><option value="">كل التصنيفات</option></select>
     </div>
     <div style="overflow-x:auto"><table>
-      <thead><tr><th>المشروع</th><th>التصنيف</th><th>الجوال</th><th>الموقع</th><th>الحالة</th><th style="text-align:left">إجراءات</th></tr></thead>
+      <thead><tr><th>المشروع</th><th>التصنيف</th><th>الجوال</th><th>الموقع</th><th>الحالة</th><th>الإعلان</th><th style="text-align:left">إجراءات</th></tr></thead>
       <tbody id="tbl-body"></tbody>
     </table></div>
   </div>
@@ -917,6 +984,15 @@ tr:hover td{background:rgba(242,101,34,.04)}
       <button type="button" class="btn btn-or" onclick="saveNewCat()">💾 إضافة التصنيف</button>
       <button type="button" class="btn btn-ghost" onclick="closeM('add-cat')">إلغاء</button>
     </div>
+  </div>
+</div>
+
+<!-- Quick Promo Modal -->
+<div class="overlay" id="modal-promo-quick" onclick="if(event.target===this)closeM('promo-quick')">
+  <div class="modal" style="max-width:480px">
+    <div class="mh"><div class="mh-title">⭐ الإعلان المميز</div><button type="button" style="background:none;border:none;color:var(--mu);font-size:17px;cursor:pointer" onclick="closeM('promo-quick')">✕</button></div>
+    <div class="mc" id="promo-quick-body"></div>
+    <div class="mf" id="promo-quick-footer"></div>
   </div>
 </div>
 
