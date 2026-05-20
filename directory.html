@@ -393,6 +393,7 @@ function openBusiness(id) {
   <div class="detail-section">
     <div class="detail-section-title">📍 الموقع</div>
     <div class="detail-section-val">${b.location||""}</div>
+    ${b.mapsUrl ? `<a href="${b.mapsUrl}" target="_blank" rel="noreferrer" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;color:var(--orange);font-size:12px;font-weight:600">🗺️ فتح في خرائط Google</a>` : ""}
   </div>`;
   const socials = [
     b.instagram&&`<a href="https://instagram.com/${b.instagram}" target="_blank" class="social-btn" style="background:#c13584">📸 Instagram</a>`,
