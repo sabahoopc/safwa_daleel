@@ -343,10 +343,10 @@ function openBusiness(id) {
     ${b.maps_url?`<a href="${b.maps_url}" target="_blank" rel="noreferrer" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;color:var(--orange);font-size:12px;font-weight:600">🗺️ فتح في خرائط Google</a>`:""}
   </div>`;
   const socials = [
-    b.instagram&&`<a href="https://instagram.com/${b.instagram}" target="_blank" class="social-btn" style="background:#c13584">📸 Instagram</a>`,
-    b.twitter&&`<a href="https://twitter.com/${b.twitter}" target="_blank" class="social-btn" style="background:#1a8cd8">𝕏 Twitter</a>`,
-    b.snapchat&&`<a href="https://snapchat.com/add/${b.snapchat}" target="_blank" class="social-btn" style="background:#FFFC00;color:#000">👻 Snapchat</a>`,
-    b.tiktok&&`<a href="https://tiktok.com/@${b.tiktok}" target="_blank" class="social-btn" style="background:#111">🎵 TikTok</a>`,
+    b.instagram&&`<a href="${b.instagram}" target="_blank" class="social-btn" style="background:#c13584">📸 Instagram</a>`,
+    b.twitter&&`<a href="${b.twitter}" target="_blank" class="social-btn" style="background:#1a8cd8">𝕏 Twitter</a>`,
+    b.snapchat&&`<a href="${b.snapchat}" target="_blank" class="social-btn" style="background:#FFFC00;color:#000">👻 Snapchat</a>`,
+    b.tiktok&&`<a href="${b.tiktok}" target="_blank" class="social-btn" style="background:#111">🎵 TikTok</a>`,
   ].filter(Boolean);
   if (socials.length) html += `<div class="detail-section"><div class="detail-section-title">📱 التواصل الاجتماعي</div><div class="social-btns">${socials.join("")}</div></div>`;
   if (b.website) html += `<div class="detail-section"><div class="detail-section-title">🌐 الموقع الإلكتروني</div><a href="${b.website}" target="_blank" style="color:var(--orange);font-size:13px;font-weight:600;word-break:break-all">${b.website.replace(/^https?:\/\//,"")}</a></div>`;
