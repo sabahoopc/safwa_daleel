@@ -419,12 +419,14 @@ tr:hover td{background:rgba(242,101,34,.04)}
 <div class="toast" id="toast"></div>
 
 <script>
+// Make all functions global so inline onclick works
+
 const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
 
 const DEFAULT_CATS = [{'id': 'restaurants', 'label': 'مطاعم', 'icon': '🍽️'}, {'id': 'groceries', 'label': 'بقالات', 'icon': '🛒'}, {'id': 'supermarkets', 'label': 'سوبرماركت', 'icon': '🏪'}, {'id': 'realestate', 'label': 'مكاتب عقار', 'icon': '🏠'}, {'id': 'homeprod', 'label': 'أسر منتجة', 'icon': '🧺'}, {'id': 'cafes', 'label': 'مقاهي', 'icon': '☕'}, {'id': 'bookstores', 'label': 'مكتبات', 'icon': '📚'}, {'id': 'printing', 'label': 'مطابع', 'icon': '🖨️'}, {'id': 'mobiles', 'label': 'جوالات وملحقاتها', 'icon': '📱'}, {'id': 'nuts', 'label': 'مكسرات', 'icon': '🥜'}, {'id': 'weddinghalls', 'label': 'صالات أفراح', 'icon': '💒'}, {'id': 'barbers', 'label': 'حلاقة', 'icon': '✂️'}, {'id': 'women', 'label': 'مراكز نسائية', 'icon': '💄'}, {'id': 'electronics', 'label': 'إلكترونيات', 'icon': '🔌'}, {'id': 'clothing', 'label': 'ملابس', 'icon': '👗'}, {'id': 'gold', 'label': 'ذهب', 'icon': '💍'}, {'id': 'sweets', 'label': 'حلويات', 'icon': '🍰'}];
 
-async function supa(path, method="GET", body=null) {
+window.supa = async function supa(path, method="GET", body=null) {
   const opts = {
     method,
     headers: {
@@ -449,10 +451,10 @@ let logoData = null;
 let imgData = null;
 let pickedEmoji = "";
 
-function getCat(id) { return CATS.find(c=>c.id===id)||{icon:"🏢",label:""}; }
-function esc(s) { return (s||"").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function isUrl(s) { if(!s||!s.trim()) return true; try{ new URL(s); return true; }catch{ return false; } }
-function validateUrl(input) {
+window.getCat = function getCat(id) { return CATS.find(c=>c.id===id)||{icon:"🏢",label:""}; }
+window.esc = function esc(s) { return (s||"").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+window.isUrl = function isUrl(s) { if(!s||!s.trim()) return true; try{ new URL(s); return true; }catch{ return false; } }
+window.validateUrl = function validateUrl(input) {
   const v = input.value.trim();
   if (v && !isUrl(v)) {
     input.classList.add("err");
@@ -471,7 +473,7 @@ function validateUrl(input) {
 })();
 
 // ── Supabase helpers ──────────────────────
-function mapFromDB(r) {
+window.mapFromDB = function mapFromDB(r) {
   return {
     id:r.id, name:r.name, category:r.category, phone:r.phone,
     whatsapp:r.whatsapp, location:r.location, mapsUrl:r.maps_url,
@@ -483,7 +485,7 @@ function mapFromDB(r) {
   };
 }
 
-async function loadAll() {
+window.loadAll = async function loadAll() {
   try {
     const [bizData, catData, reqData] = await Promise.all([
       supa("businesses?select=*&order=promoted.desc,created_at.desc"),
@@ -499,7 +501,7 @@ async function loadAll() {
   }
 }
 
-async function saveToSupabase(biz) {
+window.saveToSupabase = async function saveToSupabase(biz) {
   const {id, ...data} = biz;
   const row = {
     name:data.name, category:data.category, phone:data.phone||null,
@@ -521,18 +523,18 @@ async function saveToSupabase(biz) {
 }
 
 // ── Update UI ─────────────────────────────
-function updateAll() {
+window.updateAll = function updateAll() {
   updateSidebar(); updateDashboard(); fillCats(); renderTbl(); renderPromo(); renderCatsTable();
 }
 
-function updateSidebar() {
+window.updateSidebar = function updateSidebar() {
   document.getElementById("sb-total").textContent = DB.length;
   document.getElementById("sb-promo").textContent = DB.filter(b=>b.promoted).length;
   const pending = REQUESTS.filter(r=>r.status==="pending").length;
   document.getElementById("sb-req").textContent = pending;
 }
 
-function updateDashboard() {
+window.updateDashboard = function updateDashboard() {
   document.getElementById("st-total").textContent  = DB.length;
   document.getElementById("st-active").textContent = DB.filter(b=>!b.hidden).length;
   document.getElementById("st-promo").textContent  = DB.filter(b=>b.promoted).length;
@@ -543,7 +545,7 @@ function updateDashboard() {
     : `<div style="text-align:center;padding:24px;color:var(--mu)">لا توجد مشاريع بعد</div>`;
 }
 
-function fillCats() {
+window.fillCats = function fillCats() {
   const opts = CATS.map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join("");
   const fc = document.getElementById("f-cat");
   const tc = document.getElementById("tbl-cat");
@@ -552,7 +554,7 @@ function fillCats() {
 }
 
 // ── Pages ─────────────────────────────────
-function go(id, btn) {
+window.go = function go(id, btn) {
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById("page-"+id).classList.add("active");
   document.querySelectorAll(".sb-btn").forEach(b=>b.classList.remove("active"));
@@ -565,7 +567,7 @@ function go(id, btn) {
 }
 
 // ── Table ─────────────────────────────────
-function renderTbl() {
+window.renderTbl = function renderTbl() {
   const q   = (document.getElementById("tbl-q")?.value||"").toLowerCase();
   const cat = document.getElementById("tbl-cat")?.value||"";
   const list = DB.filter(b=>(!q||b.name.toLowerCase().includes(q)||(b.location||"").includes(q))&&(!cat||b.category===cat));
@@ -590,7 +592,7 @@ function renderTbl() {
 }
 
 // ── Requests ──────────────────────────────
-function renderRequests() {
+window.renderRequests = function renderRequests() {
   const wrap = document.getElementById("req-list");
   const pending = REQUESTS.filter(r=>r.status==="pending");
   const others  = REQUESTS.filter(r=>r.status!=="pending");
@@ -607,7 +609,7 @@ function renderRequests() {
   wrap.innerHTML = html;
 }
 
-function reqCard(r) {
+window.reqCard = function reqCard(r) {
   const statusLabel = r.status==="pending"?"معلّق":r.status==="approved"?"مقبول":"مرفوض";
   const statusClass = r.status==="pending"?"badge-pending":r.status==="approved"?"badge-active":"badge-hidden";
   const date = new Date(r.created_at).toLocaleDateString("ar-SA");
@@ -631,7 +633,7 @@ function reqCard(r) {
   </div>`;
 }
 
-function openReqDetail(id) {
+window.openReqDetail = function openReqDetail(id) {
   const r = REQUESTS.find(x=>x.id===id); if(!r) return;
   const fields = [
     ["اسم المشروع",r.business_name],["التصنيف",r.category],
@@ -658,7 +660,7 @@ function openReqDetail(id) {
   openM("req");
 }
 
-async function approveReq(id) {
+window.approveReq = async function approveReq(id) {
   const r = REQUESTS.find(x=>x.id===id); if(!r) return;
   try {
     // Add to businesses
@@ -681,7 +683,7 @@ async function approveReq(id) {
   } catch(e) { toast("❌ فشل: "+e.message,true); }
 }
 
-async function rejectReq(id) {
+window.rejectReq = async function rejectReq(id) {
   try {
     await supa("submission_requests?id=eq."+id,"PATCH",{status:"rejected"});
     const r = REQUESTS.find(x=>x.id===id);
@@ -693,7 +695,7 @@ async function rejectReq(id) {
 }
 
 // ── Categories ────────────────────────────
-function renderCatsTable() {
+window.renderCatsTable = function renderCatsTable() {
   document.getElementById("cats-table").innerHTML = CATS.map(c=>`<tr>
     <td style="font-size:24px">${c.icon}</td>
     <td style="font-weight:600">${c.label}</td>
@@ -704,13 +706,13 @@ function renderCatsTable() {
   </tr>`).join("");
 }
 
-function pickEmoji(e) {
+window.pickEmoji = function pickEmoji(e) {
   pickedEmoji = e;
   document.getElementById("picked-emoji").textContent = e;
   document.getElementById("new-cat-icon").value = e;
 }
 
-async function saveNewCat() {
+window.saveNewCat = async function saveNewCat() {
   const label = document.getElementById("new-cat-label").value.trim();
   const icon  = document.getElementById("new-cat-icon").value;
   if(!label||!icon) { toast("⚠️ أدخل اسم التصنيف واختر أيقونة",true); return; }
@@ -726,7 +728,7 @@ async function saveNewCat() {
   } catch(e) { toast("❌ فشل: "+e.message,true); }
 }
 
-async function delCat(id) {
+window.delCat = async function delCat(id) {
   if(!confirm("حذف هذا التصنيف؟")) return;
   try {
     await supa("custom_categories?id=eq."+id,"DELETE");
@@ -737,7 +739,7 @@ async function delCat(id) {
 }
 
 // ── Promoted ──────────────────────────────
-function renderPromo() {
+window.renderPromo = function renderPromo() {
   const list = DB.filter(b=>b.promoted);
   document.getElementById("promo-list").innerHTML = list.length===0
     ? `<div style="text-align:center;padding:40px;color:var(--mu)">لا توجد إعلانات مميزة<br><small>فعّل الإعلان عند إضافة أو تعديل مشروع</small></div>`
@@ -755,7 +757,7 @@ function renderPromo() {
 }
 
 // ── Add / Save ────────────────────────────
-async function saveBiz() {
+window.saveBiz = async function saveBiz() {
   const name = document.getElementById("f-name").value.trim();
   const cat  = document.getElementById("f-cat").value;
   const loc  = document.getElementById("f-loc").value.trim();
@@ -797,7 +799,7 @@ async function saveBiz() {
 }
 
 // ── Edit ──────────────────────────────────
-function openEdit(id) {
+window.openEdit = function openEdit(id) {
   const b = DB.find(x=>x.id===id); if(!b) return;
   editId = id;
   const opts = CATS.map(c=>`<option value="${c.id}"${c.id===b.category?" selected":""}>${c.icon} ${c.label}</option>`).join("");
@@ -831,9 +833,9 @@ function openEdit(id) {
   openM("edit");
 }
 
-function setGE(g) { document.getElementById("e-adgrad").value=g; }
+window.setGE = function setGE(g) { document.getElementById("e-adgrad").value=g; }
 
-async function saveEdit() {
+window.saveEdit = async function saveEdit() {
   const b = DB.find(x=>x.id===editId); if(!b) return;
   b.name=document.getElementById("e-name").value.trim();
   b.category=document.getElementById("e-cat").value;
@@ -861,18 +863,18 @@ async function saveEdit() {
 }
 
 // ── Actions ───────────────────────────────
-async function toggleHide(id) {
+window.toggleHide = async function toggleHide(id) {
   const b=DB.find(x=>x.id===id); if(!b)return;
   b.hidden=!b.hidden;
   try { await supa("businesses?id=eq."+id,"PATCH",{hidden:b.hidden}); updateAll(); toast(b.hidden?"🙈 مخفي":"👁️ ظاهر"); }
   catch(e) { b.hidden=!b.hidden; toast("❌ فشل",true); }
 }
-function removePromo(id) {
+window.removePromo = function removePromo(id) {
   const b=DB.find(x=>x.id===id); if(!b)return;
   b.promoted=false; b.badge=""; b.adText=""; b.adGrad="";
   saveToSupabase(b).then(()=>{ updateAll(); toast("تم إلغاء التمييز"); }).catch(e=>toast("❌ "+e.message,true));
 }
-function askDel(id) {
+window.askDel = function askDel(id) {
   const b=DB.find(x=>x.id===id); if(!b)return;
   document.getElementById("conf-title").textContent="حذف: "+b.name;
   document.getElementById("conf-sub").textContent="سيُحذف نهائياً من قاعدة البيانات.";
@@ -884,32 +886,32 @@ function askDel(id) {
 }
 
 // ── Form helpers ──────────────────────────
-function resetForm() {
+window.resetForm = function resetForm() {
   ["f-name","f-phone","f-wa","f-loc","f-maps","f-desc","f-tags","f-web","f-ig","f-tw","f-sc","f-tt","f-badge","f-adtext","f-adgrad"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";el.classList.remove("err");}});
   document.getElementById("f-cat").value="";
   document.getElementById("f-promo").checked=false;
   document.getElementById("promo-details").style.display="none";
   clearLogo(); clearImg(); logoData=null; imgData=null;
 }
-function togglePromo() { document.getElementById("promo-details").style.display=document.getElementById("f-promo").checked?"grid":"none"; }
-function setG(g) { document.getElementById("f-adgrad").value=g; }
-function pickLogo(inp) {
+window.togglePromo = function togglePromo() { document.getElementById("promo-details").style.display=document.getElementById("f-promo").checked?"grid":"none"; }
+window.setG = function setG(g) { document.getElementById("f-adgrad").value=g; }
+window.pickLogo = function pickLogo(inp) {
   const f=inp.files[0]; if(!f)return;
   const r=new FileReader();
   r.onload=ev=>{ logoData=ev.target.result; document.getElementById("logo-box").innerHTML=`<img src="${logoData}" style="width:100%;height:100%;object-fit:cover">`; };
   r.readAsDataURL(f);
 }
-function clearLogo() { logoData=null; document.getElementById("logo-box").innerHTML=`<div id="logo-ph" style="text-align:center"><div style="font-size:20px">🏷️</div><div style="font-size:9px;color:var(--or);font-weight:700;margin-top:2px">ارفع الشعار</div></div>`; }
-function pickImg(inp) {
+window.clearLogo = function clearLogo() { logoData=null; document.getElementById("logo-box").innerHTML=`<div id="logo-ph" style="text-align:center"><div style="font-size:20px">🏷️</div><div style="font-size:9px;color:var(--or);font-weight:700;margin-top:2px">ارفع الشعار</div></div>`; }
+window.pickImg = function pickImg(inp) {
   const f=inp.files[0]; if(!f)return;
   const r=new FileReader();
   r.onload=ev=>{ imgData=ev.target.result; document.getElementById("img-box").innerHTML=`<img src="${ev.target.result}" style="max-width:100%;max-height:120px;border-radius:7px;object-fit:cover">`; };
   r.readAsDataURL(f);
 }
-function clearImg() { imgData=null; document.getElementById("img-box").innerHTML=`<div id="img-ph"><div style="font-size:22px;margin-bottom:3px">📷</div><div style="font-size:13px;font-weight:600">اضغط لرفع صورة</div></div>`; }
+window.clearImg = function clearImg() { imgData=null; document.getElementById("img-box").innerHTML=`<div id="img-ph"><div style="font-size:22px;margin-bottom:3px">📷</div><div style="font-size:13px;font-weight:600">اضغط لرفع صورة</div></div>`; }
 
 // ── Export ────────────────────────────────
-function exportJSON() {
+window.exportJSON = function exportJSON() {
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,2)],{type:"application/json"}));
   a.download="daleel-safwa-backup.json"; a.click();
@@ -917,9 +919,9 @@ function exportJSON() {
 }
 
 // ── Helpers ───────────────────────────────
-function openM(id) { document.getElementById("modal-"+id).classList.add("open"); }
-function closeM(id) { document.getElementById("modal-"+id).classList.remove("open"); }
-function toast(msg,err=false) {
+window.openM = function openM(id) { document.getElementById("modal-"+id).classList.add("open"); }
+window.closeM = function closeM(id) { document.getElementById("modal-"+id).classList.remove("open"); }
+window.toast = function toast(msg,err=false) {
   const el=document.getElementById("toast");
   el.textContent=msg; el.className="toast "+(err?"err":"ok")+" show";
   setTimeout(()=>el.className="toast",3200);
@@ -927,6 +929,7 @@ function toast(msg,err=false) {
 
 // ── Start ─────────────────────────────────
 loadAll();
+
 </script>
 </body>
 </html>
