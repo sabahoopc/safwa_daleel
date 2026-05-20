@@ -501,7 +501,7 @@ function save(){ localStorage.setItem("safwa_biz",JSON.stringify(DB)); updateSid
 async function loadFromSupabase() {
   try {
     const data = await supa("businesses?select=*&order=promoted.desc,created_at.desc");
-    DB = data || [];
+    DB = (data || []).map(mapFromDB);
     // also cache locally
     localStorage.setItem("safwa_biz", JSON.stringify(DB));
     updateSidebar(); updateDashboard(); renderTbl(); renderPromo();
@@ -510,7 +510,32 @@ async function loadFromSupabase() {
   }
 }
 
-async function saveToSupabase(biz) {
+// تحويل أسماء حقول Supabase (snake_case) إلى ما يفهمه الأدمن (camelCase)
+function mapFromDB(row) {
+  return {
+    id:          row.id,
+    name:        row.name,
+    category:    row.category,
+    phone:       row.phone,
+    whatsapp:    row.whatsapp,
+    location:    row.location,
+    mapsUrl:     row.maps_url,
+    description: row.description,
+    tags:        row.tags || [],
+    website:     row.website,
+    instagram:   row.instagram,
+    twitter:     row.twitter,
+    snapchat:    row.snapchat,
+    tiktok:      row.tiktok,
+    logoData:    row.logo_data,
+    imgData:     row.img_data,
+    promoted:    row.promoted,
+    badge:       row.badge,
+    adText:      row.ad_text,
+    adGrad:      row.ad_grad,
+    hidden:      row.hidden,
+  };
+}
   const {id, ...data} = biz;
   // map camelCase to snake_case for Supabase
   const row = {
