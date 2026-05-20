@@ -25,7 +25,6 @@ function tryLogin(){
 }
 </script>
 <script defer>
-document.addEventListener("DOMContentLoaded", function() {
 
 const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
@@ -68,15 +67,6 @@ window.validateUrl = function validateUrl(input) {
     input.classList.remove("err");
   }
 }
-
-// ── Auth ──────────────────────────────────
-(function(){
-  if(sessionStorage.getItem("sd_ok")==="1"){
-    document.addEventListener("DOMContentLoaded",()=>{
-      const l=document.getElementById("lock"); if(l)l.style.display="none";
-    });
-  }
-})();
 
 // ── Supabase helpers ──────────────────────
 window.mapFromDB = function mapFromDB(r) {
@@ -543,9 +533,7 @@ window.toast = function toast(msg,err=false) {
 }
 
 // ── Start ─────────────────────────────────
-loadAll();
-
-}); // end DOMContentLoaded
+window.addEventListener("load", loadAll);
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
