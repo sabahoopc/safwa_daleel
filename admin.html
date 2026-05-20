@@ -408,8 +408,17 @@ window.saveBiz = async function saveBiz() {
 window.openEdit = function openEdit(id) {
   const b = DB.find(x=>x.id===id); if(!b) return;
   editId = id;
-  const opts = CATS.map(c=>`<option value="${c.id}"${c.id===b.category?" selected":""}>${c.icon} ${c.label}</option>`).join("");
-  const gradBtnsEdit = `<button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a3a2a,#2d6a4a)')" style="background:linear-gradient(135deg,#1a3a2a,#2d6a4a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أخضر داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a1a3a,#2d3a8a)')" style="background:linear-gradient(135deg,#1a1a3a,#2d3a8a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أزرق داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#3a1a1a,#8a3a2d)')" style="background:linear-gradient(135deg,#3a1a1a,#8a3a2d);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أحمر داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#2a1a3a,#6a2d8a)')" style="background:linear-gradient(135deg,#2a1a3a,#6a2d8a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">بنفسجي</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1f1005,#4a2a05)')" style="background:linear-gradient(135deg,#1f1005,#4a2a05);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">برتقالي داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a1a1a,#3a3a3a)')" style="background:linear-gradient(135deg,#1a1a1a,#3a3a3a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">رمادي</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#2a1a05,#5a3a10)')" style="background:linear-gradient(135deg,#2a1a05,#5a3a10);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">بني ذهبي</button>`.replace(/onclick="setG/g, "onclick="setGE");
+  const opts = CATS.map(c=>'<option value="'+c.id+'"'+(c.id===b.category?' selected':'')+'>'+c.icon+' '+c.label+'</option>').join("");
+  const GRADS = [
+    ["أخضر داكن","linear-gradient(135deg,#1a3a2a,#2d6a4a)"],
+    ["أزرق داكن","linear-gradient(135deg,#1a1a3a,#2d3a8a)"],
+    ["أحمر داكن","linear-gradient(135deg,#3a1a1a,#8a3a2d)"],
+    ["بنفسجي","linear-gradient(135deg,#2a1a3a,#6a2d8a)"],
+    ["برتقالي","linear-gradient(135deg,#1f1005,#4a2a05)"],
+    ["رمادي","linear-gradient(135deg,#1a1a1a,#3a3a3a)"],
+    ["بني ذهبي","linear-gradient(135deg,#2a1a05,#5a3a10)"],
+  ];
+  const gradBtnsEdit = GRADS.map(([n,g])=>'<button type="button" onclick="setGE(\''+g+'\')" style="background:'+g+';color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">'+n+'</button>').join("");
   document.getElementById("edit-body").innerHTML = `
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
     <div style="grid-column:1/-1"><label class="flabel">اسم المشروع *</label><input class="finput" id="e-name" value="${esc(b.name)}"></div>
@@ -665,17 +674,17 @@ tr:hover td{background:rgba(242,101,34,.04)}
 <div class="layout">
 <aside class="sidebar">
   <div class="sb-sec">الرئيسية</div>
-  <button class="sb-btn active" onclick="go('dashboard',this)">📊 لوحة المعلومات</button>
-  <button class="sb-btn" onclick="go('businesses',this)">🏪 المشاريع <span class="sb-count" id="sb-total">0</span></button>
-  <button class="sb-btn" onclick="go('add',this)">➕ إضافة مشروع</button>
-  <button class="sb-btn" onclick="go('requests',this)">📥 الطلبات <span class="sb-count" id="sb-req">0</span></button>
+  <button class="sb-btn active" data-go="dashboard">📊 لوحة المعلومات</button>
+  <button class="sb-btn" data-go="businesses">🏪 المشاريع <span class="sb-count" id="sb-total">0</span></button>
+  <button class="sb-btn" data-go="add">➕ إضافة مشروع</button>
+  <button class="sb-btn" data-go="requests">📥 الطلبات <span class="sb-count" id="sb-req">0</span></button>
   <hr class="sb-div">
   <div class="sb-sec">الإعلانات</div>
-  <button class="sb-btn" onclick="go('promoted',this)">⭐ المميزة <span class="sb-count" id="sb-promo">0</span></button>
+  <button class="sb-btn" data-go="promoted">⭐ المميزة <span class="sb-count" id="sb-promo">0</span></button>
   <hr class="sb-div">
   <div class="sb-sec">الإعدادات</div>
-  <button class="sb-btn" onclick="go('categories',this)">🗂️ التصنيفات</button>
-  <button class="sb-btn" onclick="go('export',this)">📤 تصدير</button>
+  <button class="sb-btn" data-go="categories">🗂️ التصنيفات</button>
+  <button class="sb-btn" data-go="export">📤 تصدير</button>
 </aside>
 
 <main class="main">
@@ -700,7 +709,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
 <div class="page" id="page-businesses">
   <div class="ph">
     <div><div class="ph-title">المشاريع</div><div class="ph-sub" id="biz-label"></div></div>
-    <button class="btn btn-or" onclick="go('add',document.querySelectorAll('.sb-btn')[2])">➕ إضافة</button>
+    <button class="btn btn-or" data-go="add">➕ إضافة</button>
   </div>
   <div class="tbl-wrap">
     <div class="tbl-bar">
@@ -931,5 +940,16 @@ tr:hover td{background:rgba(242,101,34,.04)}
 
 <div class="toast" id="toast"></div>
 
+
+<script>
+// Event delegation — runs immediately when parsed
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-go]');
+  if (btn && typeof window.go === 'function') {
+    e.preventDefault();
+    window.go(btn.dataset.go, btn);
+  }
+});
+</script>
 </body>
 </html>
