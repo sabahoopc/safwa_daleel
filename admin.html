@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة تحكم — دليل صفوى</title>
+<script>
+const ADMIN_PASSWORD = "safwa2025";
+(function(){
+  if(sessionStorage.getItem("sd_ok")==="1"){
+    document.addEventListener("DOMContentLoaded",()=>{
+      const l=document.getElementById("lock"); if(l)l.style.display="none";
+    });
+  }
+})();
+function tryLogin(){
+  if(document.getElementById("pw").value===ADMIN_PASSWORD){
+    sessionStorage.setItem("sd_ok","1");
+    document.getElementById("lock").style.display="none";
+  } else {
+    document.getElementById("pw-err").style.display="block";
+    document.getElementById("pw").value="";
+    document.getElementById("pw").focus();
+  }
+}
+</script>
+<script defer>
+document.addEventListener("DOMContentLoaded", function() {
+
+const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
+
+const DEFAULT_CATS = [{'id': 'restaurants', 'label': 'مطاعم', 'icon': '🍽️'}, {'id': 'groceries', 'label': 'بقالات', 'icon': '🛒'}, {'id': 'supermarkets', 'label': 'سوبرماركت', 'icon': '🏪'}, {'id': 'realestate', 'label': 'مكاتب عقار', 'icon': '🏠'}, {'id': 'homeprod', 'label': 'أسر منتجة', 'icon': '🧺'}, {'id': 'cafes', 'label': 'مقاهي', 'icon': '☕'}, {'id': 'bookstores', 'label': 'مكتبات', 'icon': '📚'}, {'id': 'printing', 'label': 'مطابع', 'icon': '🖨️'}, {'id': 'mobiles', 'label': 'جوالات وملحقاتها', 'icon': '📱'}, {'id': 'nuts', 'label': 'مكسرات', 'icon': '🥜'}, {'id': 'weddinghalls', 'label': 'صالات أفراح', 'icon': '💒'}, {'id': 'barbers', 'label': 'حلاقة', 'icon': '✂️'}, {'id': 'women', 'label': 'مراكز نسائية', 'icon': '💄'}, {'id': 'electronics', 'label': 'إلكترونيات', 'icon': '🔌'}, {'id': 'clothing', 'label': 'ملابس', 'icon': '👗'}, {'id': 'gold', 'label': 'ذهب', 'icon': '💍'}, {'id': 'sweets', 'label': 'حلويات', 'icon': '🍰'}];
+
+window.supa = async function supa(path, method="GET", body=null) {
+  const opts = {
+    method,
+    headers: {
+      "apikey": SUPA_KEY,
+      "Authorization": "Bearer " + SUPA_KEY,
+      "Content-Type": "application/json",
+      "Prefer": "return=representation",
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPA_URL + "/rest/v1/" + path, opts);
+  if (!res.ok) { const err = await res.text(); throw new Error(err); }
+  const ct = res.headers.get("content-type")||"";
+  return ct.includes("json") && res.status!==204 ? res.json() : null;
+}
+
+let DB = [];
+let CATS = [...DEFAULT_CATS];
+let REQUESTS = [];
+let editId = null;
+let logoData = null;
+let imgData = null;
+let pickedEmoji = "";
+
+window.getCat = function getCat(id) { return CATS.find(c=>c.id===id)||{icon:"🏢",label:""}; }
+window.esc = function esc(s) { return (s||"").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+window.isUrl = function isUrl(s) { if(!s||!s.trim()) return true; try{ new URL(s); return true; }catch{ return false; } }
+window.validateUrl = function validateUrl(input) {
+  const v = input.value.trim();
+  if (v && !isUrl(v)) {
+    input.classList.add("err");
+  } else {
+    input.classList.remove("err");
+  }
+}
+
+// ── Auth ──────────────────────────────────
+(function(){
+  if(sessionStorage.getItem("sd_ok")==="1"){
+    document.addEventListener("DOMContentLoaded",()=>{
+      const l=document.getElementById("lock"); if(l)l.style.display="none";
+    });
+  }
+})();
+
+// ── Supabase helpers ──────────────────────
+window.mapFromDB = function mapFromDB(r) {
+  return {
+    id:r.id, name:r.name, category:r.category, phone:r.phone,
+    whatsapp:r.whatsapp, location:r.location, mapsUrl:r.maps_url,
+    description:r.description, tags:r.tags||[], website:r.website,
+    instagram:r.instagram, twitter:r.twitter, snapchat:r.snapchat,
+    tiktok:r.tiktok, logoData:r.logo_data, imgData:r.img_data,
+    promoted:r.promoted, badge:r.badge, adText:r.ad_text,
+    adGrad:r.ad_grad, hidden:r.hidden,
+  };
+}
+
+window.loadAll = async function loadAll() {
+  try {
+    const [bizData, catData, reqData] = await Promise.all([
+      supa("businesses?select=*&order=promoted.desc,created_at.desc"),
+      supa("custom_categories?select=*&order=created_at"),
+      supa("submission_requests?select=*&order=created_at.desc"),
+    ]);
+    DB = (bizData||[]).map(mapFromDB);
+    if (catData && catData.length) CATS = [...DEFAULT_CATS, ...catData.map(c=>{return{id:c.id,label:c.label,icon:c.icon}})];
+    REQUESTS = reqData||[];
+    updateAll();
+  } catch(e) {
+    toast("⚠️ تعذّر الاتصال: "+e.message, true);
+  }
+}
+
+window.saveToSupabase = async function saveToSupabase(biz) {
+  const {id, ...data} = biz;
+  const row = {
+    name:data.name, category:data.category, phone:data.phone||null,
+    whatsapp:data.whatsapp||null, location:data.location, maps_url:data.mapsUrl||null,
+    description:data.description||null, tags:data.tags||[], website:data.website||null,
+    instagram:data.instagram||null, twitter:data.twitter||null,
+    snapchat:data.snapchat||null, tiktok:data.tiktok||null,
+    logo_data:data.logoData||null, img_data:data.imgData||null,
+    promoted:data.promoted||false, badge:data.badge||null,
+    ad_text:data.adText||null, ad_grad:data.adGrad||null, hidden:data.hidden||false,
+  };
+  if (!Number.isInteger(id) || id > 1e12) {
+    const res = await supa("businesses","POST",row);
+    return res&&res[0] ? res[0].id : null;
+  } else {
+    await supa("businesses?id=eq."+id,"PATCH",row);
+    return id;
+  }
+}
+
+// ── Update UI ─────────────────────────────
+window.updateAll = function updateAll() {
+  updateSidebar(); updateDashboard(); fillCats(); renderTbl(); renderPromo(); renderCatsTable();
+}
+
+window.updateSidebar = function updateSidebar() {
+  document.getElementById("sb-total").textContent = DB.length;
+  document.getElementById("sb-promo").textContent = DB.filter(b=>b.promoted).length;
+  const pending = REQUESTS.filter(r=>r.status==="pending").length;
+  document.getElementById("sb-req").textContent = pending;
+}
+
+window.updateDashboard = function updateDashboard() {
+  document.getElementById("st-total").textContent  = DB.length;
+  document.getElementById("st-active").textContent = DB.filter(b=>!b.hidden).length;
+  document.getElementById("st-promo").textContent  = DB.filter(b=>b.promoted).length;
+  document.getElementById("st-req").textContent    = REQUESTS.filter(r=>r.status==="pending").length;
+  const recent = [...DB].slice(0,5);
+  document.getElementById("recent-list").innerHTML = recent.length
+    ? recent.map(b=>`<div class="r-item"><div class="r-logo">${b.logoData?`<img src="${b.logoData}">`:getCat(b.category).icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${b.name}</div><div style="font-size:11px;color:var(--mu)">${getCat(b.category).label}</div></div>${b.promoted?`<span class="badge-promo">مميز</span>`:""}</div>`).join("")
+    : `<div style="text-align:center;padding:24px;color:var(--mu)">لا توجد مشاريع بعد</div>`;
+}
+
+window.fillCats = function fillCats() {
+  const opts = CATS.map(c=>`<option value="${c.id}">${c.icon} ${c.label}</option>`).join("");
+  const fc = document.getElementById("f-cat");
+  const tc = document.getElementById("tbl-cat");
+  if(fc) fc.innerHTML = `<option value="">اختر التصنيف</option>`+opts;
+  if(tc) tc.innerHTML = `<option value="">كل التصنيفات</option>`+opts;
+}
+
+// ── Pages ─────────────────────────────────
+window.go = function go(id, btn) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  document.querySelectorAll(".sb-btn").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  if(id==="businesses") renderTbl();
+  if(id==="promoted")   renderPromo();
+  if(id==="requests")   renderRequests();
+  if(id==="categories") renderCatsTable();
+  if(id==="add") { resetForm(); document.getElementById("add-title").textContent="إضافة مشروع جديد"; }
+}
+
+// ── Table ─────────────────────────────────
+window.renderTbl = function renderTbl() {
+  const q   = (document.getElementById("tbl-q")?.value||"").toLowerCase();
+  const cat = document.getElementById("tbl-cat")?.value||"";
+  const list = DB.filter(b=>(!q||b.name.toLowerCase().includes(q)||(b.location||"").includes(q))&&(!cat||b.category===cat));
+  document.getElementById("biz-label").textContent = list.length+" مشروع";
+  document.getElementById("tbl-body").innerHTML = list.length===0
+    ? `<tr><td colspan="6"><div style="text-align:center;padding:36px;color:var(--mu)">لا توجد مشاريع</div></td></tr>`
+    : list.map(b=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div class="r-logo" style="width:32px;height:32px;font-size:15px">${b.logoData?`<img src="${b.logoData}">`:getCat(b.category).icon}</div>
+        <div><div style="font-weight:700;font-size:13px">${b.promoted?`<span class="badge-promo" style="margin-left:5px">مميز</span>`:""}${b.name}</div><div style="font-size:11px;color:var(--mu)">${b.phone||""}</div></div>
+      </div></td>
+      <td style="font-size:13px">${getCat(b.category).icon} ${getCat(b.category).label}</td>
+      <td style="font-size:12px;color:var(--mu)">${b.phone||"—"}</td>
+      <td style="font-size:12px;color:var(--mu);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.location||"—"}</td>
+      <td><span class="${b.hidden?"badge-hidden":"badge-active"}">${b.hidden?"مخفي":"نشط"}</span></td>
+      <td><div class="td-actions">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="openEdit(${b.id})">✏️</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="toggleHide(${b.id})">${b.hidden?"👁️":"🙈"}</button>
+        <button type="button" class="btn btn-red btn-sm" onclick="askDel(${b.id})">🗑️</button>
+      </div></td>
+    </tr>`).join("");
+}
+
+// ── Requests ──────────────────────────────
+window.renderRequests = function renderRequests() {
+  const wrap = document.getElementById("req-list");
+  const pending = REQUESTS.filter(r=>r.status==="pending");
+  const others  = REQUESTS.filter(r=>r.status!=="pending");
+  if (!REQUESTS.length) { wrap.innerHTML=`<div style="text-align:center;padding:40px;color:var(--mu)">لا توجد طلبات</div>`; return; }
+  let html = "";
+  if (pending.length) {
+    html += `<div style="font-size:13px;font-weight:700;color:#f0a000;margin-bottom:10px">⏳ طلبات معلّقة (${pending.length})</div>`;
+    html += pending.map(r=>reqCard(r)).join("");
+  }
+  if (others.length) {
+    html += `<div style="font-size:13px;font-weight:700;color:var(--mu);margin:16px 0 10px">✅ مراجَعة سابقاً</div>`;
+    html += others.map(r=>reqCard(r)).join("");
+  }
+  wrap.innerHTML = html;
+}
+
+window.reqCard = function reqCard(r) {
+  const statusLabel = r.status==="pending"?"معلّق":r.status==="approved"?"مقبول":"مرفوض";
+  const statusClass = r.status==="pending"?"badge-pending":r.status==="approved"?"badge-active":"badge-hidden";
+  const date = new Date(r.created_at).toLocaleDateString("ar-SA");
+  return `<div class="req-card ${r.status==="pending"?"req-pending":""}">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:15px;font-weight:800">${r.business_name}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--mu)">${date}</span>
+        <span class="${statusClass}">${statusLabel}</span>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:6px">${r.category||""} — ${r.location||""}</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:10px">صاحب المشروع: ${r.owner_name||"—"} | ${r.owner_phone||"—"}</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button type="button" class="btn btn-ghost btn-sm" onclick="openReqDetail(${r.id})">🔍 تفاصيل</button>
+      ${r.status==="pending"?`
+        <button type="button" class="btn btn-green btn-sm" onclick="approveReq(${r.id})">✅ قبول وإضافة للدليل</button>
+        <button type="button" class="btn btn-red btn-sm" onclick="rejectReq(${r.id})">✕ رفض</button>
+      `:""}
+    </div>
+  </div>`;
+}
+
+window.openReqDetail = function openReqDetail(id) {
+  const r = REQUESTS.find(x=>x.id===id); if(!r) return;
+  const fields = [
+    ["اسم المشروع",r.business_name],["التصنيف",r.category],
+    ["صاحب المشروع",r.owner_name],["جوال صاحب المشروع",r.owner_phone],
+    ["البريد الإلكتروني",r.owner_email],["جوال المشروع",r.phone],
+    ["واتساب",r.whatsapp],["الموقع",r.location],["الوصف",r.description],
+    ["الموقع الإلكتروني",r.website],["Instagram",r.instagram],
+    ["Snapchat",r.snapchat],["Twitter",r.twitter],["TikTok",r.tiktok],
+    ["إعلان مميز",r.wants_promoted?"نعم":"لا"],
+  ];
+  let html = fields.filter(f=>f[1]).map(f=>`
+    <div style="margin-bottom:10px;padding:9px;background:var(--card);border-radius:8px;border:1px solid var(--b)">
+      <div style="font-size:11px;color:var(--mu);margin-bottom:3px">${f[0]}</div>
+      <div style="font-size:13px">${esc(String(f[1]))}</div>
+    </div>`).join("");
+  if (r.logo_data) html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mu);margin-bottom:5px">الشعار</div><img src="${r.logo_data}" style="width:80px;height:80px;border-radius:8px;object-fit:cover"></div>`;
+  if (r.img_data)  html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mu);margin-bottom:5px">صورة المنتجات</div><img src="${r.img_data}" style="max-width:100%;border-radius:8px"></div>`;
+  document.getElementById("req-detail-body").innerHTML = html;
+  document.getElementById("req-detail-footer").innerHTML = r.status==="pending"
+    ? `<button type="button" class="btn btn-green" onclick="approveReq(${r.id});closeM('req')">✅ قبول وإضافة</button>
+       <button type="button" class="btn btn-red" onclick="rejectReq(${r.id});closeM('req')">✕ رفض</button>
+       <button type="button" class="btn btn-ghost" onclick="closeM('req')">إغلاق</button>`
+    : `<button type="button" class="btn btn-ghost" onclick="closeM('req')">إغلاق</button>`;
+  openM("req");
+}
+
+window.approveReq = async function approveReq(id) {
+  const r = REQUESTS.find(x=>x.id===id); if(!r) return;
+  try {
+    // Add to businesses
+    const row = {
+      name:r.business_name, category:r.category, phone:r.phone||null,
+      whatsapp:r.whatsapp||null, location:r.location, maps_url:r.maps_url||null,
+      description:r.description||null, website:r.website||null,
+      instagram:r.instagram||null, twitter:r.twitter||null,
+      snapchat:r.snapchat||null, tiktok:r.tiktok||null,
+      logo_data:r.logo_data||null, img_data:r.img_data||null,
+      promoted:false, hidden:false,
+    };
+    const res = await supa("businesses","POST",row);
+    await supa("submission_requests?id=eq."+id,"PATCH",{status:"approved"});
+    r.status = "approved";
+    if (res&&res[0]) DB.unshift(mapFromDB(res[0]));
+    updateAll();
+    renderRequests();
+    toast("✅ تم القبول وإضافة المشروع للدليل");
+  } catch(e) { toast("❌ فشل: "+e.message,true); }
+}
+
+window.rejectReq = async function rejectReq(id) {
+  try {
+    await supa("submission_requests?id=eq."+id,"PATCH",{status:"rejected"});
+    const r = REQUESTS.find(x=>x.id===id);
+    if(r) r.status="rejected";
+    updateSidebar();
+    renderRequests();
+    toast("تم رفض الطلب");
+  } catch(e) { toast("❌ فشل: "+e.message,true); }
+}
+
+// ── Categories ────────────────────────────
+window.renderCatsTable = function renderCatsTable() {
+  document.getElementById("cats-table").innerHTML = CATS.map(c=>`<tr>
+    <td style="font-size:24px">${c.icon}</td>
+    <td style="font-weight:600">${c.label}</td>
+    <td><span style="font-size:11px;color:var(--mu)">${DEFAULT_CATS.find(d=>d.id===c.id)?"افتراضي":"مخصص"}</span></td>
+    <td><div class="td-actions">
+      ${!DEFAULT_CATS.find(d=>d.id===c.id)?`<button type="button" class="btn btn-red btn-sm" onclick="delCat('${c.id}')">🗑️</button>`:"<span style='font-size:11px;color:var(--mu)'>—</span>"}
+    </div></td>
+  </tr>`).join("");
+}
+
+window.pickEmoji = function pickEmoji(e) {
+  pickedEmoji = e;
+  document.getElementById("picked-emoji").textContent = e;
+  document.getElementById("new-cat-icon").value = e;
+}
+
+window.saveNewCat = async function saveNewCat() {
+  const label = document.getElementById("new-cat-label").value.trim();
+  const icon  = document.getElementById("new-cat-icon").value;
+  if(!label||!icon) { toast("⚠️ أدخل اسم التصنيف واختر أيقونة",true); return; }
+  const id = label.toLowerCase().replace(/\s+/g,"_").replace(/[^a-z0-9_]/g,"")+"_"+Date.now();
+  try {
+    await supa("custom_categories","POST",{id,label,icon});
+    CATS.push({id,label,icon});
+    fillCats(); renderCatsTable(); closeM("add-cat");
+    document.getElementById("new-cat-label").value="";
+    pickedEmoji=""; document.getElementById("picked-emoji").textContent="❓";
+    document.getElementById("new-cat-icon").value="";
+    toast("✅ تم إضافة التصنيف");
+  } catch(e) { toast("❌ فشل: "+e.message,true); }
+}
+
+window.delCat = async function delCat(id) {
+  if(!confirm("حذف هذا التصنيف؟")) return;
+  try {
+    await supa("custom_categories?id=eq."+id,"DELETE");
+    CATS = CATS.filter(c=>c.id!==id);
+    fillCats(); renderCatsTable();
+    toast("تم حذف التصنيف");
+  } catch(e) { toast("❌ فشل: "+e.message,true); }
+}
+
+// ── Promoted ──────────────────────────────
+window.renderPromo = function renderPromo() {
+  const list = DB.filter(b=>b.promoted);
+  document.getElementById("promo-list").innerHTML = list.length===0
+    ? `<div style="text-align:center;padding:40px;color:var(--mu)">لا توجد إعلانات مميزة<br><small>فعّل الإعلان عند إضافة أو تعديل مشروع</small></div>`
+    : list.map(b=>`<div style="background:linear-gradient(135deg,#1f1005,#140a02);border:1px solid #7a3010;border-radius:12px;padding:16px;margin-bottom:11px;display:flex;align-items:center;gap:13px;flex-wrap:wrap">
+      <div class="r-logo" style="width:48px;height:48px;font-size:22px">${b.logoData?`<img src="${b.logoData}">`:getCat(b.category).icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:800;color:var(--orl);margin-bottom:3px">${b.name}</div>
+        <div style="font-size:12px;color:var(--mu)">${b.adText||"لا يوجد نص إعلاني"}</div>
+      </div>
+      <div style="display:flex;gap:7px">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="openEdit(${b.id})">✏️</button>
+        <button type="button" class="btn btn-red btn-sm" onclick="removePromo(${b.id})">إلغاء التمييز</button>
+      </div>
+    </div>`).join("");
+}
+
+// ── Add / Save ────────────────────────────
+window.saveBiz = async function saveBiz() {
+  const name = document.getElementById("f-name").value.trim();
+  const cat  = document.getElementById("f-cat").value;
+  const loc  = document.getElementById("f-loc").value.trim();
+  if(!name||!cat||!loc) { toast("⚠️ الاسم والتصنيف والموقع مطلوبة",true); return; }
+  // Validate URLs
+  const urlFields = ["f-ig","f-tw","f-sc","f-tt","f-web","f-maps"];
+  for(const fid of urlFields) {
+    const v = document.getElementById(fid).value.trim();
+    if(v && !isUrl(v)) { toast("⚠️ الرابط في حقل التواصل الاجتماعي غير صحيح",true); document.getElementById(fid).classList.add("err"); return; }
+  }
+  const biz = {
+    id:Date.now(), name, category:cat,
+    phone:document.getElementById("f-phone").value.trim(),
+    whatsapp:document.getElementById("f-wa").value.trim(),
+    location:loc, mapsUrl:document.getElementById("f-maps").value.trim(),
+    description:document.getElementById("f-desc").value.trim(),
+    tags:document.getElementById("f-tags").value.split(",").map(t=>t.trim()).filter(Boolean),
+    website:document.getElementById("f-web").value.trim(),
+    instagram:document.getElementById("f-ig").value.trim(),
+    twitter:document.getElementById("f-tw").value.trim(),
+    snapchat:document.getElementById("f-sc").value.trim(),
+    tiktok:document.getElementById("f-tt").value.trim(),
+    promoted:document.getElementById("f-promo").checked,
+    badge:document.getElementById("f-badge").value.trim(),
+    adText:document.getElementById("f-adtext").value.trim(),
+    adGrad:document.getElementById("f-adgrad").value.trim(),
+    logoData, imgData, hidden:false,
+  };
+  toast("⏳ جاري الحفظ...");
+  try {
+    const newId = await saveToSupabase(biz);
+    if(newId) biz.id=newId;
+    DB.unshift(biz);
+    updateAll();
+    toast("✅ تم الحفظ — يظهر على الدليل فوراً");
+    resetForm();
+    go("businesses",document.querySelectorAll(".sb-btn")[1]);
+  } catch(e) { toast("❌ فشل: "+e.message,true); }
+}
+
+// ── Edit ──────────────────────────────────
+window.openEdit = function openEdit(id) {
+  const b = DB.find(x=>x.id===id); if(!b) return;
+  editId = id;
+  const opts = CATS.map(c=>'<option value="'+c.id+'"'+(c.id===b.category?' selected':'')+'>'+c.icon+' '+c.label+'</option>').join("");
+  const GRADS = [
+    ["أخضر داكن","linear-gradient(135deg,#1a3a2a,#2d6a4a)"],
+    ["أزرق داكن","linear-gradient(135deg,#1a1a3a,#2d3a8a)"],
+    ["أحمر داكن","linear-gradient(135deg,#3a1a1a,#8a3a2d)"],
+    ["بنفسجي","linear-gradient(135deg,#2a1a3a,#6a2d8a)"],
+    ["برتقالي","linear-gradient(135deg,#1f1005,#4a2a05)"],
+    ["رمادي","linear-gradient(135deg,#1a1a1a,#3a3a3a)"],
+    ["بني ذهبي","linear-gradient(135deg,#2a1a05,#5a3a10)"],
+  ];
+  const gradBtnsEdit = GRADS.map(([n,g])=>'<button type="button" onclick="setGE(\''+g+'\')" style="background:'+g+';color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">'+n+'</button>').join("");
+  document.getElementById("edit-body").innerHTML = `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
+    <div style="grid-column:1/-1"><label class="flabel">اسم المشروع *</label><input class="finput" id="e-name" value="${esc(b.name)}"></div>
+    <div><label class="flabel">التصنيف</label><select class="finput" id="e-cat"><option value="">—</option>${opts}</select></div>
+    <div><label class="flabel">الجوال</label><input class="finput" id="e-phone" value="${esc(b.phone)}" dir="ltr" type="tel"></div>
+    <div><label class="flabel">الواتساب</label><input class="finput" id="e-wa" value="${esc(b.whatsapp)}" dir="ltr" type="tel"></div>
+    <div><label class="flabel">الموقع / الحي *</label><input class="finput" id="e-loc" value="${esc(b.location)}"></div>
+    <div><label class="flabel">📍 Google Maps</label><input class="finput" id="e-maps" value="${esc(b.mapsUrl)}" dir="ltr"></div>
+    <div style="grid-column:1/-1"><label class="flabel">الوصف</label><textarea class="finput" id="e-desc" style="height:66px;resize:vertical">${esc(b.description)}</textarea></div>
+    <div style="grid-column:1/-1"><label class="flabel">الكلمات المفتاحية</label><input class="finput" id="e-tags" value="${esc((b.tags||[]).join("، "))}"></div>
+    <div style="grid-column:1/-1"><label class="flabel">🌐 الموقع الإلكتروني</label><input class="finput" id="e-web" value="${esc(b.website)}" dir="ltr"></div>
+    <div><label class="flabel">📸 Instagram</label><input class="finput" id="e-ig" value="${esc(b.instagram)}" dir="ltr" oninput="validateUrl(this)"><div class="hint">الرابط الكامل وليس اسم المستخدم</div></div>
+    <div><label class="flabel">𝕏 Twitter</label><input class="finput" id="e-tw" value="${esc(b.twitter)}" dir="ltr" oninput="validateUrl(this)"><div class="hint">الرابط الكامل وليس اسم المستخدم</div></div>
+    <div><label class="flabel">👻 Snapchat</label><input class="finput" id="e-sc" value="${esc(b.snapchat)}" dir="ltr" oninput="validateUrl(this)"><div class="hint">الرابط الكامل وليس اسم المستخدم</div></div>
+    <div><label class="flabel">🎵 TikTok</label><input class="finput" id="e-tt" value="${esc(b.tiktok)}" dir="ltr" oninput="validateUrl(this)"><div class="hint">الرابط الكامل وليس اسم المستخدم</div></div>
+    <div style="grid-column:1/-1;margin-top:6px">
+      <div class="promo-toggle"><input type="checkbox" id="e-promo"${b.promoted?" checked":""}><label for="e-promo" style="font-size:13px;cursor:pointer">⭐ إعلان مميز — ٥٠ ريال / شهر</label></div>
+    </div>
+    <div><label class="flabel">الشارة</label><input class="finput" id="e-badge" value="${esc(b.badge)}"></div>
+    <div><label class="flabel">نص البانر</label><input class="finput" id="e-adtext" value="${esc(b.adText)}"></div>
+    <div style="grid-column:1/-1">
+      <label class="flabel">لون البانر</label>
+      <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px">${gradBtnsEdit}</div>
+      <input class="finput" id="e-adgrad" value="${esc(b.adGrad)}" dir="ltr" readonly style="font-size:11px;color:var(--mu)">
+    </div>
+  </div>`;
+  openM("edit");
+}
+
+window.setGE = function setGE(g) { document.getElementById("e-adgrad").value=g; }
+
+window.saveEdit = async function saveEdit() {
+  const b = DB.find(x=>x.id===editId); if(!b) return;
+  b.name=document.getElementById("e-name").value.trim();
+  b.category=document.getElementById("e-cat").value;
+  b.phone=document.getElementById("e-phone").value.trim();
+  b.whatsapp=document.getElementById("e-wa").value.trim();
+  b.location=document.getElementById("e-loc").value.trim();
+  b.mapsUrl=document.getElementById("e-maps").value.trim();
+  b.description=document.getElementById("e-desc").value.trim();
+  b.tags=document.getElementById("e-tags").value.split(/[,،]/).map(t=>t.trim()).filter(Boolean);
+  b.website=document.getElementById("e-web").value.trim();
+  b.instagram=document.getElementById("e-ig").value.trim();
+  b.twitter=document.getElementById("e-tw").value.trim();
+  b.snapchat=document.getElementById("e-sc").value.trim();
+  b.tiktok=document.getElementById("e-tt").value.trim();
+  b.promoted=document.getElementById("e-promo").checked;
+  b.badge=document.getElementById("e-badge").value.trim();
+  b.adText=document.getElementById("e-adtext").value.trim();
+  b.adGrad=document.getElementById("e-adgrad").value.trim();
+  try {
+    await saveToSupabase(b);
+    updateAll();
+    closeM("edit");
+    toast("✅ تم الحفظ — يظهر فوراً على الدليل");
+  } catch(e) { toast("❌ فشل: "+e.message,true); }
+}
+
+// ── Actions ───────────────────────────────
+window.toggleHide = async function toggleHide(id) {
+  const b=DB.find(x=>x.id===id); if(!b)return;
+  b.hidden=!b.hidden;
+  try { await supa("businesses?id=eq."+id,"PATCH",{hidden:b.hidden}); updateAll(); toast(b.hidden?"🙈 مخفي":"👁️ ظاهر"); }
+  catch(e) { b.hidden=!b.hidden; toast("❌ فشل",true); }
+}
+window.removePromo = function removePromo(id) {
+  const b=DB.find(x=>x.id===id); if(!b)return;
+  b.promoted=false; b.badge=""; b.adText=""; b.adGrad="";
+  saveToSupabase(b).then(()=>{ updateAll(); toast("تم إلغاء التمييز"); }).catch(e=>toast("❌ "+e.message,true));
+}
+window.askDel = function askDel(id) {
+  const b=DB.find(x=>x.id===id); if(!b)return;
+  document.getElementById("conf-title").textContent="حذف: "+b.name;
+  document.getElementById("conf-sub").textContent="سيُحذف نهائياً من قاعدة البيانات.";
+  document.getElementById("conf-ok").onclick=async()=>{
+    try { await supa("businesses?id=eq."+id,"DELETE"); DB=DB.filter(x=>x.id!==id); updateAll(); closeM("confirm"); toast("🗑️ تم الحذف"); }
+    catch(e) { toast("❌ "+e.message,true); closeM("confirm"); }
+  };
+  openM("confirm");
+}
+
+// ── Form helpers ──────────────────────────
+window.resetForm = function resetForm() {
+  ["f-name","f-phone","f-wa","f-loc","f-maps","f-desc","f-tags","f-web","f-ig","f-tw","f-sc","f-tt","f-badge","f-adtext","f-adgrad"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";el.classList.remove("err");}});
+  document.getElementById("f-cat").value="";
+  document.getElementById("f-promo").checked=false;
+  document.getElementById("promo-details").style.display="none";
+  clearLogo(); clearImg(); logoData=null; imgData=null;
+}
+window.togglePromo = function togglePromo() { document.getElementById("promo-details").style.display=document.getElementById("f-promo").checked?"grid":"none"; }
+window.setG = function setG(g) { document.getElementById("f-adgrad").value=g; }
+window.pickLogo = function pickLogo(inp) {
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{ logoData=ev.target.result; document.getElementById("logo-box").innerHTML=`<img src="${logoData}" style="width:100%;height:100%;object-fit:cover">`; };
+  r.readAsDataURL(f);
+}
+window.clearLogo = function clearLogo() { logoData=null; document.getElementById("logo-box").innerHTML=`<div id="logo-ph" style="text-align:center"><div style="font-size:20px">🏷️</div><div style="font-size:9px;color:var(--or);font-weight:700;margin-top:2px">ارفع الشعار</div></div>`; }
+window.pickImg = function pickImg(inp) {
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{ imgData=ev.target.result; document.getElementById("img-box").innerHTML=`<img src="${ev.target.result}" style="max-width:100%;max-height:120px;border-radius:7px;object-fit:cover">`; };
+  r.readAsDataURL(f);
+}
+window.clearImg = function clearImg() { imgData=null; document.getElementById("img-box").innerHTML=`<div id="img-ph"><div style="font-size:22px;margin-bottom:3px">📷</div><div style="font-size:13px;font-weight:600">اضغط لرفع صورة</div></div>`; }
+
+// ── Export ────────────────────────────────
+window.exportJSON = function exportJSON() {
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,2)],{type:"application/json"}));
+  a.download="daleel-safwa-backup.json"; a.click();
+  toast("✅ تم تصدير النسخة الاحتياطية");
+}
+
+// ── Helpers ───────────────────────────────
+window.openM = function openM(id) { document.getElementById("modal-"+id).classList.add("open"); }
+window.closeM = function closeM(id) { document.getElementById("modal-"+id).classList.remove("open"); }
+window.toast = function toast(msg,err=false) {
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.className="toast "+(err?"err":"ok")+" show";
+  setTimeout(()=>el.className="toast",3200);
+}
+
+// ── Start ─────────────────────────────────
+loadAll();
+
+}); // end DOMContentLoaded
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--s:#111;--card:#161616;--card2:#1c1c1c;--b:#222;--b2:#2a2a2a;
+  --or:#f26522;--orl:#ff8c42;--ord:#c84d0a;
+  --tx:#f0f0f0;--mu:#777;--gr:#4caf50;--re:#e05c5c;--bl:#4a90d9;
+}
+body{background:var(--bg);color:var(--tx);font-family:"Segoe UI",Tahoma,sans-serif;min-height:100vh;direction:rtl}
+button,select,input,textarea{font-family:inherit}
+a{color:inherit;text-decoration:none}
+#lock{position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;align-items:center;justify-content:center}
+.lock-box{background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:40px 36px;width:100%;max-width:360px;text-align:center}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 64px)}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+.topbar{background:linear-gradient(135deg,#111,#1a0d04);border-bottom:2px solid var(--or);display:flex;align-items:center;justify-content:space-between;padding:13px 22px;gap:12px;flex-wrap:wrap}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-wrap img{width:40px;height:40px;object-fit:contain;mix-blend-mode:screen}
+.logo-title{font-size:17px;font-weight:900;color:var(--or)}
+.logo-sub{font-size:11px;color:var(--mu)}
+.admin-badge{background:var(--or);color:#fff;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px}
+.sidebar{background:var(--s);border-left:1px solid var(--b);padding:14px 0;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+@media(max-width:768px){.sidebar{display:none}}
+.sb-sec{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:1.5px;padding:10px 16px 4px;text-transform:uppercase}
+.sb-btn{background:none;border:none;color:var(--mu);border-radius:8px;padding:9px 13px;text-align:right;font-size:13px;display:flex;align-items:center;gap:8px;width:calc(100% - 12px);margin:0 6px;cursor:pointer}
+.sb-btn:hover{background:var(--card);color:var(--tx)}
+.sb-btn.active{background:var(--or);color:#fff;font-weight:700}
+.sb-count{background:rgba(255,255,255,.22);border-radius:20px;padding:1px 7px;font-size:11px;margin-right:auto}
+.sb-div{border:none;border-top:1px solid var(--b);margin:5px 8px}
+.main{padding:22px;overflow-y:auto;min-width:0}
+.page{display:none}.page.active{display:block}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.ph-title{font-size:18px;font-weight:800}
+.ph-sub{font-size:12px;color:var(--mu);margin-top:3px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:13px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:16px}
+.stat-n{font-size:26px;font-weight:900;color:var(--or)}
+.stat-l{font-size:12px;color:var(--mu);margin-top:4px}
+.btn{border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-or{background:linear-gradient(135deg,var(--or),var(--orl));color:#fff}
+.btn-ghost{background:var(--card2);border:1px solid var(--b2);color:var(--mu)}
+.btn-ghost:hover{color:var(--tx)}
+.btn-red{background:#2a1010;border:1px solid #5a2020;color:var(--re)}
+.btn-green{background:#0a2a0a;border:1px solid #2a5a2a;color:var(--gr)}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:6px}
+.btn-export{background:linear-gradient(135deg,#1a3a10,#2a6a20);color:#fff;border:none;border-radius:8px;padding:9px 17px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.tbl-wrap{background:var(--card);border:1px solid var(--b);border-radius:12px;overflow:hidden}
+.tbl-bar{padding:11px 13px;border-bottom:1px solid var(--b);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tbl-bar input{flex:1;min-width:150px;background:var(--card2);border:1px solid var(--b2);border-radius:8px;padding:7px 10px;color:var(--tx);font-size:13px;outline:none;direction:rtl}
+.tbl-bar select{background:var(--card2);border:1px solid var(--b2);border-radius:8px;padding:7px 9px;color:var(--tx);font-size:12px;outline:none}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:right;padding:9px 12px;color:var(--mu);font-weight:600;font-size:11px;border-bottom:1px solid var(--b);background:var(--card2)}
+td{padding:10px 12px;border-bottom:1px solid var(--b);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(242,101,34,.04)}
+.td-actions{display:flex;gap:5px;justify-content:flex-end}
+.badge-promo{background:linear-gradient(135deg,var(--ord),var(--or));color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px}
+.badge-active{background:#0a2a0a;color:var(--gr);border:1px solid #2a5a2a;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.badge-hidden{background:#1a1a1a;color:var(--mu);border:1px solid var(--b);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.badge-pending{background:#1a1505;color:#f0a000;border:1px solid #5a4000;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.panel{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:20px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+@media(max-width:600px){.fg{grid-template-columns:1fr}}
+.fs{font-size:11px;font-weight:700;color:var(--or);padding-bottom:7px;border-bottom:1px solid var(--b);margin-bottom:12px;margin-top:6px;grid-column:1/-1;text-transform:uppercase;letter-spacing:.5px}
+.fl{grid-column:1/-1}
+.flabel{display:block;font-size:12px;color:var(--mu);margin-bottom:4px;font-weight:600}
+.req{color:var(--or)}
+.hint{font-size:11px;color:var(--mu);margin-top:-8px;margin-bottom:10px}
+.hint.warn{color:#f0a000}
+.finput{width:100%;background:var(--card2);border:1px solid var(--b2);border-radius:8px;padding:9px 11px;color:var(--tx);font-size:13px;outline:none;margin-bottom:12px}
+.finput:focus{border-color:var(--or)}
+.finput.err{border-color:var(--re)}
+.logo-row{display:flex;gap:13px;align-items:flex-start;grid-column:1/-1;margin-bottom:4px}
+.logo-box{width:76px;height:76px;border-radius:10px;border:2px dashed var(--or);background:var(--card2);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0}
+.logo-box img{width:100%;height:100%;object-fit:cover}
+.promo-toggle{background:#1f1005;border:1px solid #7a3010;border-radius:9px;padding:12px;display:flex;align-items:center;gap:9px;grid-column:1/-1}
+.promo-det{grid-column:1/-1;background:#1a1005;border:1px solid #5a2005;border-radius:8px;padding:13px;display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.grad-opts{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;grid-column:1/-1}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;align-items:center;justify-content:center;padding:14px}
+.overlay.open{display:flex}
+.modal{background:var(--s);border:1px solid var(--b);border-radius:14px;width:100%;max-width:600px;max-height:90vh;display:flex;flex-direction:column}
+.mh{padding:15px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
+.mh-title{font-size:15px;font-weight:800}
+.mc{overflow-y:auto;padding:20px}
+.mf{padding:13px 20px;border-top:1px solid var(--b);display:flex;gap:9px;justify-content:flex-end}
+.confirm-box{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:28px;text-align:center;max-width:340px;width:100%}
+.toast{position:fixed;bottom:22px;right:22px;background:#1a1a1a;border:1px solid var(--b);border-radius:10px;padding:11px 17px;font-size:13px;z-index:300;display:flex;align-items:center;gap:7px;transform:translateY(70px);opacity:0;transition:.3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:#2a5a2a;color:var(--gr)}
+.toast.err{border-color:#5a2020;color:var(--re)}
+.r-item{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--b)}
+.r-item:last-child{border-bottom:none}
+.r-logo{width:34px;height:34px;border-radius:7px;background:#252525;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;font-size:16px}
+.r-logo img{width:100%;height:100%;object-fit:cover}
+.req-card{background:var(--card);border:1px solid var(--b);border-radius:11px;padding:16px;margin-bottom:12px}
+.req-pending{border-color:#5a4000;background:#1a1505}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0}
+</style>
+</head>
+<body>
+
+<div id="lock">
+  <div class="lock-box">
+    <div style="font-size:40px;margin-bottom:13px">🔐</div>
+    <div style="font-size:19px;font-weight:900;color:var(--or);margin-bottom:5px">دليل صفوى</div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:24px">لوحة التحكم — للمسؤول فقط</div>
+    <input id="pw" type="password" placeholder="كلمة المرور"
+      style="width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;padding:11px;color:#f0f0f0;font-size:14px;outline:none;text-align:center;margin-bottom:10px;direction:rtl"
+      onkeydown="if(event.key==='Enter')tryLogin()">
+    <button onclick="tryLogin()" style="width:100%;background:linear-gradient(135deg,#f26522,#ff8c42);color:#fff;border:none;border-radius:9px;padding:12px;font-weight:700;font-size:14px;cursor:pointer">دخول</button>
+    <div id="pw-err" style="display:none;color:#e05c5c;font-size:12px;margin-top:8px">⚠️ كلمة المرور غير صحيحة</div>
+    <div style="font-size:10px;color:#333;margin-top:16px">غيّر كلمة المرور من ADMIN_PASSWORD في الكود</div>
+  </div>
+</div>
+
+<div class="topbar">
+  <div class="logo-wrap">
+    <img src="data:image/png;base64,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" alt="دليل صفوى">
+    <div><div class="logo-title">دليل صفوى</div><div class="logo-sub">لوحة التحكم</div></div>
+    <span class="admin-badge">ADMIN</span>
+  </div>
+  <div style="display:flex;gap:9px;flex-wrap:wrap">
+    <a href="directory.html" target="_blank" class="btn btn-ghost">👁️ معاينة</a>
+  </div>
+</div>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sb-sec">الرئيسية</div>
+  <button class="sb-btn active" data-go="dashboard">📊 لوحة المعلومات</button>
+  <button class="sb-btn" data-go="businesses">🏪 المشاريع <span class="sb-count" id="sb-total">0</span></button>
+  <button class="sb-btn" data-go="add">➕ إضافة مشروع</button>
+  <button class="sb-btn" data-go="requests">📥 الطلبات <span class="sb-count" id="sb-req">0</span></button>
+  <hr class="sb-div">
+  <div class="sb-sec">الإعلانات</div>
+  <button class="sb-btn" data-go="promoted">⭐ المميزة <span class="sb-count" id="sb-promo">0</span></button>
+  <hr class="sb-div">
+  <div class="sb-sec">الإعدادات</div>
+  <button class="sb-btn" data-go="categories">🗂️ التصنيفات</button>
+  <button class="sb-btn" data-go="export">📤 تصدير</button>
+</aside>
+
+<main class="main">
+
+<!-- Dashboard -->
+<div class="page active" id="page-dashboard">
+  <div class="ph"><div><div class="ph-title">لوحة المعلومات</div><div class="ph-sub">نظرة عامة على دليل صفوى</div></div></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="st-total">0</div><div class="stat-l">إجمالي المشاريع</div></div>
+    <div class="stat"><div class="stat-n" id="st-active" style="color:var(--gr)">0</div><div class="stat-l">مشروع نشط</div></div>
+    <div class="stat"><div class="stat-n" id="st-promo">0</div><div class="stat-l">إعلان مميز</div></div>
+    <div class="stat"><div class="stat-n" id="st-req" style="color:#f0a000">0</div><div class="stat-l">طلب معلّق</div></div>
+  </div>
+  <div class="panel" style="margin-bottom:18px"><div style="font-size:14px;font-weight:700;margin-bottom:12px">آخر المشاريع</div><div id="recent-list"></div></div>
+  <div class="panel" style="background:linear-gradient(135deg,#1f1005,#140a02);border-color:#7a3010">
+    <div style="font-size:13px;font-weight:700;color:var(--orl);margin-bottom:7px">💡 كيفية الاستخدام</div>
+    <div style="font-size:13px;color:var(--mu);line-height:1.9">١. أضف المشاريع من «إضافة مشروع»<br>٢. راجع طلبات التجار من «الطلبات»<br>٣. فعّل الإعلانات من «المميزة»<br>٤. أي تغيير يظهر فوراً على الدليل</div>
+  </div>
+</div>
+
+<!-- Businesses -->
+<div class="page" id="page-businesses">
+  <div class="ph">
+    <div><div class="ph-title">المشاريع</div><div class="ph-sub" id="biz-label"></div></div>
+    <button class="btn btn-or" data-go="add">➕ إضافة</button>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-bar">
+      <input id="tbl-q" placeholder="ابحث..." oninput="renderTbl()">
+      <select id="tbl-cat" onchange="renderTbl()"><option value="">كل التصنيفات</option></select>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>المشروع</th><th>التصنيف</th><th>الجوال</th><th>الموقع</th><th>الحالة</th><th style="text-align:left">إجراءات</th></tr></thead>
+      <tbody id="tbl-body"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- Add -->
+<div class="page" id="page-add">
+  <div class="ph"><div><div class="ph-title" id="add-title">إضافة مشروع جديد</div><div class="ph-sub">أضف مشروعاً وسيظهر فوراً على الدليل</div></div></div>
+  <div class="panel"><div class="fg">
+
+    <div class="fs">الشعار (اختياري)</div>
+    <div class="logo-row">
+      <div class="logo-box" id="logo-box" onclick="document.getElementById('logo-file').click()">
+        <div id="logo-ph" style="text-align:center"><div style="font-size:20px">🏷️</div><div style="font-size:9px;color:var(--or);font-weight:700;margin-top:2px">ارفع الشعار</div></div>
+      </div>
+      <input type="file" id="logo-file" accept="image/*" style="display:none" onchange="pickLogo(this)">
+      <div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">شعار المتجر</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:6px">صورة مربعة، خلفية شفافة أو بيضاء</div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('logo-file').click()">اختر صورة</button>
+        <button type="button" class="btn btn-red btn-sm" style="margin-right:5px" onclick="clearLogo()">✕ إزالة</button>
+      </div>
+    </div>
+
+    <div class="fs">المعلومات الأساسية</div>
+    <div>
+      <label class="flabel">اسم المشروع <span class="req">*</span></label>
+      <input class="finput" id="f-name" placeholder="مطعم الأصيل...">
+    </div>
+    <div>
+      <label class="flabel">التصنيف <span class="req">*</span></label>
+      <select class="finput" id="f-cat"><option value="">اختر التصنيف</option></select>
+    </div>
+    <div>
+      <label class="flabel">رقم الجوال</label>
+      <input class="finput" id="f-phone" placeholder="05xxxxxxxx" type="tel" dir="ltr">
+    </div>
+    <div>
+      <label class="flabel">رقم الواتساب</label>
+      <input class="finput" id="f-wa" placeholder="05xxxxxxxx" type="tel" dir="ltr">
+    </div>
+    <div class="fl">
+      <label class="flabel">الموقع / الحي <span class="req">*</span></label>
+      <input class="finput" id="f-loc" placeholder="حي النخيل، الشارع الرئيسي...">
+      <div class="hint warn">⚠️ يجب أن يكون المشروع داخل مدينة صفوى</div>
+    </div>
+    <div class="fl">
+      <label class="flabel">📍 رابط Google Maps</label>
+      <input class="finput" id="f-maps" placeholder="https://maps.app.goo.gl/..." dir="ltr">
+    </div>
+    <div class="fl">
+      <label class="flabel">وصف المشروع</label>
+      <textarea class="finput" id="f-desc" style="height:76px;resize:vertical" placeholder="نبذة عن ما يقدمه المشروع..."></textarea>
+    </div>
+    <div class="fl">
+      <label class="flabel">الكلمات المفتاحية (افصل بفاصلة)</label>
+      <input class="finput" id="f-tags" placeholder="مشويات، أكلات شعبية، توصيل...">
+    </div>
+
+    <div class="fs">التواصل الاجتماعي والموقع</div>
+    <div class="fl">
+      <label class="flabel">🌐 الموقع الإلكتروني</label>
+      <input class="finput" id="f-web" placeholder="https://www.example.com" dir="ltr">
+    </div>
+    <div>
+      <label class="flabel">📸 Instagram</label>
+      <input class="finput" id="f-ig" placeholder="https://instagram.com/..." dir="ltr" oninput="validateUrl(this)">
+      <div class="hint">أدخل الرابط الكامل وليس اسم المستخدم</div>
+    </div>
+    <div>
+      <label class="flabel">𝕏 Twitter / X</label>
+      <input class="finput" id="f-tw" placeholder="https://x.com/..." dir="ltr" oninput="validateUrl(this)">
+      <div class="hint">أدخل الرابط الكامل وليس اسم المستخدم</div>
+    </div>
+    <div>
+      <label class="flabel">👻 Snapchat</label>
+      <input class="finput" id="f-sc" placeholder="https://snapchat.com/add/..." dir="ltr" oninput="validateUrl(this)">
+      <div class="hint">أدخل الرابط الكامل وليس اسم المستخدم</div>
+    </div>
+    <div>
+      <label class="flabel">🎵 TikTok</label>
+      <input class="finput" id="f-tt" placeholder="https://tiktok.com/@..." dir="ltr" oninput="validateUrl(this)">
+      <div class="hint">أدخل الرابط الكامل وليس اسم المستخدم</div>
+    </div>
+
+    <div class="fs">صورة المنتجات / القائمة</div>
+    <div class="fl">
+      <div style="border:2px dashed var(--b2);border-radius:9px;padding:16px;text-align:center;cursor:pointer;background:var(--card2);min-height:72px;display:flex;align-items:center;justify-content:center"
+           id="img-box" onclick="document.getElementById('img-file').click()">
+        <div id="img-ph"><div style="font-size:22px;margin-bottom:3px">📷</div><div style="font-size:13px;font-weight:600">اضغط لرفع صورة</div></div>
+      </div>
+      <input type="file" id="img-file" accept="image/*" style="display:none" onchange="pickImg(this)">
+      <button type="button" class="btn btn-red btn-sm" style="margin-top:6px" onclick="clearImg()">✕ إزالة</button>
+    </div>
+
+    <div class="fs">الإعلان المميز</div>
+    <div class="promo-toggle">
+      <input type="checkbox" id="f-promo" onchange="togglePromo()">
+      <label for="f-promo" style="font-size:13px;cursor:pointer">⭐ تفعيل الإعلان المميز — <strong>٥٠ ريال / شهر</strong></label>
+    </div>
+    <div class="promo-det" id="promo-details" style="display:none">
+      <div>
+        <label class="flabel">الشارة</label>
+        <input class="finput" id="f-badge" placeholder="الأكثر تقييماً...">
+      </div>
+      <div>
+        <label class="flabel">نص البانر</label>
+        <input class="finput" id="f-adtext" placeholder="🔥 عرض خاص — تواصل الآن!">
+      </div>
+      <div class="fl">
+        <label class="flabel">لون البانر</label>
+        <div class="grad-opts"><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a3a2a,#2d6a4a)')" style="background:linear-gradient(135deg,#1a3a2a,#2d6a4a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أخضر داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a1a3a,#2d3a8a)')" style="background:linear-gradient(135deg,#1a1a3a,#2d3a8a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أزرق داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#3a1a1a,#8a3a2d)')" style="background:linear-gradient(135deg,#3a1a1a,#8a3a2d);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أحمر داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#2a1a3a,#6a2d8a)')" style="background:linear-gradient(135deg,#2a1a3a,#6a2d8a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">بنفسجي</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1f1005,#4a2a05)')" style="background:linear-gradient(135deg,#1f1005,#4a2a05);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">برتقالي داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a1a1a,#3a3a3a)')" style="background:linear-gradient(135deg,#1a1a1a,#3a3a3a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">رمادي</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#2a1a05,#5a3a10)')" style="background:linear-gradient(135deg,#2a1a05,#5a3a10);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">بني ذهبي</button></div>
+        <input class="finput" id="f-adgrad" placeholder="سيظهر هنا بعد اختيار اللون" dir="ltr" readonly style="font-size:11px;color:var(--mu)">
+      </div>
+    </div>
+
+    <div class="fl" style="display:flex;gap:9px;margin-top:6px">
+      <button type="button" class="btn btn-or" onclick="saveBiz()" style="flex:1;justify-content:center;padding:12px">💾 حفظ المشروع</button>
+      <button type="button" class="btn btn-ghost" onclick="resetForm()" style="padding:12px 18px">إلغاء</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- Requests -->
+<div class="page" id="page-requests">
+  <div class="ph"><div><div class="ph-title">طلبات الإضافة</div><div class="ph-sub">طلبات التجار — راجع وافق أو ارفض</div></div></div>
+  <div id="req-list"><div style="text-align:center;padding:40px;color:var(--mu)">جاري التحميل...</div></div>
+</div>
+
+<!-- Promoted -->
+<div class="page" id="page-promoted">
+  <div class="ph"><div><div class="ph-title">الإعلانات المميزة</div><div class="ph-sub">تظهر في البانر الدوار أعلى الدليل</div></div></div>
+  <div id="promo-list"></div>
+</div>
+
+<!-- Categories -->
+<div class="page" id="page-categories">
+  <div class="ph">
+    <div><div class="ph-title">التصنيفات</div><div class="ph-sub">أضف تصنيفات جديدة للدليل</div></div>
+    <button class="btn btn-or" onclick="openM('add-cat')">➕ تصنيف جديد</button>
+  </div>
+  <div class="tbl-wrap"><div style="overflow-x:auto"><table>
+    <thead><tr><th>الأيقونة</th><th>الاسم</th><th>النوع</th><th style="text-align:left">إجراءات</th></tr></thead>
+    <tbody id="cats-table"></tbody>
+  </table></div></div>
+</div>
+
+<!-- Export -->
+<div class="page" id="page-export">
+  <div class="ph"><div><div class="ph-title">تصدير</div><div class="ph-sub">نسخة احتياطية من البيانات</div></div></div>
+  <div class="panel" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:13px">
+    <div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:3px">💾 نسخة احتياطية JSON</div>
+      <div style="font-size:12px;color:var(--mu)">لاستيرادها لاحقاً</div>
+    </div>
+    <button class="btn btn-green" onclick="exportJSON()">تصدير JSON</button>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- Edit Modal -->
+<div class="overlay" id="modal-edit" onclick="if(event.target===this)closeM('edit')">
+  <div class="modal">
+    <div class="mh"><div class="mh-title">تعديل مشروع</div><button type="button" style="background:none;border:none;color:var(--mu);font-size:17px;cursor:pointer" onclick="closeM('edit')">✕</button></div>
+    <div class="mc" id="edit-body"></div>
+    <div class="mf">
+      <button type="button" class="btn btn-or" onclick="saveEdit()">💾 حفظ</button>
+      <button type="button" class="btn btn-ghost" onclick="closeM('edit')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Request Detail Modal -->
+<div class="overlay" id="modal-req" onclick="if(event.target===this)closeM('req')">
+  <div class="modal">
+    <div class="mh"><div class="mh-title">تفاصيل الطلب</div><button type="button" style="background:none;border:none;color:var(--mu);font-size:17px;cursor:pointer" onclick="closeM('req')">✕</button></div>
+    <div class="mc" id="req-detail-body"></div>
+    <div class="mf" id="req-detail-footer"></div>
+  </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="overlay" id="modal-add-cat" onclick="if(event.target===this)closeM('add-cat')">
+  <div class="modal" style="max-width:460px">
+    <div class="mh"><div class="mh-title">إضافة تصنيف جديد</div><button type="button" style="background:none;border:none;color:var(--mu);font-size:17px;cursor:pointer" onclick="closeM('add-cat')">✕</button></div>
+    <div class="mc">
+      <label class="flabel">اسم التصنيف <span class="req">*</span></label>
+      <input class="finput" id="new-cat-label" placeholder="مثال: مغاسل، محلات عطور...">
+      <label class="flabel" style="margin-top:4px">الأيقونة <span class="req">*</span></label>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div id="picked-emoji" style="font-size:32px;width:48px;height:48px;background:var(--card2);border:1px solid var(--b2);border-radius:8px;display:flex;align-items:center;justify-content:center">❓</div>
+        <div style="font-size:12px;color:var(--mu)">اختر أيقونة من الأسفل</div>
+      </div>
+      <div style="max-height:200px;overflow-y:auto;background:var(--card2);border-radius:9px;padding:10px">
+        <div class="emoji-grid"><button type="button" onclick="pickEmoji('🍽️')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🍽️</button><button type="button" onclick="pickEmoji('🛒')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🛒</button><button type="button" onclick="pickEmoji('🏪')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🏪</button><button type="button" onclick="pickEmoji('🏠')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🏠</button><button type="button" onclick="pickEmoji('🧺')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🧺</button><button type="button" onclick="pickEmoji('☕')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">☕</button><button type="button" onclick="pickEmoji('📚')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">📚</button><button type="button" onclick="pickEmoji('🖨️')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🖨️</button><button type="button" onclick="pickEmoji('📱')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">📱</button><button type="button" onclick="pickEmoji('🥜')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🥜</button><button type="button" onclick="pickEmoji('💒')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">💒</button><button type="button" onclick="pickEmoji('✂️')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">✂️</button><button type="button" onclick="pickEmoji('💄')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">💄</button><button type="button" onclick="pickEmoji('🔌')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🔌</button><button type="button" onclick="pickEmoji('👗')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">👗</button><button type="button" onclick="pickEmoji('💍')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">💍</button><button type="button" onclick="pickEmoji('🍰')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🍰</button><button type="button" onclick="pickEmoji('🏋️')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🏋️</button><button type="button" onclick="pickEmoji('💊')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">💊</button><button type="button" onclick="pickEmoji('🚗')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🚗</button><button type="button" onclick="pickEmoji('✈️')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">✈️</button><button type="button" onclick="pickEmoji('🎓')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🎓</button><button type="button" onclick="pickEmoji('💻')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">💻</button><button type="button" onclick="pickEmoji('🎮')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🎮</button><button type="button" onclick="pickEmoji('📸')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">📸</button><button type="button" onclick="pickEmoji('🎵')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🎵</button><button type="button" onclick="pickEmoji('🌿')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🌿</button><button type="button" onclick="pickEmoji('🍕')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🍕</button><button type="button" onclick="pickEmoji('🍔')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🍔</button><button type="button" onclick="pickEmoji('🥗')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🥗</button><button type="button" onclick="pickEmoji('🍜')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🍜</button><button type="button" onclick="pickEmoji('🍣')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🍣</button><button type="button" onclick="pickEmoji('🧁')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🧁</button><button type="button" onclick="pickEmoji('🍦')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🍦</button><button type="button" onclick="pickEmoji('☕')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">☕</button><button type="button" onclick="pickEmoji('🧃')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🧃</button><button type="button" onclick="pickEmoji('🏥')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🏥</button><button type="button" onclick="pickEmoji('💈')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">💈</button><button type="button" onclick="pickEmoji('🧴')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🧴</button><button type="button" onclick="pickEmoji('👠')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">👠</button><button type="button" onclick="pickEmoji('👒')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">👒</button><button type="button" onclick="pickEmoji('🎁')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🎁</button><button type="button" onclick="pickEmoji('🛠️')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🛠️</button><button type="button" onclick="pickEmoji('🔧')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🔧</button><button type="button" onclick="pickEmoji('🏗️')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🏗️</button><button type="button" onclick="pickEmoji('📦')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">📦</button><button type="button" onclick="pickEmoji('🌸')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🌸</button><button type="button" onclick="pickEmoji('🌙')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🌙</button><button type="button" onclick="pickEmoji('⭐')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">⭐</button><button type="button" onclick="pickEmoji('🔑')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🔑</button><button type="button" onclick="pickEmoji('💎')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">💎</button><button type="button" onclick="pickEmoji('🏆')" style="font-size:20px;background:none;border:1px solid #2a2a2a;border-radius:6px;padding:4px 8px;cursor:pointer">🏆</button></div>
+      </div>
+      <input type="hidden" id="new-cat-icon" value="">
+    </div>
+    <div class="mf">
+      <button type="button" class="btn btn-or" onclick="saveNewCat()">💾 إضافة التصنيف</button>
+      <button type="button" class="btn btn-ghost" onclick="closeM('add-cat')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="overlay" id="modal-confirm" onclick="if(event.target===this)closeM('confirm')">
+  <div class="confirm-box">
+    <div style="font-size:32px;margin-bottom:10px">⚠️</div>
+    <div style="font-size:15px;font-weight:700;margin-bottom:6px" id="conf-title">تأكيد</div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:17px" id="conf-sub">لا يمكن التراجع.</div>
+    <div style="display:flex;gap:9px;justify-content:center">
+      <button type="button" class="btn btn-red" id="conf-ok">تأكيد</button>
+      <button type="button" class="btn btn-ghost" onclick="closeM('confirm')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+// Event delegation — runs immediately when parsed
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-go]');
+  if (btn && typeof window.go === 'function') {
+    e.preventDefault();
+    window.go(btn.dataset.go, btn);
+  }
+});
+</script>
+</body>
+</html>
