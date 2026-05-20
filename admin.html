@@ -539,6 +539,8 @@ function mapFromDB(row) {
     hidden:      row.hidden,
   };
 }
+
+async function saveToSupabase(biz) {
   const {id, ...data} = biz;
   // map camelCase to snake_case for Supabase
   const row = {
