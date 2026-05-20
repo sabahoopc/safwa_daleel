@@ -446,6 +446,8 @@ window.setGE = function setGE(g) { document.getElementById("e-adgrad").value=g; 
 
 window.saveEdit = async function saveEdit() {
   const b = DB.find(x=>x.id===editId); if(!b) return;
+  const promoEl = document.getElementById("e-promo");
+  console.log("e-promo element:", promoEl, "checked:", promoEl?.checked, "editId:", editId);
   b.name=document.getElementById("e-name").value.trim();
   b.category=document.getElementById("e-cat").value;
   b.phone=document.getElementById("e-phone").value.trim();
@@ -459,7 +461,7 @@ window.saveEdit = async function saveEdit() {
   b.twitter=document.getElementById("e-tw").value.trim();
   b.snapchat=document.getElementById("e-sc").value.trim();
   b.tiktok=document.getElementById("e-tt").value.trim();
-  b.promoted=document.getElementById("e-promo").checked;
+  b.promoted = promoEl ? promoEl.checked : false;
   b.badge=document.getElementById("e-badge").value.trim();
   b.adText=document.getElementById("e-adtext").value.trim();
   b.adGrad=document.getElementById("e-adgrad").value.trim();
