@@ -109,13 +109,16 @@ window.saveToSupabase = async function saveToSupabase(biz) {
     promoted:data.promoted===true, badge:data.badge||null,
     ad_text:data.adText||null, ad_grad:data.adGrad||null, hidden:data.hidden||false,
   };
-  console.log("saveToSupabase row:", JSON.stringify({promoted:row.promoted, badge:row.badge, ad_text:row.ad_text, ad_grad:row.ad_grad}));
-  if (!Number.isInteger(id) || id > 1e12) {
+  console.log("saveToSupabase:", {id, type: typeof id, promoted: row.promoted, ad_text: row.ad_text, ad_grad: row.ad_grad});
+  const numId = Number(id);
+  if (isNaN(numId) || numId > 1e12) {
+    // جديد — insert
     const res = await supa("businesses","POST",row);
     return res&&res[0] ? res[0].id : null;
   } else {
-    await supa("businesses?id=eq."+id,"PATCH",row);
-    return id;
+    // موجود — update
+    await supa("businesses?id=eq."+numId,"PATCH",row);
+    return numId;
   }
 }
 
@@ -433,7 +436,7 @@ window.openEdit = function openEdit(id) {
     <div style="grid-column:1/-1">
       <label class="flabel">لون البانر</label>
       <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px">${gradBtnsEdit}</div>
-      <input class="finput" id="e-adgrad" value="${esc(b.adGrad)}" dir="ltr" readonly style="font-size:11px;color:var(--mu)">
+      <input class="finput" id="e-adgrad" value="${esc(b.adGrad)}" dir="ltr" style="font-size:11px;color:var(--mu)" placeholder="اختر لوناً من الأعلى">
     </div>
   </div>`;
   openM("edit");
@@ -820,7 +823,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
       <div class="fl">
         <label class="flabel">لون البانر</label>
         <div class="grad-opts"><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a3a2a,#2d6a4a)')" style="background:linear-gradient(135deg,#1a3a2a,#2d6a4a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أخضر داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a1a3a,#2d3a8a)')" style="background:linear-gradient(135deg,#1a1a3a,#2d3a8a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أزرق داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#3a1a1a,#8a3a2d)')" style="background:linear-gradient(135deg,#3a1a1a,#8a3a2d);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">أحمر داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#2a1a3a,#6a2d8a)')" style="background:linear-gradient(135deg,#2a1a3a,#6a2d8a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">بنفسجي</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1f1005,#4a2a05)')" style="background:linear-gradient(135deg,#1f1005,#4a2a05);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">برتقالي داكن</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#1a1a1a,#3a3a3a)')" style="background:linear-gradient(135deg,#1a1a1a,#3a3a3a);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">رمادي</button><button type="button" class="grad-opt" onclick="setG('linear-gradient(135deg,#2a1a05,#5a3a10)')" style="background:linear-gradient(135deg,#2a1a05,#5a3a10);color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">بني ذهبي</button></div>
-        <input class="finput" id="f-adgrad" placeholder="سيظهر هنا بعد اختيار اللون" dir="ltr" readonly style="font-size:11px;color:var(--mu)">
+        <input class="finput" id="f-adgrad" placeholder="سيظهر هنا بعد اختيار اللون — أو اكتب يدوياً" dir="ltr" style="font-size:11px">
       </div>
     </div>
 
