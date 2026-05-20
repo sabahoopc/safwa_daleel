@@ -25,7 +25,7 @@ function tryLogin(){
 }
 </script>
 <script defer>
-// Make all functions global so inline onclick works
+document.addEventListener("DOMContentLoaded", function() {
 
 const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
@@ -545,6 +545,7 @@ window.toast = function toast(msg,err=false) {
 // ── Start ─────────────────────────────────
 loadAll();
 
+}); // end DOMContentLoaded
 </script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
