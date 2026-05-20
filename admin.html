@@ -106,9 +106,10 @@ window.saveToSupabase = async function saveToSupabase(biz) {
     instagram:data.instagram||null, twitter:data.twitter||null,
     snapchat:data.snapchat||null, tiktok:data.tiktok||null,
     logo_data:data.logoData||null, img_data:data.imgData||null,
-    promoted:data.promoted||false, badge:data.badge||null,
+    promoted:data.promoted===true, badge:data.badge||null,
     ad_text:data.adText||null, ad_grad:data.adGrad||null, hidden:data.hidden||false,
   };
+  console.log("saveToSupabase row:", JSON.stringify({promoted:row.promoted, badge:row.badge, ad_text:row.ad_text, ad_grad:row.ad_grad}));
   if (!Number.isInteger(id) || id > 1e12) {
     const res = await supa("businesses","POST",row);
     return res&&res[0] ? res[0].id : null;
