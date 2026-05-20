@@ -132,6 +132,22 @@ window.updateSidebar = function updateSidebar() {
   document.getElementById("sb-promo").textContent = DB.filter(b=>b.promoted).length;
   const pending = REQUESTS.filter(r=>r.status==="pending").length;
   document.getElementById("sb-req").textContent = pending;
+  // Mobile badges
+  const mobTotal = document.getElementById("mob-total");
+  const mobReq   = document.getElementById("mob-req-badge");
+  const mobPromo = document.getElementById("mob-promo-count");
+  if(mobTotal) mobTotal.textContent = DB.length;
+  if(mobReq)  { mobReq.textContent = pending; mobReq.style.display = pending>0?"block":"none"; }
+  if(mobPromo) mobPromo.textContent = DB.filter(b=>b.promoted).length;
+}
+
+window.setMobActive = function setMobActive(btn) {
+  document.querySelectorAll(".mob-btn").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+}
+
+window.openMobMenu = function openMobMenu() {
+  openM("mob-menu");
 }
 
 window.updateDashboard = function updateDashboard() {
@@ -629,13 +645,24 @@ a{color:inherit;text-decoration:none}
 .logo-sub{font-size:11px;color:var(--mu)}
 .admin-badge{background:var(--or);color:#fff;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px}
 .sidebar{background:var(--s);border-left:1px solid var(--b);padding:14px 0;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
-@media(max-width:768px){.sidebar{display:none}}
+@media(max-width:768px){.sidebar{display:none}.layout{grid-template-columns:1fr}.main{padding:14px;padding-bottom:80px}}
 .sb-sec{font-size:10px;color:var(--mu);font-weight:700;letter-spacing:1.5px;padding:10px 16px 4px;text-transform:uppercase}
 .sb-btn{background:none;border:none;color:var(--mu);border-radius:8px;padding:9px 13px;text-align:right;font-size:13px;display:flex;align-items:center;gap:8px;width:calc(100% - 12px);margin:0 6px;cursor:pointer}
 .sb-btn:hover{background:var(--card);color:var(--tx)}
 .sb-btn.active{background:var(--or);color:#fff;font-weight:700}
 .sb-count{background:rgba(255,255,255,.22);border-radius:20px;padding:1px 7px;font-size:11px;margin-right:auto}
 .sb-div{border:none;border-top:1px solid var(--b);margin:5px 8px}
+
+/* ── Mobile Bottom Nav ── */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid var(--b);z-index:40;padding:6px 0 10px}
+.mob-nav-inner{display:flex;align-items:center;justify-content:space-around}
+.mob-btn{background:none;border:none;color:var(--mu);display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 6px;cursor:pointer;font-size:10px;min-width:52px;position:relative}
+.mob-btn.active{color:var(--or)}
+.mob-btn-icon{font-size:20px;line-height:1}
+.mob-badge{position:absolute;top:0;right:6px;background:var(--or);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:20px;min-width:16px;text-align:center}
+@media(max-width:768px){.mob-nav{display:block}}
+.mob-menu-item{background:none;border:none;color:var(--tx);font-size:14px;padding:11px 12px;text-align:right;width:100%;cursor:pointer;border-radius:9px;display:flex;align-items:center;gap:8px}
+.mob-menu-item:hover{background:var(--card)}
 .main{padding:22px;overflow-y:auto;min-width:0}
 .page{display:none}.page.active{display:block}
 .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
@@ -940,6 +967,41 @@ tr:hover td{background:rgba(242,101,34,.04)}
 </div>
 
 </main>
+</div>
+
+<!-- Mobile Bottom Nav -->
+<nav class="mob-nav">
+  <div class="mob-nav-inner">
+    <button class="mob-btn active" id="mob-dashboard" onclick="go('dashboard',document.querySelectorAll('.sb-btn')[0]);setMobActive(this)">
+      <span class="mob-btn-icon">📊</span>الرئيسية
+    </button>
+    <button class="mob-btn" id="mob-businesses" onclick="go('businesses',document.querySelectorAll('.sb-btn')[1]);setMobActive(this)">
+      <span class="mob-btn-icon">🏪</span>المشاريع
+      <span class="mob-badge" id="mob-total">0</span>
+    </button>
+    <button class="mob-btn" id="mob-add" onclick="go('add',document.querySelectorAll('.sb-btn')[2]);setMobActive(this)">
+      <span class="mob-btn-icon" style="background:var(--or);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:2px">➕</span>إضافة
+    </button>
+    <button class="mob-btn" id="mob-requests" onclick="go('requests',document.querySelectorAll('.sb-btn')[3]);setMobActive(this)">
+      <span class="mob-btn-icon">📥</span>الطلبات
+      <span class="mob-badge" id="mob-req-badge" style="display:none">0</span>
+    </button>
+    <button class="mob-btn" id="mob-more" onclick="openMobMenu()">
+      <span class="mob-btn-icon">⋯</span>المزيد
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile More Menu -->
+<div class="overlay" id="modal-mob-menu" onclick="if(event.target===this)closeM('mob-menu')">
+  <div style="position:fixed;bottom:70px;left:0;right:0;background:#111;border-top:1px solid var(--b);border-radius:18px 18px 0 0;padding:16px;display:flex;flex-direction:column;gap:6px">
+    <div style="font-size:11px;color:var(--mu);font-weight:700;letter-spacing:1px;padding:4px 8px 8px;border-bottom:1px solid var(--b);margin-bottom:4px">المزيد</div>
+    <button class="mob-menu-item" onclick="go('promoted',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">⭐ الإعلانات المميزة <span id="mob-promo-count" style="background:var(--or);color:#fff;font-size:10px;padding:1px 6px;border-radius:12px;margin-right:4px">0</span></button>
+    <button class="mob-menu-item" onclick="go('categories',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">🗂️ التصنيفات</button>
+    <button class="mob-menu-item" onclick="go('export',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">📤 تصدير</button>
+    <button class="mob-menu-item" onclick="window.open('directory.html','_blank');closeM('mob-menu')">👁️ معاينة الدليل</button>
+    <button class="mob-menu-item" onclick="closeM('mob-menu')" style="color:var(--mu);margin-top:4px;border-top:1px solid var(--b);padding-top:10px">إغلاق</button>
+  </div>
 </div>
 
 <!-- Edit Modal -->
