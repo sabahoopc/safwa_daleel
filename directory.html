@@ -213,7 +213,12 @@ function filter(){
   const q=document.getElementById("si").value.toLowerCase().trim();
   const list=ALL.filter(b=>{
     const mc=activeCat==="all"||b.category===activeCat;
-    const mq=!q||b.name.includes(q)||(b.description||"").includes(q)||(b.tags||[]).some(t=>t.includes(q))||(b.location||"").includes(q);
+    const mq=!q||
+      (b.name||"").toLowerCase().includes(q)||
+      (b.description||"").toLowerCase().includes(q)||
+      (b.location||"").toLowerCase().includes(q)||
+      (b.tags||[]).some(t=>(t||"").toLowerCase().includes(q))||
+      getCat(b.category).label.includes(q);
     return mc&&mq;
   });
   document.getElementById("rc").textContent=list.length+" مشروع";
