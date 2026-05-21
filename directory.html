@@ -341,9 +341,9 @@ function renderForm(){
   </div>
 
   <!-- حقل معروف — يظهر للجميع كاختياري -->
-  <label class="fl">رقم تسجيل معروف <span style="color:var(--muted);font-weight:400">(اختياري — للأسر المنتجة)</span></label>
+  <label class="fl" id="maaroof-label">رقم تسجيل معروف <span style="color:var(--muted);font-weight:400">(اختياري — للأسر المنتجة)</span></label>
   <input class="fi" id="rmaaroof" placeholder="رقم حسابك في منصة معروف" dir="ltr">
-  <div class="fh" style="margin-top:-8px;margin-bottom:10px">إذا كنت أسرة منتجة مسجّلة في <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a>، أدخل رقم التسجيل</div>
+  <div class="fh" id="maaroof-hint" style="margin-top:-8px;margin-bottom:10px">إذا كنت أسرة منتجة مسجّلة في <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a>، أدخل رقم التسجيل</div>
   <label class="fl">جوال المشروع (للعملاء)</label>
   <input class="fi" id="rph" placeholder="05xxxxxxxx" type="tel" dir="ltr">
   <label class="fl">رقم الواتساب</label>
@@ -396,10 +396,25 @@ function renderForm(){
 }
 
 function onCatChange(sel){
+  const val   = sel.value;
   const label = sel.options[sel.selectedIndex]?.text||"";
-  const isAds = label.includes("إعلان");
+  const isAds  = label.includes("إعلان");
+  const isHome = val==="homeprod";
+  // موثوق — للإعلانات فقط
   document.getElementById("mawthooq-wrap").style.display = isAds ? "block" : "none";
   if(!isAds) document.getElementById("rmawthooq").value="";
+  // معروف — إلزامي للأسر المنتجة، اختياري للباقي
+  const maroofLabel = document.getElementById("maaroof-label");
+  const maroofHint  = document.getElementById("maaroof-hint");
+  if(isHome){
+    maroofLabel.innerHTML = 'رقم تسجيل معروف <span style="color:var(--orange)">*</span>';
+    maroofHint.innerHTML  = '⚠️ مطلوب للأسر المنتجة — سجّل مشروعك على <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">maaroof.com</a> إذا لم تكن مسجّلاً';
+    maroofHint.style.color = "#f0a000";
+  } else {
+    maroofLabel.innerHTML = 'رقم تسجيل معروف <span style="color:var(--muted);font-weight:400">(اختياري — للأسر المنتجة)</span>';
+    maroofHint.innerHTML  = 'إذا كنت أسرة منتجة مسجّلة في <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a>، أدخل رقم التسجيل';
+    maroofHint.style.color = "";
+  }
 }
 
 function chkUrl(inp){
@@ -441,6 +456,15 @@ async function submitReq(){
     errEl.style.display="block";
     errEl.textContent="⚠️ رقم رخصة موثوق مطلوب للمشاريع الإعلانية";
     document.getElementById("rmawthooq").focus();
+    return;
+  }
+  // التحقق من رقم معروف للأسر المنتجة
+  const isHome = document.getElementById("rcat").value==="homeprod";
+  const maaroof = document.getElementById("rmaaroof").value.trim();
+  if(isHome && !maaroof){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ رقم تسجيل معروف مطلوب للأسر المنتجة";
+    document.getElementById("rmaaroof").focus();
     return;
   }
   // التحقق من الموافقة على الشروط
