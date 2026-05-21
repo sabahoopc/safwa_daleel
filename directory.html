@@ -449,7 +449,15 @@ function renderForm(){
   <label class="fl">اسم المشروع *</label>
   <input class="fi" id="rn" placeholder="مطعم الأصيل...">
   <label class="fl">التصنيف *</label>
-  <select class="fi" id="rcat" onchange="onCatChange(this)"><option value="">اختر التصنيف</option>${catsOpts}</select>
+  <div style="position:relative;margin-bottom:11px" id="cat-picker-wrap">
+    <input class="fi" id="rcat-search" placeholder="ابحث أو اختر التصنيف..." autocomplete="off"
+      style="margin-bottom:0;padding-left:32px"
+      oninput="filterCatList()" onfocus="showCatList()" onblur="hideCatList()">
+    <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none">▾</span>
+    <input type="hidden" id="rcat">
+    <div id="cat-dropdown" style="display:none;position:absolute;top:100%;right:0;left:0;background:#1a1a1a;border:1px solid var(--orange);border-radius:9px;z-index:99;max-height:220px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.5)">
+    </div>
+  </div>
 
   <!-- حقل رخصة موثوق — يظهر فقط عند اختيار تصنيف الإعلانات -->
   <div id="mawthooq-wrap" style="display:none">
@@ -513,31 +521,7 @@ function renderForm(){
   rLogoData=null; rImgData=null;
 }
 
-function onCatChange(sel){
-  const val   = sel.value;
-  const label = sel.options[sel.selectedIndex]?.text||"";
-  const isAds  = label.includes("إعلان");
-  const isHome = val==="homeprod";
-  // موثوق — للإعلانات فقط
-  document.getElementById("mawthooq-wrap").style.display = isAds ? "block" : "none";
-  if(!isAds) document.getElementById("rmawthooq").value="";
-  // معروف — إلزامي للأسر المنتجة، اختياري للباقي
-  const maroofLabel = document.getElementById("maaroof-label");
-  const maroofHint  = document.getElementById("maaroof-hint");
-  if(isHome){
-    maroofLabel.innerHTML = 'رقم تسجيل معروف <span style="color:var(--orange)">*</span>';
-    maroofHint.innerHTML  = '⚠️ مطلوب للأسر المنتجة — سجّل مشروعك على <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">maaroof.com</a> إذا لم تكن مسجّلاً';
-    maroofHint.style.color = "#f0a000";
-  } else {
-    maroofLabel.innerHTML = 'رقم تسجيل معروف <span style="color:var(--muted);font-weight:400">(اختياري — للأسر المنتجة)</span>';
-    maroofHint.innerHTML  = 'إذا كنت أسرة منتجة مسجّلة في <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a>، أدخل رقم التسجيل';
-    maroofHint.style.color = "";
-  }
-}
-
-function onCatChange(sel){
-  const val   = sel.value;
-  const label = sel.options[sel.selectedIndex]?.text||"";
+function onCatChange(val, label) {
   const isAds  = label.includes("إعلان");
   const isHome = val==="homeprod";
   document.getElementById("mawthooq-wrap").style.display = isAds ? "block" : "none";
@@ -553,6 +537,49 @@ function onCatChange(sel){
     maroofHint.innerHTML  = 'إذا كنت أسرة منتجة مسجّلة في <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a>، أدخل رقم التسجيل';
     maroofHint.style.color = "";
   }
+}
+
+function buildCatDropdown(filter=""){
+  const q = filter.toLowerCase();
+  const items = CATS.filter(c=> !q || c.label.includes(q) || c.icon.includes(q));
+  const dd = document.getElementById("cat-dropdown");
+  if(!items.length){
+    dd.innerHTML=`<div style="padding:12px;color:var(--muted);font-size:13px;text-align:center">لا توجد نتائج</div>`;
+    return;
+  }
+  dd.innerHTML = items.map(c=>`
+    <div onmousedown="pickCat('${c.id}','${c.icon} ${c.label}')"
+      style="padding:11px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:9px;border-bottom:1px solid #252525"
+      onmouseover="this.style.background='#252525'" onmouseout="this.style.background=''">
+      <span style="font-size:18px">${c.icon}</span>
+      <span>${c.label}</span>
+    </div>`).join("");
+}
+
+function showCatList(){
+  buildCatDropdown(document.getElementById("rcat-search").value);
+  document.getElementById("cat-dropdown").style.display="block";
+}
+
+function hideCatList(){
+  setTimeout(()=>{ document.getElementById("cat-dropdown").style.display="none"; },150);
+}
+
+function filterCatList(){
+  buildCatDropdown(document.getElementById("rcat-search").value);
+  document.getElementById("cat-dropdown").style.display="block";
+  // إذا مسح الاختيار السابق أعد الـ hidden input
+  if(!document.getElementById("rcat-search").value){
+    document.getElementById("rcat").value="";
+  }
+}
+
+function pickCat(id, label){
+  document.getElementById("rcat").value = id;
+  document.getElementById("rcat-search").value = label;
+  document.getElementById("cat-dropdown").style.display="none";
+  document.getElementById("rcat-search").style.borderColor = "";
+  onCatChange(id, label);
 }
 
 function chkUrl(inp){
@@ -585,11 +612,12 @@ async function submitReq(){
   const errEl=document.getElementById("rerr");
   if(!owner||!ownerPhone||!name||!cat||!loc){
     errEl.style.display="block";
-    errEl.textContent=!owner?"⚠️ الاسم مطلوب":!ownerPhone?"⚠️ جوال صاحب المشروع مطلوب":!name?"⚠️ اسم المشروع مطلوب":!cat?"⚠️ التصنيف مطلوب":"⚠️ الموقع مطلوب";
+    errEl.textContent=!owner?"⚠️ الاسم مطلوب":!ownerPhone?"⚠️ جوال صاحب المشروع مطلوب":!name?"⚠️ اسم المشروع مطلوب":!cat?"⚠️ يرجى اختيار التصنيف من القائمة":"⚠️ الموقع مطلوب";
+    if(!cat) document.getElementById("rcat-search").style.borderColor="#e05c5c";
     return;
   }
   // التحقق من رخصة موثوق عند اختيار تصنيف الإعلانات
-  const catLabel = document.getElementById("rcat").options[document.getElementById("rcat").selectedIndex]?.text||"";
+  const catLabel = document.getElementById("rcat-search").value||"";
   const isAds = catLabel.includes("إعلان");
   const mawthooq = document.getElementById("rmawthooq").value.trim();
   if(isAds && !mawthooq){
