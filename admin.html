@@ -498,6 +498,34 @@ window.openEdit = function openEdit(id) {
   const gradBtnsEdit = GRADS.map(([n,g])=>'<button type="button" onclick="setGE(\''+g+'\')" style="background:'+g+';color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;cursor:pointer;font-weight:600">'+n+'</button>').join("");
   document.getElementById("edit-body").innerHTML = `
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 14px">
+
+    <div style="grid-column:1/-1;margin-bottom:4px">
+      <div class="fs">الشعار وصورة المنتجات</div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <div>
+          <label class="flabel">شعار المتجر</label>
+          <div id="e-logo-box" onclick="document.getElementById('e-logo-file').click()"
+               style="width:80px;height:80px;border-radius:10px;border:2px dashed var(--or);background:var(--card2);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden">
+            ${b.logoData ? `<img src="${b.logoData}" style="width:100%;height:100%;object-fit:cover">` : `<div style="text-align:center"><div style="font-size:20px">🏷️</div><div style="font-size:8px;color:var(--or);font-weight:700">ارفع الشعار</div></div>`}
+          </div>
+          <input type="file" id="e-logo-file" accept="image/*" style="display:none" onchange="editPickLogo(this)">
+          <div style="font-size:10px;color:var(--mu);margin-top:4px;max-width:80px">المفضل: 400×400</div>
+          ${b.logoData ? `<button type="button" style="background:none;border:none;color:#e05c5c;font-size:10px;cursor:pointer;margin-top:2px" onclick="editClearLogo()">✕ إزالة</button>` : ""}
+        </div>
+        <div style="flex:1;min-width:140px">
+          <label class="flabel">صورة المنتجات / القائمة</label>
+          <div id="e-img-box" onclick="document.getElementById('e-img-file').click()"
+               style="height:80px;border-radius:10px;border:2px dashed #2a2a2a;background:var(--card2);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden">
+            ${b.imgData ? `<img src="${b.imgData}" style="max-width:100%;max-height:80px;object-fit:cover;border-radius:8px">` : `<div style="text-align:center"><div style="font-size:22px">📷</div><div style="font-size:11px;font-weight:600">اضغط لرفع صورة</div></div>`}
+          </div>
+          <input type="file" id="e-img-file" accept="image/*" style="display:none" onchange="editPickImg(this)">
+          <div style="font-size:10px;color:var(--mu);margin-top:4px">المفضل: 1200×800 أو 1:1</div>
+          ${b.imgData ? `<button type="button" style="background:none;border:none;color:#e05c5c;font-size:10px;cursor:pointer;margin-top:2px" onclick="editClearImg()">✕ إزالة الصورة</button>` : ""}
+        </div>
+      </div>
+    </div>
+
+    <div class="fs">المعلومات الأساسية</div>
     <div style="grid-column:1/-1"><label class="flabel">اسم المشروع *</label><input class="finput" id="e-name" value="${esc(b.name)}"></div>
     <div><label class="flabel">التصنيف</label><select class="finput" id="e-cat"><option value="">—</option>${opts}</select></div>
     <div><label class="flabel">الجوال</label><input class="finput" id="e-phone" value="${esc(b.phone)}" dir="ltr" type="tel"></div>
@@ -507,11 +535,15 @@ window.openEdit = function openEdit(id) {
     <div style="grid-column:1/-1"><label class="flabel">الوصف</label><textarea class="finput" id="e-desc" style="height:66px;resize:vertical">${esc(b.description)}</textarea></div>
     <div style="grid-column:1/-1"><label class="flabel">الكلمات المفتاحية</label><input class="finput" id="e-tags" value="${esc((b.tags||[]).join("، "))}"></div>
     <div style="grid-column:1/-1"><label class="flabel">🌐 الموقع الإلكتروني</label><input class="finput" id="e-web" value="${esc(b.website)}" dir="ltr"></div>
+
+    <div class="fs">التواصل الاجتماعي</div>
     <div><label class="flabel">📸 Instagram</label><input class="finput" id="e-ig" value="${esc(b.instagram)}" dir="ltr" oninput="validateUrl(this)"><div class="hint">الرابط الكامل وليس اسم المستخدم</div></div>
     <div><label class="flabel">𝕏 Twitter</label><input class="finput" id="e-tw" value="${esc(b.twitter)}" dir="ltr" oninput="validateUrl(this)"><div class="hint">الرابط الكامل وليس اسم المستخدم</div></div>
     <div><label class="flabel">👻 Snapchat</label><input class="finput" id="e-sc" value="${esc(b.snapchat)}" dir="ltr" oninput="validateUrl(this)"><div class="hint">الرابط الكامل وليس اسم المستخدم</div></div>
     <div><label class="flabel">🎵 TikTok</label><input class="finput" id="e-tt" value="${esc(b.tiktok)}" dir="ltr" oninput="validateUrl(this)"><div class="hint">الرابط الكامل وليس اسم المستخدم</div></div>
-    <div style="grid-column:1/-1;margin-top:6px">
+
+    <div class="fs">الإعلان المميز</div>
+    <div style="grid-column:1/-1">
       <div class="promo-toggle"><input type="checkbox" id="e-promo"${b.promoted?" checked":""}><label for="e-promo" style="font-size:13px;cursor:pointer">⭐ إعلان مميز — ٥٠ ريال / شهر</label></div>
     </div>
     <div><label class="flabel">الشارة</label><input class="finput" id="e-badge" value="${esc(b.badge)}"></div>
@@ -519,7 +551,7 @@ window.openEdit = function openEdit(id) {
     <div style="grid-column:1/-1">
       <label class="flabel">لون البانر</label>
       <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px">${gradBtnsEdit}</div>
-      <input class="finput" id="e-adgrad" value="${esc(b.adGrad)}" dir="ltr" style="font-size:11px;color:var(--mu)" placeholder="اختر لوناً من الأعلى">
+      <input class="finput" id="e-adgrad" value="${esc(b.adGrad)}" dir="ltr" style="font-size:11px" placeholder="اختر لوناً من الأعلى">
     </div>
   </div>`;
   openM("edit");
@@ -527,27 +559,66 @@ window.openEdit = function openEdit(id) {
 
 window.setGE = function setGE(g) { document.getElementById("e-adgrad").value=g; }
 
+// رفع الصور في نموذج التعديل
+let editLogoData = null;
+let editImgData  = null;
+let editLogoCleared = false;
+let editImgCleared  = false;
+
+window.editPickLogo = function editPickLogo(inp) {
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    editLogoData=ev.target.result; editLogoCleared=false;
+    document.getElementById("e-logo-box").innerHTML=`<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+  };
+  r.readAsDataURL(f);
+}
+window.editClearLogo = function editClearLogo() {
+  editLogoData=null; editLogoCleared=true;
+  document.getElementById("e-logo-box").innerHTML=`<div style="text-align:center"><div style="font-size:20px">🏷️</div><div style="font-size:8px;color:var(--or);font-weight:700">ارفع الشعار</div></div>`;
+}
+window.editPickImg = function editPickImg(inp) {
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    editImgData=ev.target.result; editImgCleared=false;
+    document.getElementById("e-img-box").innerHTML=`<img src="${ev.target.result}" style="max-width:100%;max-height:80px;object-fit:cover;border-radius:8px">`;
+  };
+  r.readAsDataURL(f);
+}
+window.editClearImg = function editClearImg() {
+  editImgData=null; editImgCleared=true;
+  document.getElementById("e-img-box").innerHTML=`<div style="text-align:center"><div style="font-size:22px">📷</div><div style="font-size:11px;font-weight:600">اضغط لرفع صورة</div></div>`;
+}
+
 window.saveEdit = async function saveEdit() {
   const b = DB.find(x=>x.id===editId); if(!b) return;
   const promoEl = document.getElementById("e-promo");
-  console.log("e-promo element:", promoEl, "checked:", promoEl?.checked, "editId:", editId);
-  b.name=document.getElementById("e-name").value.trim();
-  b.category=document.getElementById("e-cat").value;
-  b.phone=document.getElementById("e-phone").value.trim();
-  b.whatsapp=document.getElementById("e-wa").value.trim();
-  b.location=document.getElementById("e-loc").value.trim();
-  b.mapsUrl=document.getElementById("e-maps").value.trim();
-  b.description=document.getElementById("e-desc").value.trim();
-  b.tags=document.getElementById("e-tags").value.split(/[,،]/).map(t=>t.trim()).filter(Boolean);
-  b.website=document.getElementById("e-web").value.trim();
-  b.instagram=document.getElementById("e-ig").value.trim();
-  b.twitter=document.getElementById("e-tw").value.trim();
-  b.snapchat=document.getElementById("e-sc").value.trim();
-  b.tiktok=document.getElementById("e-tt").value.trim();
-  b.promoted = promoEl ? promoEl.checked : false;
-  b.badge=document.getElementById("e-badge").value.trim();
-  b.adText=document.getElementById("e-adtext").value.trim();
-  b.adGrad=document.getElementById("e-adgrad").value.trim();
+  b.name        = document.getElementById("e-name").value.trim();
+  b.category    = document.getElementById("e-cat").value;
+  b.phone       = document.getElementById("e-phone").value.trim();
+  b.whatsapp    = document.getElementById("e-wa").value.trim();
+  b.location    = document.getElementById("e-loc").value.trim();
+  b.mapsUrl     = document.getElementById("e-maps").value.trim();
+  b.description = document.getElementById("e-desc").value.trim();
+  b.tags        = document.getElementById("e-tags").value.split(/[,،]/).map(t=>t.trim()).filter(Boolean);
+  b.website     = document.getElementById("e-web").value.trim();
+  b.instagram   = document.getElementById("e-ig").value.trim();
+  b.twitter     = document.getElementById("e-tw").value.trim();
+  b.snapchat    = document.getElementById("e-sc").value.trim();
+  b.tiktok      = document.getElementById("e-tt").value.trim();
+  b.promoted    = promoEl ? promoEl.checked : false;
+  b.badge       = document.getElementById("e-badge").value.trim();
+  b.adText      = document.getElementById("e-adtext").value.trim();
+  b.adGrad      = document.getElementById("e-adgrad").value.trim();
+  // الصور — إذا رُفعت جديدة تستبدل القديمة، إذا حُذفت تصبح null
+  if (editLogoData)    b.logoData = editLogoData;
+  if (editLogoCleared) b.logoData = null;
+  if (editImgData)     b.imgData  = editImgData;
+  if (editImgCleared)  b.imgData  = null;
+  // إعادة ضبط متغيرات التعديل
+  editLogoData=null; editImgData=null; editLogoCleared=false; editImgCleared=false;
   try {
     await saveToSupabase(b);
     updateAll();
