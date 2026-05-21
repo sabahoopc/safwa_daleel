@@ -10,6 +10,12 @@
   gtag("config", "G-487L69CPTL");
 </script>
 <meta charset="UTF-8">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#f26522">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دليل صفوى">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>دليل صفوى — دليلك الشامل لمشاريع مدينة صفوى</title>
 <meta name="description" content="دليل صفوى — اكتشف أفضل المطاعم والمحلات والخدمات في مدينة صفوى">
@@ -702,6 +708,15 @@ function openM(id){document.getElementById("modal-"+id).classList.add("open");do
 function closeM(id){document.getElementById("modal-"+id).classList.remove("open");document.body.style.overflow="";}
 
 load();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => console.log('SW registered'))
+      .catch(e => console.log('SW failed:', e));
+  });
+}
 </script>
 </body>
 </html>
