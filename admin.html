@@ -441,11 +441,42 @@ window.saveQuickPromo = async function saveQuickPromo(id) {
 }
 
 
+window.onAdminCatChange = function onAdminCatChange(sel) {
+  const label  = sel.options[sel.selectedIndex]?.text||"";
+  const val    = sel.value;
+  const isAds  = label.includes("إعلان");
+  const isHome = val==="homeprod";
+  // موثوق
+  document.getElementById("f-mawthooq-wrap").style.display = isAds ? "block" : "none";
+  if(!isAds) document.getElementById("f-mawthooq").value="";
+  // معروف
+  const lbl  = document.getElementById("f-maaroof-label");
+  const hint = document.getElementById("f-maaroof-hint");
+  if(isHome){
+    lbl.innerHTML  = 'رقم تسجيل معروف <span class="req">*</span>';
+    hint.textContent = "⚠️ مطلوب للأسر المنتجة";
+    hint.className = "hint warn";
+  } else {
+    lbl.innerHTML  = 'رقم تسجيل معروف <span style="color:var(--mu);font-weight:400">(اختياري)</span>';
+    hint.textContent = "للأسر المنتجة — إلزامي عند اختيار هذا التصنيف";
+    hint.className = "hint";
+  }
+}
+
+
 window.saveBiz = async function saveBiz() {
   const name = document.getElementById("f-name").value.trim();
   const cat  = document.getElementById("f-cat").value;
   const loc  = document.getElementById("f-loc").value.trim();
   if(!name||!cat||!loc) { toast("⚠️ الاسم والتصنيف والموقع مطلوبة",true); return; }
+  // validation الرخص
+  const catLabel = document.getElementById("f-cat").options[document.getElementById("f-cat").selectedIndex]?.text||"";
+  const isAds  = catLabel.includes("إعلان");
+  const isHome = cat==="homeprod";
+  const mawthooq = document.getElementById("f-mawthooq").value.trim();
+  const maaroof  = document.getElementById("f-maaroof").value.trim();
+  if(isAds && !mawthooq){ toast("⚠️ رقم رخصة موثوق مطلوب للمشاريع الإعلانية",true); return; }
+  if(isHome && !maaroof){ toast("⚠️ رقم تسجيل معروف مطلوب للأسر المنتجة",true); return; }
   // Validate URLs
   const urlFields = ["f-ig","f-tw","f-sc","f-tt","f-web","f-maps"];
   for(const fid of urlFields) {
@@ -468,6 +499,8 @@ window.saveBiz = async function saveBiz() {
     badge:document.getElementById("f-badge").value.trim(),
     adText:document.getElementById("f-adtext").value.trim(),
     adGrad:document.getElementById("f-adgrad").value.trim(),
+    mawthooqLicense:mawthooq||null,
+    maaroofLicense:maaroof||null,
     logoData, imgData, hidden:false,
   };
   toast("⏳ جاري الحفظ...");
@@ -653,10 +686,16 @@ window.askDel = function askDel(id) {
 
 // ── Form helpers ──────────────────────────
 window.resetForm = function resetForm() {
-  ["f-name","f-phone","f-wa","f-loc","f-maps","f-desc","f-tags","f-web","f-ig","f-tw","f-sc","f-tt","f-badge","f-adtext","f-adgrad"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";el.classList.remove("err");}});
+  ["f-name","f-phone","f-wa","f-loc","f-maps","f-desc","f-tags","f-web","f-ig","f-tw","f-sc","f-tt","f-badge","f-adtext","f-adgrad","f-mawthooq","f-maaroof"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";el.classList.remove("err");}});
   document.getElementById("f-cat").value="";
   document.getElementById("f-promo").checked=false;
   document.getElementById("promo-details").style.display="none";
+  document.getElementById("f-mawthooq-wrap").style.display="none";
+  // إعادة label معروف للحالة الافتراضية
+  const lbl = document.getElementById("f-maaroof-label");
+  const hint = document.getElementById("f-maaroof-hint");
+  if(lbl) lbl.innerHTML='رقم تسجيل معروف <span style="color:var(--mu);font-weight:400">(اختياري)</span>';
+  if(hint){ hint.textContent="للأسر المنتجة — إلزامي عند اختيار هذا التصنيف"; hint.className="hint"; }
   clearLogo(); clearImg(); logoData=null; imgData=null;
 }
 window.togglePromo = function togglePromo() { document.getElementById("promo-details").style.display=document.getElementById("f-promo").checked?"grid":"none"; }
@@ -774,6 +813,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
 .flabel{display:block;font-size:12px;color:var(--mu);margin-bottom:4px;font-weight:600}
 .req{color:var(--or)}
 .hint{font-size:11px;color:var(--mu);margin-top:-8px;margin-bottom:10px}
+.hint.warn{color:#f0a000}
 .hint.warn{color:#f0a000}
 .finput{width:100%;background:var(--card2);border:1px solid var(--b2);border-radius:8px;padding:9px 11px;color:var(--tx);font-size:13px;outline:none;margin-bottom:12px}
 .finput:focus{border-color:var(--or)}
@@ -910,7 +950,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
     </div>
     <div>
       <label class="flabel">التصنيف <span class="req">*</span></label>
-      <select class="finput" id="f-cat"><option value="">اختر التصنيف</option></select>
+      <select class="finput" id="f-cat" onchange="onAdminCatChange(this)"><option value="">اختر التصنيف</option></select>
     </div>
     <div>
       <label class="flabel">رقم الجوال</label>
@@ -936,6 +976,18 @@ tr:hover td{background:rgba(242,101,34,.04)}
     <div class="fl">
       <label class="flabel">الكلمات المفتاحية (افصل بفاصلة)</label>
       <input class="finput" id="f-tags" placeholder="مشويات، أكلات شعبية، توصيل...">
+    </div>
+
+    <div class="fs">الترخيص والتسجيل</div>
+    <div id="f-mawthooq-wrap" style="display:none;grid-column:1/-1">
+      <label class="flabel">رقم رخصة موثوق <span class="req">*</span></label>
+      <input class="finput" id="f-mawthooq" placeholder="رقم الرخصة من منصة موثوق" dir="ltr">
+      <div class="hint warn">مطلوب للمشاريع الإعلانية</div>
+    </div>
+    <div class="fl">
+      <label class="flabel" id="f-maaroof-label">رقم تسجيل معروف <span style="color:var(--mu);font-weight:400">(اختياري)</span></label>
+      <input class="finput" id="f-maaroof" placeholder="رقم الحساب في منصة معروف" dir="ltr">
+      <div class="hint" id="f-maaroof-hint">للأسر المنتجة — إلزامي عند اختيار هذا التصنيف</div>
     </div>
 
     <div class="fs">التواصل الاجتماعي والموقع</div>
