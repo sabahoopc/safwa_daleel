@@ -2,7 +2,7 @@
   "name": "دليل صفوى",
   "short_name": "دليل صفوى",
   "description": "دليلك الشامل لمشاريع وخدمات مدينة صفوى",
-  "start_url": "/",
+  "start_url": "/directory.html",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#f26522",
