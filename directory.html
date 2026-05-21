@@ -144,7 +144,7 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
   </div>
 </div></div>
 
-<footer>دليل صفوى — جميع الحقوق محفوظة ٢٠٢٥</footer>
+<footer>دليل صفوى — جميع الحقوق محفوظة ٢٠٢٥ | <a href="terms.html" style="color:var(--orange);font-size:11px">الشروط والأحكام</a></footer>
 
 <!-- Business Modal -->
 <div class="ov" id="modal-business" onclick="if(event.target===this)closeM('business')">
@@ -331,7 +331,19 @@ function renderForm(){
   <label class="fl">اسم المشروع *</label>
   <input class="fi" id="rn" placeholder="مطعم الأصيل...">
   <label class="fl">التصنيف *</label>
-  <select class="fi" id="rcat"><option value="">اختر التصنيف</option>${catsOpts}</select>
+  <select class="fi" id="rcat" onchange="onCatChange(this)"><option value="">اختر التصنيف</option>${catsOpts}</select>
+
+  <!-- حقل رخصة موثوق — يظهر فقط عند اختيار تصنيف الإعلانات -->
+  <div id="mawthooq-wrap" style="display:none">
+    <label class="fl">رقم رخصة موثوق <span style="color:var(--orange)">*</span></label>
+    <input class="fi" id="rmawthooq" placeholder="أدخل رقم الرخصة من منصة موثوق" dir="ltr">
+    <div class="fhw" style="margin-top:-8px;margin-bottom:10px">⚠️ مطلوب للمشاريع الإعلانية — تحقق من رخصتك على <a href="https://mawthooq.com" target="_blank" style="color:var(--orange)">mawthooq.com</a></div>
+  </div>
+
+  <!-- حقل معروف — يظهر للجميع كاختياري -->
+  <label class="fl">رقم تسجيل معروف <span style="color:var(--muted);font-weight:400">(اختياري — للأسر المنتجة)</span></label>
+  <input class="fi" id="rmaaroof" placeholder="رقم حسابك في منصة معروف" dir="ltr">
+  <div class="fh" style="margin-top:-8px;margin-bottom:10px">إذا كنت أسرة منتجة مسجّلة في <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a>، أدخل رقم التسجيل</div>
   <label class="fl">جوال المشروع (للعملاء)</label>
   <input class="fi" id="rph" placeholder="05xxxxxxxx" type="tel" dir="ltr">
   <label class="fl">رقم الواتساب</label>
@@ -371,12 +383,23 @@ function renderForm(){
     <input type="checkbox" id="rpromo">
     <label for="rpromo" style="cursor:pointer;font-size:13px">🚀 أريد الإعلان المميز — <strong>٥٠ ريال / شهر</strong></label>
   </div>
+  <div style="background:#141414;border:1px solid #252525;border-radius:8px;padding:10px 13px;margin-top:10px;margin-bottom:10px;display:flex;align-items:flex-start;gap:9px">
+    <input type="checkbox" id="rterms" style="margin-top:3px;flex-shrink:0">
+    <label for="rterms" style="font-size:12px;color:var(--muted);cursor:pointer;line-height:1.6">أوافق على <a href="terms.html" target="_blank" style="color:var(--orange);font-weight:600">الشروط والأحكام</a> وأؤكد أن المعلومات المدخلة صحيحة وأن مشروعي يستوفي متطلبات الترخيص</label>
+  </div>
   <div id="rerr" style="color:#e05c5c;font-size:12px;margin-bottom:10px;display:none"></div>
   <div style="display:flex;gap:8px;margin-top:4px">
     <button id="rsub" onclick="submitReq()" style="flex:1;background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:7px;padding:11px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">إرسال الطلب</button>
     <button onclick="closeM('request')" style="background:var(--card);border:1px solid #2a2a2a;color:var(--muted);border-radius:7px;padding:11px 16px;font-size:12px;font-family:inherit;cursor:pointer">إلغاء</button>
   </div>`;
   rLogoData=null; rImgData=null;
+}
+
+function onCatChange(sel){
+  const label = sel.options[sel.selectedIndex]?.text||"";
+  const isAds = label.includes("إعلان");
+  document.getElementById("mawthooq-wrap").style.display = isAds ? "block" : "none";
+  if(!isAds) document.getElementById("rmawthooq").value="";
 }
 
 function chkUrl(inp){
@@ -410,6 +433,22 @@ async function submitReq(){
     errEl.textContent=!owner?"⚠️ الاسم مطلوب":!ownerPhone?"⚠️ جوال صاحب المشروع مطلوب":!name?"⚠️ اسم المشروع مطلوب":!cat?"⚠️ التصنيف مطلوب":"⚠️ الموقع مطلوب";
     return;
   }
+  // التحقق من رخصة موثوق عند اختيار تصنيف الإعلانات
+  const catLabel = document.getElementById("rcat").options[document.getElementById("rcat").selectedIndex]?.text||"";
+  const isAds = catLabel.includes("إعلان");
+  const mawthooq = document.getElementById("rmawthooq").value.trim();
+  if(isAds && !mawthooq){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ رقم رخصة موثوق مطلوب للمشاريع الإعلانية";
+    document.getElementById("rmawthooq").focus();
+    return;
+  }
+  // التحقق من الموافقة على الشروط
+  if(!document.getElementById("rterms").checked){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ يجب الموافقة على الشروط والأحكام للمتابعة";
+    return;
+  }
   const urlIds=["rig","rsc","rtw","rtt","rweb","rmaps"];
   for(const id of urlIds){
     const v=document.getElementById(id).value.trim();
@@ -433,6 +472,8 @@ async function submitReq(){
       tiktok:document.getElementById("rtt").value.trim()||null,
       website:document.getElementById("rweb").value.trim()||null,
       wants_promoted:document.getElementById("rpromo").checked,
+      mawthooq_license:document.getElementById("rmawthooq").value.trim()||null,
+      maaroof_license:document.getElementById("rmaaroof").value.trim()||null,
       logo_data:rLogoData||null,
       img_data:rImgData||null,
       status:"pending",
