@@ -509,6 +509,7 @@ window.saveBiz = async function saveBiz() {
     adGrad:document.getElementById("f-adgrad").value.trim(),
     mawthooqLicense:mawthooq||null,
     maaroofLicense:maaroof||null,
+    freelanceLicense:document.getElementById("f-freelance").value.trim()||null,
     logoData, imgData, hidden:false,
   };
   toast("⏳ جاري الحفظ...");
@@ -694,7 +695,7 @@ window.askDel = function askDel(id) {
 
 // ── Form helpers ──────────────────────────
 window.resetForm = function resetForm() {
-  ["f-name","f-phone","f-wa","f-loc","f-maps","f-desc","f-tags","f-web","f-ig","f-tw","f-sc","f-tt","f-badge","f-adtext","f-adgrad","f-mawthooq","f-maaroof"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";el.classList.remove("err");}});
+  ["f-name","f-phone","f-wa","f-loc","f-maps","f-desc","f-tags","f-web","f-ig","f-tw","f-sc","f-tt","f-badge","f-adtext","f-adgrad","f-mawthooq","f-maaroof","f-freelance"].forEach(id=>{const el=document.getElementById(id);if(el){el.value="";el.classList.remove("err");}});
   document.getElementById("f-cat").value="";
   document.getElementById("f-promo").checked=false;
   document.getElementById("promo-details").style.display="none";
@@ -997,6 +998,11 @@ tr:hover td{background:rgba(242,101,34,.04)}
       <input class="finput" id="f-maaroof" placeholder="رقم الحساب في منصة معروف" dir="ltr">
       <div class="hint" id="f-maaroof-hint">للأسر المنتجة — إلزامي عند اختيار هذا التصنيف</div>
     </div>
+    <div class="fl">
+      <label class="flabel">شهادة العمل الحر <span style="color:var(--mu);font-weight:400">(اختياري)</span></label>
+      <input class="finput" id="f-freelance" placeholder="رقم شهادة العمل الحر إن وجدت" dir="ltr">
+      <div class="hint">للمستقلين المسجّلين في منصة العمل الحر</div>
+    </div>
 
     <div class="fs">التواصل الاجتماعي والموقع</div>
     <div class="fl">
@@ -1120,6 +1126,9 @@ tr:hover td{background:rgba(242,101,34,.04)}
     </button>
     <button class="mob-btn" id="mob-more" onclick="openMobMenu()">
       <span class="mob-btn-icon">⋯</span>المزيد
+    </button>
+    <button class="mob-btn" onclick="location.reload()" title="تحديث">
+      <span class="mob-btn-icon">🔄</span>تحديث
     </button>
   </div>
 </nav>
