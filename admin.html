@@ -34,6 +34,32 @@ function tryLogin(){
 </script>
 <script defer>
 
+// ── OneSignal Push ────────────────────────
+const OS_APP_ID  = "f5c43e1d-5935-48a8-9cf0-8781dd03611d";
+const OS_API_KEY = "os_v2_app_6xcd4hkzgvekrhhqq6a52a3bdvqgncdlvqje6u4mkrjaapsgqxvcml2fi7v5uigwtv7p7sebsdqqsqew5xyhhbrrcg4mt5q5tbeb3ai";
+
+async function sendPush(title, message, url="/directory.html") {
+  try {
+    await fetch("https://onesignal.com/api/v1/notifications", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Basic " + OS_API_KEY,
+      },
+      body: JSON.stringify({
+        app_id: OS_APP_ID,
+        included_segments: ["Total Subscriptions"],
+        headings:  { ar: title,   en: title },
+        contents:  { ar: message, en: message },
+        url: "https://1safwa.com" + url,
+        chrome_web_icon: "https://1safwa.com/icon-192.png",
+        chrome_web_badge: "https://1safwa.com/icon-192.png",
+      })
+    });
+  } catch(e) { console.warn("Push failed:", e.message); }
+}
+// ─────────────────────────────────────────
+
 const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
 
@@ -310,6 +336,12 @@ window.approveReq = async function approveReq(id) {
     updateAll();
     renderRequests();
     toast("✅ تم القبول وإضافة المشروع للدليل");
+    // إشعار للزوار
+    sendPush(
+      "🆕 مشروع جديد في دليل صفوى",
+      `تم إضافة "${r.business_name}" — تصفّح الدليل الآن`,
+      "/directory.html"
+    );
   } catch(e) { toast("❌ فشل: "+e.message,true); }
 }
 
@@ -519,6 +551,12 @@ window.saveBiz = async function saveBiz() {
     DB.unshift(biz);
     updateAll();
     toast("✅ تم الحفظ — يظهر على الدليل فوراً");
+    // إشعار للزوار بمشروع جديد
+    sendPush(
+      "🆕 مشروع جديد في دليل صفوى",
+      `تم إضافة "${biz.name}" — تصفّح الدليل الآن`,
+      "/directory.html"
+    );
     resetForm();
     go("businesses",document.querySelectorAll(".sb-btn")[1]);
   } catch(e) { toast("❌ فشل: "+e.message,true); }
@@ -853,6 +891,33 @@ tr:hover td{background:rgba(242,101,34,.04)}
 .req-pending{border-color:#5a4000;background:#1a1505}
 .emoji-grid{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0}
 </style>
+
+<!-- OneSignal للأدمن — إشعارات الطلبات الجديدة -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "f5c43e1d-5935-48a8-9cf0-8781dd03611d",
+      serviceWorkerPath: "/sw.js",
+      notifyButton: { enable: false },
+      promptOptions: {
+        slidedown: {
+          prompts: [{
+            type: "push",
+            autoPrompt: true,
+            delay: { pageViews: 1, timeDelay: 3 },
+            text: {
+              actionMessage: "🔔 فعّل الإشعارات لتصلك تنبيهات بالطلبات الجديدة",
+              acceptButton: "تفعيل",
+              cancelButton: "لا شكراً",
+            }
+          }]
+        }
+      }
+    });
+  });
+</script>
 </head>
 <body>
 
