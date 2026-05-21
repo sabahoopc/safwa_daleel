@@ -1,0 +1,56 @@
+{
+  "name": "دليل صفوى",
+  "short_name": "دليل صفوى",
+  "description": "دليلك الشامل لمشاريع وخدمات مدينة صفوى",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#f26522",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": [
+    "business",
+    "shopping",
+    "local"
+  ],
+  "shortcuts": [
+    {
+      "name": "تصفح الدليل",
+      "url": "/directory.html",
+      "description": "عرض جميع المشاريع"
+    },
+    {
+      "name": "أضف مشروعك",
+      "url": "/directory.html#add",
+      "description": "تسجيل مشروع جديد"
+    }
+  ]
+}
