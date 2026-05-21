@@ -43,12 +43,32 @@ header{background:linear-gradient(135deg,#111,#1a0d04);border-bottom:2px solid v
 @media(max-width:768px){.mob-refresh{display:block!important}}
 
 /* Banner */
+/* ── Banner ── */
 .bw{max-width:1100px;margin:22px auto 0;padding:0 20px}
-.bl{font-size:11px;color:var(--muted);margin-bottom:7px;font-weight:700;letter-spacing:1px}
-.bc{border-radius:13px;padding:22px 26px 44px;cursor:pointer;position:relative;min-height:100px;transition:.3s}
-.bb{font-size:12px;color:rgba(255,255,255,.55);margin-bottom:5px}
-.bt{font-size:17px;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.4}
-.bd{position:absolute;bottom:14px;left:20px;display:flex;gap:5px}
+.bl{font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.bl::before{content:"";display:inline-block;width:6px;height:6px;background:var(--orange);border-radius:50%;animation:blink 1.4s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.banner-card{border-radius:16px;overflow:hidden;cursor:pointer;position:relative;display:flex;min-height:140px;transition:transform .2s,box-shadow .2s}
+.banner-card:hover{transform:translateY(-2px);box-shadow:0 12px 36px rgba(0,0,0,.4)}
+.banner-img-side{width:200px;flex-shrink:0;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#111}
+.banner-img-side img{width:100%;height:100%;object-fit:cover}
+.banner-img-side .banner-logo{width:100%;height:100%;object-fit:contain;padding:20px}
+.banner-img-overlay{position:absolute;inset:0;background:linear-gradient(to left,rgba(0,0,0,.4),transparent)}
+.banner-content{flex:1;padding:22px 24px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:1}
+.banner-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;width:fit-content;backdrop-filter:blur(4px)}
+.banner-biz-name{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px;font-weight:600}
+.banner-ad-text{font-size:20px;font-weight:900;color:#fff;line-height:1.35;margin-bottom:14px}
+.banner-cta-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#111;font-size:13px;font-weight:800;padding:8px 18px;border-radius:9px;width:fit-content;transition:opacity .2s}
+.banner-cta-btn:hover{opacity:.9}
+.banner-dots{position:absolute;bottom:14px;left:18px;display:flex;gap:5px;z-index:2}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;border:none;transition:.25s}
+.dot.active{background:#fff;width:22px;border-radius:4px}
+@media(max-width:600px){
+  .banner-img-side{width:110px}
+  .banner-ad-text{font-size:15px}
+  .banner-content{padding:16px}
+  .banner-cta-btn{font-size:12px;padding:7px 14px}
+}
 .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;border:none}
 .dot.active{background:var(--orange);width:20px;border-radius:4px}
 
@@ -169,11 +189,22 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
 <!-- Banner -->
 <div class="bw">
   <div class="bl">📢 إعلانات مميزة</div>
-  <div id="banner" class="bc" style="background:linear-gradient(135deg,#1a3a2a,#2d6a4a)" onclick="openBannerBiz()">
-    <div class="bb" id="bb"></div>
-    <div class="bt" id="bt">جاري التحميل...</div>
-    <div style="font-size:12px;color:rgba(255,255,255,.75);font-weight:600">عرض التفاصيل ←</div>
-    <div class="bd" id="bd"></div>
+  <div id="banner-wrap" onclick="openBannerBiz()">
+    <div class="banner-card" id="banner-card">
+      <!-- Image side -->
+      <div class="banner-img-side" id="banner-img-side">
+        <div class="banner-img-overlay"></div>
+      </div>
+      <!-- Content side -->
+      <div class="banner-content" id="banner-content">
+        <div class="banner-badge" id="banner-badge">⭐ إعلان مميز</div>
+        <div class="banner-biz-name" id="banner-biz-name">جاري التحميل...</div>
+        <div class="banner-ad-text" id="banner-ad-text"></div>
+        <div class="banner-cta-btn">عرض التفاصيل ←</div>
+      </div>
+      <!-- Dots -->
+      <div class="banner-dots" id="banner-dots"></div>
+    </div>
   </div>
 </div>
 
@@ -224,11 +255,11 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
 
 <footer>
   <div style="display:flex;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-    <a href="https://wa.me/966597904227" target="_blank"
+    <a href="https://wa.me/966XXXXXXXXXX" target="_blank"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #2a5a2a;color:#4caf50;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">💬</span> تواصل عبر واتساب
     </a>
-    <a href="mailto:one.safwa.1@gmail.com"
+    <a href="mailto:info@1safwa.com"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a1a2a;border:1px solid #2a2a5a;color:#4a90d9;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">✉️</span> راسلنا بالإيميل
     </a>
@@ -432,16 +463,36 @@ function initBanner(){
   if(!p.length){document.querySelector(".bw").style.display="none";return;}
   function show(i){
     const b=p[i];
-    document.getElementById("banner").style.background=b.ad_grad||"linear-gradient(135deg,#1a3a2a,#2d6a4a)";
-    document.getElementById("bb").textContent=b.name;
-    document.getElementById("bt").textContent=b.ad_text;
-    document.getElementById("bd").innerHTML=p.map((_,j)=>`<button class="dot${j===i?" active":""}" onclick="event.stopPropagation();showB(${j})"></button>`).join("");
+    const card    = document.getElementById("banner-card");
+    const imgSide = document.getElementById("banner-img-side");
+    const badge   = document.getElementById("banner-badge");
+    const bizName = document.getElementById("banner-biz-name");
+    const adText  = document.getElementById("banner-ad-text");
+    const dots    = document.getElementById("banner-dots");
+    // خلفية البطاقة
+    card.style.background = b.ad_grad||"linear-gradient(135deg,#1a3a2a,#2d6a4a)";
+    // الصورة — يسار البطاقة
+    const imgSrc = b.img_data || b.logo_data;
+    if(imgSrc){
+      imgSide.innerHTML = `<div class="banner-img-overlay"></div><img src="${imgSrc}" alt="${b.name}" style="width:100%;height:100%;object-fit:cover">`;
+    } else {
+      const cat = getCat(b.category);
+      imgSide.innerHTML = `<div class="banner-img-overlay"></div><div style="font-size:64px;opacity:.5">${cat.icon}</div>`;
+    }
+    // محتوى
+    badge.textContent   = `⭐ ${b.badge||"إعلان مميز"}`;
+    bizName.textContent = b.name;
+    adText.textContent  = b.ad_text;
+    // نقاط
+    dots.innerHTML = p.map((_,j)=>
+      `<button class="dot${j===i?" active":""}" onclick="event.stopPropagation();showB(${j})"></button>`
+    ).join("");
     bannerBiz=b;
   }
   window.showB=function(i){bannerIdx=i;show(i);};
   show(0);
   if(bannerTimer)clearInterval(bannerTimer);
-  bannerTimer=setInterval(()=>{bannerIdx=(bannerIdx+1)%p.length;show(bannerIdx);},4200);
+  bannerTimer=setInterval(()=>{bannerIdx=(bannerIdx+1)%p.length;show(bannerIdx);},4800);
 }
 function openBannerBiz(){if(bannerBiz)openBiz(bannerBiz.id);}
 
