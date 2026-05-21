@@ -265,7 +265,14 @@ function renderCatGrid(){
   document.getElementById("cats-page-title").textContent =
     `${usedCats.length} تصنيف — اضغط لعرض المشاريع`;
 
-  document.getElementById("cat-grid").innerHTML = usedCats.map(c=>`
+  const allTile = `
+    <div class="cat-tile" onclick="openCat('all')" style="border-color:var(--orange);background:linear-gradient(135deg,#1a0a02,#0f0f0f)">
+      <div class="cat-tile-icon">🗂️</div>
+      <div class="cat-tile-label" style="color:var(--orange)">الكل</div>
+      <div class="cat-tile-count">${ALL.length} مشروع</div>
+    </div>`;
+
+  document.getElementById("cat-grid").innerHTML = allTile + usedCats.map(c=>`
     <div class="cat-tile${hasPromo.has(c.id)?" has-promo":""}" onclick="openCat('${c.id}')">
       <div class="cat-tile-icon">${c.icon}</div>
       <div class="cat-tile-label">${c.label}</div>
@@ -276,8 +283,9 @@ function renderCatGrid(){
 // ── Open Category ─────────────────────────
 function openCat(catId){
   activeCat = catId;
-  const cat = getCat(catId);
-  const list = ALL.filter(b=>b.category===catId);
+  const isAll = catId === 'all';
+  const cat = isAll ? {icon:'🗂️', label:'جميع المشاريع'} : getCat(catId);
+  const list = isAll ? ALL : ALL.filter(b=>b.category===catId);
   document.getElementById("biz-cat-title").textContent = `${cat.icon} ${cat.label}`;
   document.getElementById("biz-cat-sub").textContent   = `${list.length} مشروع`;
   document.getElementById("rc").textContent = "";
