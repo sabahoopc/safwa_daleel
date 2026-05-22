@@ -151,32 +151,7 @@ footer{background:#050505;border-top:1px solid #111;padding:36px 24px;text-align
 }
 </style>
 
-<!-- OneSignal -->
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "f5c43e1d-5935-48a8-9cf0-8781dd03611d",
-      serviceWorkerPath: "/sw.js",
-      notifyButton: { enable: false },
-      promptOptions: {
-        slidedown: {
-          prompts: [{
-            type: "push",
-            autoPrompt: true,
-            delay: { pageViews: 1, timeDelay: 5 },
-            text: {
-              actionMessage: "📢 اشترك لتصلك إشعارات عند إضافة مشاريع جديدة في دليل صفوى",
-              acceptButton: "اشتراك",
-              cancelButton: "لاحقاً",
-            }
-          }]
-        }
-      }
-    });
-  });
-</script>
+
 </head>
 <body>
 
