@@ -257,11 +257,11 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
 
 <footer>
   <div style="display:flex;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-    <a href="https://wa.me/966XXXXXXXXXX" target="_blank"
+    <a href="https://wa.me/966597904227" target="_blank"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #2a5a2a;color:#4caf50;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">💬</span> تواصل عبر واتساب
     </a>
-    <a href="mailto:info@1safwa.com"
+    <a href="mailto:one.safwa.1.com"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a1a2a;border:1px solid #2a2a5a;color:#4a90d9;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">✉️</span> راسلنا بالإيميل
     </a>
@@ -304,7 +304,7 @@ function getCat(id){return CATS.find(c=>c.id===id)||{icon:"🏢",label:""};}
 async function load(){
   try{
     const [bizData, catData] = await Promise.all([
-      fetch(SUPA_URL+"/rest/v1/businesses?select=*&hidden=eq.false&order=promoted.desc,created_at.desc",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
+      fetch(SUPA_URL+"/rest/v1/businesses?select=*,likes_count&hidden=eq.false&order=promoted.desc,created_at.desc",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
       fetch(SUPA_URL+"/rest/v1/custom_categories?select=*",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
     ]);
     ALL = bizData||[];
@@ -421,6 +421,7 @@ function renderGrid(list){
       <div class="ct">${tags}</div>
       ${soc?`<div class="csc">${soc}</div>`:""}
       <div class="cf"><span class="clo">📍 ${b.location||""}</span><span class="cm">التفاصيل ←</span></div>
+      ${(b.likes_count||0)>0?`<div id="card-likes-${b.id}" style="font-size:11px;color:#e05c5c;margin-top:6px">❤️ ${b.likes_count}</div>`:`<div id="card-likes-${b.id}"></div>`}
     </div>`;
   }).join("");
 }
@@ -451,7 +452,15 @@ function openBiz(id){
   ].filter(Boolean);
   if(soc.length) h+=`<div style="margin-bottom:12px;padding:12px;background:var(--card);border-radius:9px;border:1px solid #252525"><div style="font-weight:700;font-size:12px;margin-bottom:8px">📱 التواصل الاجتماعي</div><div style="display:flex;flex-wrap:wrap;gap:7px">${soc.join("")}</div></div>`;
   if(b.website) h+=`<div style="margin-bottom:12px;padding:12px;background:var(--card);border-radius:9px;border:1px solid #252525"><div style="font-weight:700;font-size:12px;margin-bottom:7px">🌐 الموقع الإلكتروني</div><a href="${b.website}" target="_blank" style="color:var(--orange);font-size:13px;font-weight:600;word-break:break-all">${b.website.replace(/^https?:\/\//,"")}</a></div>`;
-  h+=`<div style="display:flex;gap:10px;margin-top:16px">`;
+  // زر الإعجاب
+  const liked = isLiked(b.id);
+  h+=`<div style="display:flex;gap:10px;margin-top:16px;align-items:center">
+    <button id="like-btn-${b.id}" onclick="toggleLike(${b.id})"
+      style="display:flex;align-items:center;gap:7px;background:${liked?"#1f1408":"var(--card)"};border:1px solid ${liked?"var(--orange)":"#2a2a2a"};color:${liked?"var(--orange)":"var(--muted)"};border-radius:9px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;font-family:inherit">
+      <span style="font-size:16px">${liked?"❤️":"🤍"}</span>
+      <span id="like-count-${b.id}">${b.likes_count||0}</span>
+      مفيد
+    </button>`;
   if(b.phone)    h+=`<a href="tel:${b.phone}" style="flex:1;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;text-align:center;font-weight:700;font-size:13px">📞 اتصال</a>`;
   if(b.whatsapp) h+=`<a href="https://wa.me/966${(b.whatsapp||"").replace(/^0/,"")}" target="_blank" style="flex:1;background:#25d366;color:#fff;border:none;border-radius:9px;padding:12px;text-align:center;font-weight:700;font-size:13px">💬 واتساب</a>`;
   h+=`</div>`;
@@ -780,6 +789,67 @@ async function submitReq(){
 
 function openM(id){document.getElementById("modal-"+id).classList.add("open");document.body.style.overflow="hidden";}
 function closeM(id){document.getElementById("modal-"+id).classList.remove("open");document.body.style.overflow="";}
+
+// ── Device ID (لمنع التكرار) ──────────────
+function getDeviceId(){
+  let id = localStorage.getItem("sd_device_id");
+  if(!id){
+    id = "d_" + Math.random().toString(36).substr(2,9) + "_" + Date.now();
+    localStorage.setItem("sd_device_id", id);
+  }
+  return id;
+}
+
+function getLikedSet(){
+  try{ return new Set(JSON.parse(localStorage.getItem("sd_liked")||"[]")); }
+  catch{ return new Set(); }
+}
+function saveLikedSet(s){
+  localStorage.setItem("sd_liked", JSON.stringify([...s]));
+}
+function isLiked(bizId){
+  return getLikedSet().has(bizId);
+}
+
+async function toggleLike(bizId){
+  const deviceId = getDeviceId();
+  const liked    = isLiked(bizId);
+  const btn      = document.getElementById("like-btn-"+bizId);
+  const countEl  = document.getElementById("like-count-"+bizId);
+  const biz      = ALL.find(x=>x.id===bizId);
+  if(!biz) return;
+
+  try{
+    if(!liked){
+      // أضف إعجاب
+      await fetch(SUPA_URL+"/rest/v1/business_likes",{
+        method:"POST",
+        headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
+        body:JSON.stringify({business_id:bizId, device_id:deviceId})
+      });
+      biz.likes_count = (biz.likes_count||0) + 1;
+      const s = getLikedSet(); s.add(bizId); saveLikedSet(s);
+      if(btn){ btn.style.background="#1f1408"; btn.style.borderColor="var(--orange)"; btn.style.color="var(--orange)"; btn.querySelector("span").textContent="❤️"; }
+    } else {
+      // ألغِ الإعجاب
+      await fetch(SUPA_URL+"/rest/v1/business_likes?business_id=eq."+bizId+"&device_id=eq."+deviceId,{
+        method:"DELETE",
+        headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}
+      });
+      biz.likes_count = Math.max(0,(biz.likes_count||1) - 1);
+      const s = getLikedSet(); s.delete(bizId); saveLikedSet(s);
+      if(btn){ btn.style.background="var(--card)"; btn.style.borderColor="#2a2a2a"; btn.style.color="var(--muted)"; btn.querySelector("span").textContent="🤍"; }
+    }
+    if(countEl) countEl.textContent = biz.likes_count;
+    // حدّث عداد بطاقة المشروع في الشبكة
+    updateCardLike(bizId, biz.likes_count);
+  } catch(e){ console.warn("Like failed:", e); }
+}
+
+function updateCardLike(bizId, count){
+  const likeEl = document.getElementById("card-likes-"+bizId);
+  if(likeEl) likeEl.textContent = count > 0 ? "❤️ "+count : "";
+}
 
 load();
 </script>
