@@ -168,32 +168,7 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
 }
 </style>
 
-<!-- OneSignal -->
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "f5c43e1d-5935-48a8-9cf0-8781dd03611d",
-      serviceWorkerPath: "/sw.js",
-      notifyButton: { enable: false },
-      promptOptions: {
-        slidedown: {
-          prompts: [{
-            type: "push",
-            autoPrompt: true,
-            delay: { pageViews: 1, timeDelay: 5 },
-            text: {
-              actionMessage: "📢 اشترك لتصلك إشعارات عند إضافة مشاريع جديدة في دليل صفوى",
-              acceptButton: "اشتراك",
-              cancelButton: "لاحقاً",
-            }
-          }]
-        }
-      }
-    });
-  });
-</script>
+
 </head>
 <body>
 
@@ -282,11 +257,11 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
 
 <footer>
   <div style="display:flex;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-    <a href="https://wa.me/966597904227" target="_blank"
+    <a href="https://wa.me/966XXXXXXXXXX" target="_blank"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #2a5a2a;color:#4caf50;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">💬</span> تواصل عبر واتساب
     </a>
-    <a href="mailto:one.safwa.1@gmail.com"
+    <a href="mailto:info@1safwa.com"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a1a2a;border:1px solid #2a2a5a;color:#4a90d9;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">✉️</span> راسلنا بالإيميل
     </a>
