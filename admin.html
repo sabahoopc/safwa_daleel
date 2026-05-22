@@ -264,23 +264,39 @@ window.reqCard = function reqCard(r) {
 
 window.openReqDetail = function openReqDetail(id) {
   const r = REQUESTS.find(x=>x.id===id); if(!r) return;
+  // دالة آمنة تقطع النصوص الطويلة وتحذف HTML
+  function safe(v, maxLen=200){
+    if(!v) return "";
+    const s = String(v).replace(/<[^>]*>/g,"").trim(); // حذف أي HTML
+    return esc(s.length > maxLen ? s.substring(0, maxLen)+"..." : s);
+  }
   const fields = [
-    ["اسم المشروع",r.business_name],["التصنيف",r.category],
-    ["صاحب المشروع",r.owner_name],["جوال صاحب المشروع",r.owner_phone],
-    ["البريد الإلكتروني",r.owner_email],["جوال المشروع",r.phone],
-    ["واتساب",r.whatsapp],["الموقع",r.location],["الوصف",r.description],
-    ["الموقع الإلكتروني",r.website],["Instagram",r.instagram],
-    ["Snapchat",r.snapchat],["Twitter",r.twitter],["TikTok",r.tiktok],
-    ["رخصة موثوق",r.mawthooq_license],["رقم معروف",r.maaroof_license],
-    ["إعلان مميز",r.wants_promoted?"نعم":"لا"],
+    ["اسم المشروع",        safe(r.business_name)],
+    ["التصنيف",            safe(r.category)],
+    ["صاحب المشروع",       safe(r.owner_name)],
+    ["جوال صاحب المشروع", safe(r.owner_phone)],
+    ["البريد الإلكتروني",  safe(r.owner_email)],
+    ["جوال المشروع",       safe(r.phone)],
+    ["واتساب",             safe(r.whatsapp)],
+    ["الموقع",             safe(r.location)],
+    ["الوصف",              safe(r.description, 400)],
+    ["الموقع الإلكتروني",  safe(r.website)],
+    ["Instagram",          safe(r.instagram)],
+    ["Snapchat",           safe(r.snapchat)],
+    ["Twitter",            safe(r.twitter)],
+    ["TikTok",             safe(r.tiktok)],
+    ["رخصة موثوق",         safe(r.mawthooq_license)],
+    ["رقم معروف",          safe(r.maaroof_license)],
+    ["شهادة العمل الحر",   safe(r.freelance_license)],
+    ["إعلان مميز",         r.wants_promoted?"نعم":"لا"],
   ];
   let html = fields.filter(f=>f[1]).map(f=>`
     <div style="margin-bottom:10px;padding:9px;background:var(--card);border-radius:8px;border:1px solid var(--b)">
       <div style="font-size:11px;color:var(--mu);margin-bottom:3px">${f[0]}</div>
-      <div style="font-size:13px">${esc(String(f[1]))}</div>
+      <div style="font-size:13px;word-break:break-word">${f[1]}</div>
     </div>`).join("");
-  if (r.logo_data) html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mu);margin-bottom:5px">الشعار</div><img src="${r.logo_data}" style="width:80px;height:80px;border-radius:8px;object-fit:cover"></div>`;
-  if (r.img_data)  html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mu);margin-bottom:5px">صورة المنتجات</div><img src="${r.img_data}" style="max-width:100%;border-radius:8px"></div>`;
+  if(r.logo_data) html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mu);margin-bottom:5px">الشعار</div><img src="${r.logo_data}" style="width:80px;height:80px;border-radius:8px;object-fit:cover"></div>`;
+  if(r.img_data)  html += `<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--mu);margin-bottom:5px">صورة المنتجات</div><img src="${r.img_data}" style="max-width:100%;border-radius:8px"></div>`;
   document.getElementById("req-detail-body").innerHTML = html;
   document.getElementById("req-detail-footer").innerHTML = r.status==="pending"
     ? `<button type="button" class="btn btn-green" onclick="approveReq(${r.id});closeM('req')">✅ قبول وإضافة</button>
