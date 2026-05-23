@@ -187,6 +187,7 @@ window.go = function go(id, btn) {
   if(id==="promoted")   renderPromo();
   if(id==="requests")   renderRequests();
   if(id==="categories") renderCatsTable();
+  if(id==="clients")    renderClients();
   if(id==="add") { resetForm(); document.getElementById("add-title").textContent="إضافة مشروع جديد"; }
 }
 
@@ -739,6 +740,46 @@ window.pickImg = function pickImg(inp) {
 window.clearImg = function clearImg() { imgData=null; document.getElementById("img-box").innerHTML=`<div id="img-ph"><div style="font-size:22px;margin-bottom:3px">📷</div><div style="font-size:13px;font-weight:600">اضغط لرفع صورة</div></div>`; }
 
 // ── Export ────────────────────────────────
+window.renderClients = function renderClients() {
+  const q = (document.getElementById("clients-q")?.value||"").toLowerCase();
+  // نجمع من الطلبات المقبولة
+  const approved = REQUESTS.filter(r => r.status === "approved");
+  const list = q
+    ? approved.filter(r =>
+        (r.business_name||"").toLowerCase().includes(q) ||
+        (r.owner_name||"").toLowerCase().includes(q) ||
+        (r.owner_phone||"").includes(q) ||
+        (r.owner_email||"").toLowerCase().includes(q)
+      )
+    : approved;
+
+  const tbody = document.getElementById("clients-body");
+  if(!tbody) return;
+
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="5"><div style="text-align:center;padding:36px;color:var(--mu)">${approved.length===0?"لا توجد طلبات مقبولة بعد":"لا توجد نتائج"}</div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(r => `
+    <tr>
+      <td style="font-weight:700;font-size:13px">${esc(r.business_name||"—")}</td>
+      <td style="font-size:13px">${esc(r.owner_name||"—")}</td>
+      <td style="font-size:13px;direction:ltr;text-align:right">
+        ${r.owner_phone ? `<a href="tel:${esc(r.owner_phone)}" style="color:var(--or);font-weight:600">${esc(r.owner_phone)}</a>` : "—"}
+      </td>
+      <td style="font-size:12px;color:var(--mu);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        ${r.owner_email ? `<a href="mailto:${esc(r.owner_email)}" style="color:var(--bl)">${esc(r.owner_email)}</a>` : "—"}
+      </td>
+      <td>
+        <div style="display:flex;gap:6px">
+          ${r.owner_phone ? `<a href="https://wa.me/966${(r.owner_phone||"").replace(/^0/,"")}" target="_blank" class="btn btn-green btn-sm">💬</a>` : ""}
+          ${r.owner_email ? `<a href="mailto:${esc(r.owner_email)}" class="btn btn-ghost btn-sm">✉️</a>` : ""}
+        </div>
+      </td>
+    </tr>`).join("");
+}
+
 window.exportJSON = function exportJSON() {
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([JSON.stringify(DB,null,2)],{type:"application/json"}));
@@ -904,6 +945,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
   <button class="sb-btn" data-go="businesses">🏪 المشاريع <span class="sb-count" id="sb-total">0</span></button>
   <button class="sb-btn" data-go="add">➕ إضافة مشروع</button>
   <button class="sb-btn" data-go="requests">📥 الطلبات <span class="sb-count" id="sb-req">0</span></button>
+  <button class="sb-btn" data-go="clients">👥 بيانات العملاء</button>
   <hr class="sb-div">
   <div class="sb-sec">الإعلانات</div>
   <button class="sb-btn" data-go="promoted">⭐ المميزة <span class="sb-count" id="sb-promo">0</span></button>
@@ -1108,6 +1150,28 @@ tr:hover td{background:rgba(242,101,34,.04)}
   </table></div></div>
 </div>
 
+<!-- Clients -->
+<div class="page" id="page-clients">
+  <div class="ph">
+    <div><div class="ph-title">بيانات العملاء</div><div class="ph-sub">معلومات التواصل مع أصحاب المشاريع المقبولة — سرية لا تُنشر</div></div>
+  </div>
+  <div class="tbl-wrap">
+    <div class="tbl-bar">
+      <input id="clients-q" placeholder="ابحث باسم المشروع أو الجوال أو الاسم..." oninput="renderClients()" style="flex:1;min-width:150px;background:var(--card2);border:1px solid var(--b2);border-radius:8px;padding:7px 10px;color:var(--tx);font-size:13px;outline:none;direction:rtl">
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr>
+        <th>المشروع</th>
+        <th>صاحب المشروع</th>
+        <th>الجوال</th>
+        <th>البريد الإلكتروني</th>
+        <th>التواصل</th>
+      </tr></thead>
+      <tbody id="clients-body"></tbody>
+    </table></div>
+  </div>
+</div>
+
 <!-- Export -->
 <div class="page" id="page-export">
   <div class="ph"><div><div class="ph-title">تصدير</div><div class="ph-sub">نسخة احتياطية من البيانات</div></div></div>
@@ -1153,6 +1217,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
 <div class="overlay" id="modal-mob-menu" onclick="if(event.target===this)closeM('mob-menu')">
   <div style="position:fixed;bottom:70px;left:0;right:0;background:#111;border-top:1px solid var(--b);border-radius:18px 18px 0 0;padding:16px;display:flex;flex-direction:column;gap:6px">
     <div style="font-size:11px;color:var(--mu);font-weight:700;letter-spacing:1px;padding:4px 8px 8px;border-bottom:1px solid var(--b);margin-bottom:4px">المزيد</div>
+    <button class="mob-menu-item" onclick="go('clients',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">👥 بيانات العملاء</button>
     <button class="mob-menu-item" onclick="go('promoted',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">⭐ الإعلانات المميزة <span id="mob-promo-count" style="background:var(--or);color:#fff;font-size:10px;padding:1px 6px;border-radius:12px;margin-right:4px">0</span></button>
     <button class="mob-menu-item" onclick="go('categories',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">🗂️ التصنيفات</button>
     <button class="mob-menu-item" onclick="go('export',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">📤 تصدير</button>
