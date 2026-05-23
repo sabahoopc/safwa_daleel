@@ -17,11 +17,26 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  const url = e.request.url;
+
+  // لا تتدخل في طلبات Supabase أو APIs خارجية
+  if (
+    url.includes('supabase.co') ||
+    url.includes('onesignal.com') ||
+    url.includes('googletagmanager') ||
+    e.request.method !== 'GET'
+  ) {
+    return; // اتركها تمر بشكل طبيعي
+  }
+
+  // باقي الطلبات: شبكة أولاً ثم cache
   e.respondWith(
     fetch(e.request)
       .then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
+        if (res && res.status === 200 && res.type === 'basic') {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
         return res;
       })
       .catch(() => caches.match(e.request))
