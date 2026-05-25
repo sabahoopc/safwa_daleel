@@ -284,7 +284,7 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
        style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #2a5a2a;color:#4caf50;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">💬</span> تواصل عبر واتساب
     </a>
-    <a href="mailto:one.safwa.a@gmail.com"
+    <a href="mailto:one.safwa.1@gmail.com"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a1a2a;border:1px solid #2a2a5a;color:#4a90d9;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">✉️</span> راسلنا بالإيميل
     </a>
@@ -564,7 +564,7 @@ function renderForm(){
   <input class="fi" id="ro" placeholder="محمد العمري...">
   <label class="fl">جوال صاحب المشروع *</label>
   <input class="fi" id="rop" placeholder="05xxxxxxxx" type="tel" dir="ltr">
-  <label class="fl">البريد الإلكتروني (اختياري)</label>
+  <label class="fl">البريد الإلكتروني *</label>
   <input class="fi" id="roe" placeholder="example@gmail.com" dir="ltr">
 
   <div class="fs">معلومات المشروع</div>
@@ -732,14 +732,21 @@ function prevFile(inp,boxId,isLogo){
 async function submitReq(){
   const owner=document.getElementById("ro").value.trim();
   const ownerPhone=document.getElementById("rop").value.trim();
+  const ownerEmail=document.getElementById("roe").value.trim();
   const name=document.getElementById("rn").value.trim();
   const cat=document.getElementById("rcat").value;
   const loc=document.getElementById("rloc").value.trim();
   const errEl=document.getElementById("rerr");
-  if(!owner||!ownerPhone||!name||!cat||!loc){
+  if(!owner||!ownerPhone||!ownerEmail||!name||!cat||!loc){
     errEl.style.display="block";
-    errEl.textContent=!owner?"⚠️ الاسم مطلوب":!ownerPhone?"⚠️ جوال صاحب المشروع مطلوب":!name?"⚠️ اسم المشروع مطلوب":!cat?"⚠️ يرجى اختيار التصنيف من القائمة":"⚠️ الموقع مطلوب";
+    errEl.textContent=!owner?"⚠️ الاسم مطلوب":!ownerPhone?"⚠️ جوال صاحب المشروع مطلوب":!ownerEmail?"⚠️ البريد الإلكتروني مطلوب":!name?"⚠️ اسم المشروع مطلوب":!cat?"⚠️ يرجى اختيار التصنيف من القائمة":"⚠️ الموقع مطلوب";
     if(!cat) document.getElementById("rcat-search").style.borderColor="#e05c5c";
+    return;
+  }
+  if(!ownerEmail.includes("@")){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ البريد الإلكتروني غير صحيح";
+    document.getElementById("roe").style.borderColor="#e05c5c";
     return;
   }
   // التحقق من رخصة موثوق عند اختيار تصنيف الإعلانات
@@ -777,7 +784,7 @@ async function submitReq(){
   try{
     const row={
       business_name:name, owner_name:owner, owner_phone:ownerPhone,
-      owner_email:document.getElementById("roe").value.trim()||null,
+      owner_email:ownerEmail||null,
       category:cat,
       phone:document.getElementById("rph").value.trim()||null,
       whatsapp:document.getElementById("rwa").value.trim()||null,
