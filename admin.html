@@ -909,23 +909,25 @@ async function sendNewsletter(){
   btn.textContent="⏳ جاري الإرسال..."; btn.disabled=true;
 
   let sent=0, failed=0;
-  // إرسال دفعات لتجنب rate limit
+  // إرسال عبر Supabase Edge Function لتجنب CORS
   for(const email of emails){
     try{
-      const res = await fetch("https://api.resend.com/emails",{
+      const res = await fetch(SUPA_URL+"/functions/v1/send-email",{
         method:"POST",
-        headers:{"Authorization":"Bearer "+RESEND_KEY,"Content-Type":"application/json"},
+        headers:{
+          "Authorization":"Bearer "+SUPA_KEY,
+          "Content-Type":"application/json"
+        },
         body:JSON.stringify({
-          from: `${fromName} <onboarding@resend.dev>`,
-          to: [email],
+          to: email,
           subject: subject,
           html: htmlContent,
+          fromName: fromName,
         })
       });
       if(res.ok) sent++; else failed++;
     }catch(e){ failed++; }
-    // تأخير بسيط بين الإرسالات
-    await new Promise(r=>setTimeout(r,100));
+    await new Promise(r=>setTimeout(r,150));
   }
 
   btn.textContent="📧 إرسال الرسالة"; btn.disabled=false;
