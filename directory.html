@@ -256,6 +256,21 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
   </div>
 </div></div>
 
+<!-- Newsletter -->
+<div style="max-width:1100px;margin:30px auto 0;padding:0 20px">
+  <div style="background:linear-gradient(135deg,#1a1a1a,#1f1005);border:1px solid #3a1a05;border-radius:16px;padding:28px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px">
+    <div>
+      <div style="font-size:16px;font-weight:800;color:var(--orange-light);margin-bottom:5px">📬 اشترك في نشرتنا البريدية</div>
+      <div style="font-size:13px;color:var(--muted)">احصل على آخر المشاريع والعروض في صفوى مباشرة لبريدك</div>
+    </div>
+    <div id="nl-form-wrap" style="display:flex;gap:9px;flex-wrap:wrap;flex:1;min-width:260px;max-width:420px">
+      <input id="nl-name" placeholder="اسمك (اختياري)" style="flex:1;min-width:100px;background:var(--card);border:1px solid #2a2a2a;border-radius:8px;padding:9px 11px;color:var(--text);font-size:13px;outline:none;direction:rtl;font-family:inherit">
+      <input id="nl-email" placeholder="بريدك الإلكتروني *" dir="ltr" style="flex:2;min-width:160px;background:var(--card);border:1px solid #2a2a2a;border-radius:8px;padding:9px 11px;color:var(--text);font-size:13px;outline:none;font-family:inherit">
+      <button onclick="subscribeNewsletter()" style="background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap">اشترك الآن</button>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div style="display:flex;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
     <a href="https://wa.me/966XXXXXXXXXX" target="_blank"
@@ -792,6 +807,35 @@ async function submitReq(){
   }catch(e){
     btn.textContent="إرسال الطلب";btn.disabled=false;
     errEl.style.display="block";errEl.textContent="⚠️ تعذّر الإرسال، تأكد من اتصال الإنترنت";
+  }
+}
+
+async function subscribeNewsletter(){
+  const email = document.getElementById("nl-email").value.trim();
+  const name  = document.getElementById("nl-name").value.trim();
+  if(!email || !email.includes("@")){
+    document.getElementById("nl-email").style.borderColor="#e05c5c";
+    return;
+  }
+  document.getElementById("nl-email").style.borderColor="";
+  const btn = document.querySelector("#nl-form-wrap button");
+  btn.textContent="⏳ جاري..."; btn.disabled=true;
+  try{
+    await fetch(SUPA_URL+"/rest/v1/newsletter_subscribers",{
+      method:"POST",
+      headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify({email, name:name||null, source:"website"})
+    });
+    document.getElementById("nl-form-wrap").innerHTML=`
+      <div style="color:#4caf50;font-weight:700;font-size:14px;padding:9px">
+        ✅ تم اشتراكك بنجاح! سنبقيك على اطلاع بآخر أخبار صفوى
+      </div>`;
+  }catch(e){
+    // قد يكون مسجلاً مسبقاً
+    document.getElementById("nl-form-wrap").innerHTML=`
+      <div style="color:var(--orange);font-weight:700;font-size:14px;padding:9px">
+        📧 بريدك مسجّل بالفعل في النشرة!
+      </div>`;
   }
 }
 
