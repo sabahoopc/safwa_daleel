@@ -38,7 +38,13 @@ header{background:linear-gradient(135deg,#111,#1a0d04);border-bottom:2px solid v
 .lw img{width:50px;height:50px;object-fit:contain;mix-blend-mode:screen}
 .lt{font-size:21px;font-weight:900;color:var(--orange)}
 .ls{font-size:11px;color:var(--muted);margin-top:2px}
-.ha{display:flex;gap:9px;flex-wrap:wrap}
+.ha{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.visit-badge{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid #2a2a2a;border-radius:20px;padding:5px 12px;font-size:12px;color:var(--muted);white-space:nowrap}
+@media(max-width:480px){
+  .hi{flex-wrap:nowrap;padding:10px 12px}
+  .ha .btn-p{display:none}
+  .visit-badge{display:none}
+}
 .btn-p{background:transparent;border:1px solid var(--orange);color:var(--orange);border-radius:8px;padding:8px 14px;font-weight:600;font-size:12px}
 .btn-a{background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:12px}
 @media(max-width:768px){.mob-refresh{display:block!important}}
@@ -182,7 +188,7 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
       </a>
     </div>
     <div class="ha">
-      <div style="display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid #2a2a2a;border-radius:20px;padding:5px 12px;font-size:12px;color:var(--muted)">
+      <div class="visit-badge">
         <span style="color:var(--orange)">👁️</span>
         <span id="visit-count">...</span>
         <span>زيارة</span>
@@ -222,6 +228,11 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
   <input id="si" class="si" placeholder="ابحث في دليل صفوى..." oninput="onSearch()">
   <button class="cb" onclick="clearSearch()">✕</button>
 </div></div>
+<!-- Visit counter mobile -->
+<div style="display:none;text-align:center;padding:6px 0;font-size:12px;color:var(--muted)" class="mob-visits">
+  👁️ <span id="visit-count-mob">...</span> زيارة منذ الإطلاق
+</div>
+<style>@media(max-width:480px){.mob-visits{display:block!important}}</style>
 
 <!-- ══ VIEW: CATEGORIES ══ -->
 <div id="view-cats">
@@ -289,7 +300,7 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
        style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #2a5a2a;color:#4caf50;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">💬</span> تواصل عبر واتساب
     </a>
-    <a href="mailto:one.safwa.1@gmail.com"
+    <a href="one.safwa.1@gmail.com"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a1a2a;border:1px solid #2a2a5a;color:#4a90d9;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">✉️</span> راسلنا بالإيميل
     </a>
@@ -937,8 +948,11 @@ async function trackVisit(){
     }).then(r=>r.json());
     if(data&&data[0]){
       const v = data[0].visits;
+      const fmt = v.toLocaleString("ar-SA");
       const el = document.getElementById("visit-count");
-      if(el) el.textContent = v.toLocaleString("ar-SA");
+      const el2 = document.getElementById("visit-count-mob");
+      if(el)  el.textContent  = fmt;
+      if(el2) el2.textContent = fmt;
     }
   }catch(e){ console.warn("Visit counter failed"); }
 }
