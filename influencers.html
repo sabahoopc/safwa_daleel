@@ -185,7 +185,7 @@ button{cursor:pointer;font-family:'Tajawal',sans-serif}
       <span>دليل مؤثري صفوى</span>
     </div>
     <nav class="header-nav">
-      <a href="/directory.html" class="nav-link" style="background:var(--green-light);color:var(--green-dark);font-weight:500">🏪 دليل المشاريع</a>
+      <a href="/directory.html" class="nav-link">الدليل الرئيسي</a>
       <a href="#nominate" class="nav-link active">رشِّح مؤثراً</a>
       <a href="#remove" class="nav-link danger">طلب إزالة</a>
     </nav>
@@ -437,10 +437,9 @@ let ALL=[];
 async function load(){
   const snap=await getDocs(query(collection(db,'influencers'),where('status','==','active')));
   ALL=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const ns=await getDocs(collection(db,'nominations'));
   document.getElementById('stat-infs').textContent=ALL.length;
   document.getElementById('stat-fields').textContent=new Set(ALL.map(i=>i.field)).size;
-  document.getElementById('stat-noms').textContent=ns.docs.filter(d=>d.data().status==='pending').length;
+  document.getElementById('stat-noms').textContent='—';
   buildFilters(); renderCards(ALL); renderCriteria(); fillRemSelect();
 }
 
