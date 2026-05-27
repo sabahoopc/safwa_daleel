@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-487L69CPTL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "G-487L69CPTL");
+</script>
+<meta charset="UTF-8">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#f26522">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دليل صفوى">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مؤثرو صفوى — دليل المؤثرين الاجتماعيين في مدينة صفوى</title>
+<meta name="description" content="دليل مؤثري صفوى — أبرز المؤثرين الاجتماعيين في مدينة صفوى، مرشَّحون من الجمهور ومُقيَّمون بمعايير أخلاقية">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--surface:#141414;--card:#1a1a1a;--border:#222;
+  --orange:#f26522;--orange-light:#ff8c42;--orange-dark:#c84d0a;
+  --text:#f0f0f0;--muted:#777;--pb:#1f1408;--pborder:#7a3010;
+  --green:#1D9E75;--green-light:#0d3d2d;--red:#c0392b;--red-light:#2a0d0d;
+}
+body{background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,sans-serif;min-height:100vh}
+a{text-decoration:none}
+button{cursor:pointer;font-family:inherit}
+
+/* ── Header (identical to directory.html) ── */
+header{background:linear-gradient(135deg,#111,#1a0d04);border-bottom:2px solid var(--orange);position:sticky;top:0;z-index:50}
+.hi{max-width:1100px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.lw{display:flex;align-items:center;gap:12px}
+.lw img{width:50px;height:50px;object-fit:contain;mix-blend-mode:screen}
+.lt{font-size:21px;font-weight:900;color:var(--orange)}
+.ls{font-size:11px;color:var(--muted);margin-top:2px}
+.ha{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+@media(max-width:480px){.hi{flex-wrap:nowrap;padding:10px 12px}.ha .btn-p{display:none}}
+.btn-p{background:transparent;border:1px solid var(--orange);color:var(--orange);border-radius:8px;padding:8px 14px;font-weight:600;font-size:12px}
+.btn-a{background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:12px}
+.btn-back{background:transparent;border:1px solid #333;color:var(--muted);border-radius:8px;padding:8px 14px;font-weight:600;font-size:12px;display:flex;align-items:center;gap:6px}
+.btn-back:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ── Page wrapper ── */
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px}
+
+/* ── Hero ── */
+.page-hero{text-align:center;padding:40px 20px 32px;margin-bottom:28px;background:linear-gradient(135deg,#111,#1a0d04);border-radius:16px;border:1px solid #222;position:relative;overflow:hidden}
+.page-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(242,101,34,.12),transparent 70%);pointer-events:none}
+.page-hero-badge{display:inline-block;background:var(--pb);border:1px solid var(--pborder);color:var(--orange);font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:14px;letter-spacing:.5px}
+.page-hero h1{font-size:28px;font-weight:900;color:var(--text);margin-bottom:10px;line-height:1.3}
+.page-hero h1 span{color:var(--orange)}
+.page-hero p{font-size:14px;color:var(--muted);max-width:520px;margin:0 auto 24px;line-height:1.8}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.hero-btn-primary{background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:10px;padding:12px 24px;font-weight:700;font-size:14px}
+.hero-btn-ghost{background:transparent;border:1px solid #333;color:var(--muted);border-radius:10px;padding:12px 24px;font-weight:600;font-size:14px}
+.hero-btn-ghost:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ── Stats ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.stat-num{font-size:26px;font-weight:900;color:var(--orange)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* ── Filters ── */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.filter-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;transition:.15s}
+.filter-btn:hover{border-color:var(--orange);color:var(--orange)}
+.filter-btn.active{background:var(--orange);border-color:var(--orange);color:#fff}
+
+/* ── Grid ── */
+.inf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:32px}
+
+/* ── Card ── */
+.inf-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;transition:transform .15s,box-shadow .15s;position:relative}
+.inf-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);border-color:#333}
+
+/* Avatar */
+.avatar-wrap{position:relative;width:56px;height:56px;margin-bottom:12px}
+.avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;overflow:hidden;border:2px solid #2a2a2a}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.av-teal  {background:#0d3d2d;color:#9FE1CB}
+.av-blue  {background:#0d1f3d;color:#B5D4F4}
+.av-coral {background:#3d1a0d;color:#F5C4B3}
+.av-purple{background:#1a0d3d;color:#CECBF6}
+.av-amber {background:#3d2a0d;color:#FAC775}
+.av-pink  {background:#3d0d1f;color:#F4C0D1}
+.av-green {background:#0d2a0d;color:#C0DD97}
+.av-gray  {background:#1f1f1f;color:#D3D1C7}
+.avatar-upload-btn{position:absolute;bottom:-2px;left:-2px;width:22px;height:22px;border-radius:50%;background:var(--orange);border:2px solid var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.avatar-upload-btn:hover{background:var(--orange-dark)}
+.avatar-upload-btn svg{width:10px;height:10px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.avatar-upload-input{display:none}
+
+.inf-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.inf-field{font-size:11px;color:var(--muted);margin-bottom:10px}
+
+/* Platforms */
+.platforms{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.platform-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:20px;border:1px solid #2a2a2a;color:var(--muted);text-decoration:none;transition:.1s}
+.platform-pill:hover{border-color:var(--orange);color:var(--orange)}
+.platform-pill svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* Remove btn */
+.card-remove-btn{width:100%;font-size:11px;padding:6px 0;border-radius:8px;border:1px solid #2a2a2a;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:5px;transition:.15s}
+.card-remove-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.card-remove-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-light)}
+
+.removal-badge{position:absolute;top:10px;left:10px;background:var(--red-light);color:#e74c3c;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid #5a1a1a}
+
+/* Loading skeleton */
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,#222 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:14px;height:200px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── Criteria ── */
+.criteria-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:28px}
+.criteria-section h2{font-size:16px;font-weight:700;color:var(--orange);margin-bottom:16px}
+.criteria-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.criteria-grid{grid-template-columns:1fr}}
+.criteria-box{background:var(--surface);border-radius:10px;padding:14px}
+.criteria-box h3{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.criteria-list{list-style:none}
+.criteria-list li{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px;color:var(--muted);border-bottom:1px solid var(--border);line-height:1.6}
+.criteria-list li:last-child{border-bottom:none}
+.criteria-list li svg{width:15px;height:15px;flex-shrink:0;margin-top:2px;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.criteria-list li svg.ok{stroke:var(--green)}
+.criteria-list li svg.no{stroke:var(--red)}
+.warning-banner{background:var(--pb);border:1px solid var(--pborder);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;margin-top:14px}
+.warning-banner svg{width:17px;height:17px;stroke:var(--orange);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px}
+.warning-banner p{font-size:12px;color:#c47a3a;line-height:1.7}
+
+/* ── Forms ── */
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.form-section h2{font-size:16px;font-weight:700;margin-bottom:4px}
+.form-section .sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
+.form-group input,.form-group select,.form-group textarea{width:100%;font-size:14px;font-family:inherit;padding:10px 12px;border:1px solid #2a2a2a;border-radius:9px;background:#111;color:var(--text);outline:none;transition:border-color .15s;direction:rtl}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--orange)}
+.form-group textarea{resize:vertical;min-height:90px}
+.form-group select option{background:#111}
+.fieldset{border:1px solid #2a2a2a;border-radius:9px;padding:14px 14px 6px;margin-bottom:14px}
+.fieldset legend{font-size:12px;color:var(--muted);font-weight:600;padding:0 6px}
+.req{color:var(--red)}
+.opt{color:var(--muted);font-weight:400;font-size:11px}
+.hint{font-size:11px;color:var(--muted);margin-bottom:6px;margin-top:-2px}
+.anon-note{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:14px}
+.anon-note svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.form-error{background:var(--red-light);border:1px solid #5a1a1a;border-radius:9px;padding:10px 14px;font-size:13px;color:#e74c3c;margin-bottom:12px;display:none}
+
+/* Photo upload */
+.photo-upload{position:relative;border:1px dashed #2a2a2a;border-radius:9px;height:70px;display:flex;align-items:center;cursor:pointer;transition:border-color .15s;overflow:hidden}
+.photo-upload:hover{border-color:var(--orange)}
+.photo-upload input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:2;padding:0;border:none;background:none}
+.photo-upload-inner{display:flex;align-items:center;justify-content:center;gap:10px;padding:0 1rem;color:var(--muted);font-size:13px;width:100%;pointer-events:none}
+.photo-upload-inner svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.photo-upload img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+
+/* Buttons */
+.btn-submit{width:100%;padding:12px;font-size:14px;font-weight:700;font-family:inherit;background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:10px;cursor:pointer;transition:opacity .15s;margin-top:4px}
+.btn-submit:hover{opacity:.88}
+.btn-remove-submit{width:100%;padding:12px;font-size:14px;font-weight:700;font-family:inherit;background:var(--red);color:#fff;border:none;border-radius:10px;cursor:pointer;transition:opacity .15s;margin-top:4px}
+.btn-remove-submit:hover{opacity:.88}
+
+/* Success */
+.form-success{text-align:center;padding:36px 20px;background:var(--green-light);border-radius:12px;display:none}
+.form-success svg{width:44px;height:44px;stroke:var(--green);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;display:block;margin:0 auto 12px}
+.form-success h3{font-size:18px;font-weight:700;color:var(--green);margin-bottom:6px}
+.form-success p{font-size:13px;color:#4aaa80;margin-bottom:16px}
+.form-success-warn{background:#2a1a00;border:1px solid #7a5010}
+.form-success-warn svg{stroke:#f39c12}
+.form-success-warn h3{color:#f39c12}
+.form-success-warn p{color:#c47a3a}
+
+/* Danger box */
+.danger-box{background:var(--red-light);border:1px solid #5a1a1a;border-radius:9px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.danger-box svg{width:17px;height:17px;stroke:#e74c3c;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:1px}
+.danger-box p{font-size:12px;color:#c0392b;line-height:1.7}
+.form-section--danger{border-color:#5a1a1a}
+.form-section--danger h2{color:#e74c3c}
+
+/* ── Modal ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:400px}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6}
+.modal-btns{display:flex;gap:10px}
+.modal-btns button{flex:1;padding:10px;font-size:13px;font-family:inherit;border-radius:9px;cursor:pointer}
+.btn-ghost{background:transparent;border:1px solid #333;color:var(--muted)}
+.btn-ghost:hover{border-color:#555;color:var(--text)}
+.btn-danger{background:var(--red);color:#fff;border:none}
+
+/* ── Footer ── */
+footer{border-top:1px solid var(--border);margin-top:40px;padding:24px 20px;text-align:center}
+footer p{font-size:12px;color:var(--muted)}
+footer a{color:var(--orange)}
+
+/* Tabs for forms */
+.form-tabs{display:flex;gap:0;margin-bottom:24px;border-bottom:1px solid var(--border)}
+.form-tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;font-family:inherit}
+.form-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.form-tab-content{display:none}
+.form-tab-content.active{display:block}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="hi">
+    <div class="lw">
+      <img src="/logo.png" alt="دليل صفوى" onerror="this.style.display='none'">
+      <div>
+        <div class="lt">دليل صفوى</div>
+        <div class="ls">مؤثرو المجتمع</div>
+      </div>
+    </div>
+    <div class="ha">
+      <a href="/directory.html" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg>
+        الدليل الرئيسي
+      </a>
+      <button class="btn-a" onclick="document.getElementById('nominate-section').scrollIntoView({behavior:'smooth'})">رشِّح مؤثراً</button>
+    </div>
+  </div>
+</header>
+
+<!-- ── MAIN ── -->
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="page-hero">
+    <div class="page-hero-badge">صفوى — المنطقة الشرقية</div>
+    <h1>دليل <span>مؤثري</span> صفوى</h1>
+    <p>منصة مجتمعية لإبراز أصوات صفوى المؤثرة — مرشَّحون من الجمهور، ومُقيَّمون بمعايير أخلاقية واضحة</p>
+    <div class="hero-btns">
+      <button class="hero-btn-primary" onclick="document.getElementById('nominate-section').scrollIntoView({behavior:'smooth'})">رشِّح مؤثراً ←</button>
+      <button class="hero-btn-ghost" onclick="document.getElementById('criteria-section').scrollIntoView({behavior:'smooth'})">معايير الإدراج</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-num" id="stat-infs">—</div><div class="stat-label">مؤثر مُدرَج</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-fields">—</div><div class="stat-label">مجال</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-noms">—</div><div class="stat-label">ترشيح قيد المراجعة</div></div>
+  </div>
+
+  <!-- Section title + filters -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+    <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase">المؤثرون المُدرَجون</div>
+    <div class="filter-row" id="filter-row"></div>
+  </div>
+
+  <!-- Cards grid -->
+  <div class="inf-grid" id="inf-grid">
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+    <div class="skeleton"></div>
+  </div>
+
+  <!-- Criteria -->
+  <div class="criteria-section" id="criteria-section">
+    <h2>⚖️ معايير الإدراج</h2>
+    <div class="criteria-grid">
+      <div class="criteria-box">
+        <h3>شروط القبول</h3>
+        <ul class="criteria-list" id="criteria-ok"></ul>
+      </div>
+      <div class="criteria-box">
+        <h3>موانع الإدراج</h3>
+        <ul class="criteria-list" id="criteria-no"></ul>
+      </div>
+    </div>
+    <div class="warning-banner">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p>في حال إخلال المؤثر بأي من هذه المعايير، تحتفظ الإدارة بحق إزالته دون إشعار مسبق. كثرة طلبات الإزالة الموثقة ستُعجّل باتخاذ القرار.</p>
+    </div>
+  </div>
+
+  <!-- Forms tabs -->
+  <div id="nominate-section">
+    <div class="form-tabs">
+      <button class="form-tab active" onclick="switchTab('nom')">رشِّح مؤثراً</button>
+      <button class="form-tab" onclick="switchTab('rem')">طلب إزالة</button>
+    </div>
+
+    <!-- Nomination form -->
+    <div class="form-tab-content active" id="tab-nom">
+      <div class="form-section">
+        <h2>رشِّح مؤثراً</h2>
+        <div class="sub">الترشيح مفتوح للجميع — تراجع الإدارة كل طلب قبل الإضافة</div>
+        <form id="nom-form" onsubmit="submitNomination(event)">
+          <div class="form-group">
+            <label>اسم المؤثر المُرشَّح <span class="req">*</span></label>
+            <input type="text" id="inf-name" placeholder="الاسم الكامل أو الاسم المعروف به" required>
+          </div>
+          <div class="form-group">
+            <label>مجال التأثير <span class="req">*</span></label>
+            <select id="inf-field" required>
+              <option value="">اختر المجال</option>
+              <option value="education">تعليم وتطوير ذات</option>
+              <option value="health">صحة ولياقة</option>
+              <option value="culture">ثقافة وتراث</option>
+              <option value="business">ريادة أعمال</option>
+              <option value="tech">تقنية وبرمجة</option>
+              <option value="coverage">تغطيات تجارية وفعاليات</option>
+              <option value="media">إعلام وصحافة</option>
+              <option value="art">فن وإبداع</option>
+              <option value="community">بيئة ومجتمع</option>
+            </select>
+          </div>
+          <fieldset class="fieldset">
+            <legend>روابط الحسابات <span class="req">*</span> <span class="opt">(رابط واحد على الأقل)</span></legend>
+            <div class="form-group" style="margin-top:10px">
+              <input type="url" id="link-instagram" placeholder="رابط انستجرام" style="margin-bottom:8px">
+              <input type="url" id="link-snapchat"  placeholder="رابط سناب شات" style="margin-bottom:8px">
+              <input type="url" id="link-x"         placeholder="رابط إكس"      style="margin-bottom:8px">
+              <input type="url" id="link-youtube"   placeholder="رابط يوتيوب">
+            </div>
+          </fieldset>
+          <div class="form-group">
+            <label>سبب الترشيح <span class="req">*</span></label>
+            <p class="hint">ما الفائدة التي يقدمها هذا المؤثر للمجتمع؟</p>
+            <textarea id="reason" placeholder="اشرح باختصار قيمة هذا المؤثر ومحتواه..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label>صورة المؤثر <span class="opt">(اختياري)</span></label>
+            <p class="hint">صورة مربعة — يُفضَّل 400×400 بكسل، بحد أقصى 1MB، بصيغة JPG أو PNG</p>
+            <div class="photo-upload" id="nom-photo-zone">
+              <input type="file" id="nom-photo" accept="image/*" onchange="previewNomPhoto(this)">
+              <div class="photo-upload-inner" id="nom-photo-inner">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>اضغط لرفع صورة</span>
+              </div>
+              <img id="nom-photo-preview" src="" alt="" style="display:none">
+            </div>
+          </div>
+          <div class="anon-note">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <span>هويتك كمُرشِّح سرية تماماً — لا يُطلب منك ذكر اسمك</span>
+          </div>
+          <div class="form-error" id="nom-error"></div>
+          <button type="submit" class="btn-submit" id="nom-btn">إرسال الترشيح للمراجعة ←</button>
+        </form>
+        <div class="form-success" id="nom-success">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <h3>تم إرسال الترشيح بنجاح</h3>
+          <p>ستراجع الإدارة الطلب وتتخذ القرار بناءً على المعايير المحددة</p>
+          <button class="btn-ghost" onclick="resetNomForm()" style="padding:8px 20px;border-radius:9px;font-family:inherit;font-size:13px">ترشيح مؤثر آخر</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Removal form -->
+    <div class="form-tab-content" id="tab-rem">
+      <div class="form-section form-section--danger">
+        <h2>طلب إزالة مؤثر</h2>
+        <div class="sub">إذا رصدت انتهاكاً للمعايير، قدِّم طلب إزالة موثقاً</div>
+        <div class="danger-box">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p>الطلبات الكيدية غير الموثقة لن تُؤخذ بعين الاعتبار. تراكم الطلبات الموثقة بحق مؤثر معين سيُعجّل بإزالته.</p>
+        </div>
+        <form id="rem-form" onsubmit="submitRemoval(event)">
+          <div class="form-group">
+            <label>اسم المؤثر المراد إزالته <span class="req">*</span></label>
+            <select id="rem-target" required>
+              <option value="">اختر المؤثر</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>سبب طلب الإزالة <span class="req">*</span></label>
+            <select id="rem-reason" required>
+              <option value="">اختر السبب الرئيسي</option>
+              <option value="bullying">محتوى تنمر أو إساءة</option>
+              <option value="misinformation">معلومات مضللة أو مزيفة</option>
+              <option value="illegal">محتوى مخالف للأنظمة</option>
+              <option value="private">الحساب أصبح خاصاً</option>
+              <option value="inactive">توقف النشاط كلياً</option>
+              <option value="hate">تحريض أو خطاب كراهية</option>
+              <option value="other">سبب آخر</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>شرح تفصيلي <span class="req">*</span></label>
+            <textarea id="rem-detail" placeholder="اشرح بوضوح ما رصدته وكيف يُخل بالمعايير..." required></textarea>
+          </div>
+          <fieldset class="fieldset">
+            <legend>الأدلة والروابط <span class="req">*</span> <span class="opt">(دليل واحد على الأقل)</span></legend>
+            <div class="form-group" style="margin-top:10px">
+              <input type="url" id="ev1" placeholder="رابط المنشور أو المقطع المخالف" style="margin-bottom:8px">
+              <input type="url" id="ev2" placeholder="رابط إضافي إن وجد" style="margin-bottom:8px">
+              <input type="text" id="ev3" placeholder="وصف دليل آخر (لقطة شاشة، تاريخ...)">
+            </div>
+          </fieldset>
+          <div class="anon-note">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            <span>هويتك سرية — لا يُطلب منك ذكر اسمك</span>
+          </div>
+          <div class="form-error" id="rem-error"></div>
+          <button type="submit" class="btn-remove-submit" id="rem-btn">إرسال طلب الإزالة ←</button>
+        </form>
+        <div class="form-success form-success-warn" id="rem-success">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <h3>تم استلام طلب الإزالة</h3>
+          <p>ستراجع الإدارة الأدلة وتتخذ القرار المناسب</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .wrap -->
+
+<!-- Remove confirmation modal -->
+<div class="overlay" id="remove-modal">
+  <div class="modal">
+    <h3>طلب إزالة</h3>
+    <p>أنت على وشك تقديم طلب إزالة بحق <strong id="modal-inf-name"></strong>. يُرجى تعبئة نموذج الإزالة بالتفاصيل والأدلة.</p>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeRemoveModal()">إلغاء</button>
+      <button class="btn-danger" onclick="goToRemoveForm()">الانتقال للنموذج</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>دليل مؤثري صفوى — جزء من <a href="/directory.html">دليل صفوى</a> · منصة مجتمعية مستقلة غير ربحية</p>
+</footer>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, where }
+  from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey:"AIzaSyDwih7d6k_vomgMBCDKbOSp2JbLq_VA8f8",
+  authDomain:"safwa-inf.firebaseapp.com",
+  projectId:"safwa-inf",
+  storageBucket:"safwa-inf.firebasestorage.app",
+  messagingSenderId:"633794658780",
+  appId:"1:633794658780:web:7957fc64c739a2f0c30f19"
+});
+const db = getFirestore(app);
+
+const FIELD_LABELS = {education:'تعليم وتطوير ذات',health:'صحة ولياقة',culture:'ثقافة وتراث',business:'ريادة أعمال',tech:'تقنية وبرمجة',coverage:'تغطيات تجارية وفعاليات',media:'إعلام وصحافة',art:'فن وإبداع',community:'بيئة ومجتمع'};
+const CRITERIA_OK = ['الحساب عام وليس خاصاً على جميع المنصات المُدرَجة','يقدم محتوى يضيف قيمة إيجابية للمجتمع','الصلة بمدينة صفوى أو المنطقة الشرقية','نشاط منتظم ومستمر على المنصة','يلتزم بأخلاقيات النشر وفق الأنظمة المحلية'];
+const CRITERIA_NO = ['خلو الحساب من مقاطع أو منشورات التنمر','لا تحريض ولا إساءة ولا معلومات مضللة','لا خطاب كراهية أو محتوى مخالف للأنظمة'];
+const PLATFORM_LABELS = {youtube:'يوتيوب',instagram:'انستجرام',snapchat:'سناب',x:'إكس'};
+const PLATFORM_ICONS = {
+  youtube:`<svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>`,
+  instagram:`<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`,
+  snapchat:`<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>`,
+  x:`<svg viewBox="0 0 24 24"><path d="M4 4l11.733 16H20L8.267 4z"/><path d="M4 20l6.768-6.768M20 4l-6.768 6.768"/></svg>`
+};
+
+const AVATAR_COLORS = ['av-teal','av-blue','av-coral','av-purple','av-amber','av-pink','av-green','av-gray'];
+function pickColor(n){return AVATAR_COLORS[n.charCodeAt(0)%AVATAR_COLORS.length]}
+function getInitials(n){const p=n.trim().split(' ');return p.length>=2?p[0][0]+p[1][0]:p[0].slice(0,2)}
+
+let ALL_INFS = [];
+
+// ── Load data ────────────────────────────────────
+async function loadData(){
+  const q    = query(collection(db,'influencers'), where('status','==','active'));
+  const snap = await getDocs(q);
+  ALL_INFS   = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+  const nomSnap = await getDocs(collection(db,'nominations'));
+  const pending = nomSnap.docs.filter(d=>d.data().status==='pending').length;
+
+  const fields = new Set(ALL_INFS.map(i=>i.field)).size;
+  document.getElementById('stat-infs').textContent   = ALL_INFS.length;
+  document.getElementById('stat-fields').textContent = fields;
+  document.getElementById('stat-noms').textContent   = pending;
+
+  buildFilters();
+  renderCards(ALL_INFS);
+  renderCriteria();
+  populateRemoveDropdown();
+}
+
+// ── Criteria ─────────────────────────────────────
+function renderCriteria(){
+  const checkSvg=`<svg class="ok" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const banSvg  =`<svg class="no" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`;
+  document.getElementById('criteria-ok').innerHTML = CRITERIA_OK.map(c=>`<li>${checkSvg}${c}</li>`).join('');
+  document.getElementById('criteria-no').innerHTML = CRITERIA_NO.map(c=>`<li>${banSvg}${c}</li>`).join('');
+}
+
+// ── Filters ───────────────────────────────────────
+function buildFilters(){
+  const fields = ['all',...new Set(ALL_INFS.map(i=>i.field))];
+  const labels = {all:'الكل',...FIELD_LABELS};
+  document.getElementById('filter-row').innerHTML = fields.map(f=>
+    `<button class="filter-btn${f==='all'?' active':''}" data-field="${f}">${labels[f]||f}</button>`
+  ).join('');
+  document.getElementById('filter-row').addEventListener('click',e=>{
+    const btn=e.target.closest('.filter-btn');
+    if(!btn)return;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const f=btn.dataset.field;
+    renderCards(f==='all'?ALL_INFS:ALL_INFS.filter(i=>i.field===f));
+  });
+}
+
+// ── Cards ─────────────────────────────────────────
+function renderCards(list){
+  const grid=document.getElementById('inf-grid');
+  if(!list.length){grid.innerHTML='<div style="color:var(--muted);font-size:14px;padding:20px">لا يوجد مؤثرون في هذا المجال حتى الآن</div>';return;}
+  grid.innerHTML=list.map(inf=>`
+    <div class="inf-card">
+      ${(inf.removalCount||0)>=3?`<span class="removal-badge">${inf.removalCount} بلاغ</span>`:''}
+      <div class="avatar-wrap">
+        <div class="avatar ${inf.color||pickColor(inf.name)}" id="av-${inf.id}">
+          ${inf.photo?`<img src="${inf.photo}" alt="${inf.name}">`:`<span>${inf.initials||getInitials(inf.name)}</span>`}
+        </div>
+        <label class="avatar-upload-btn" for="up-${inf.id}" title="رفع صورة">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </label>
+        <input class="avatar-upload-input" type="file" id="up-${inf.id}" accept="image/*" onchange="uploadAvatar(this,'${inf.id}')">
+      </div>
+      <div class="inf-name">${inf.name}</div>
+      <div class="inf-field">${inf.fieldLabel||FIELD_LABELS[inf.field]||inf.field}</div>
+      <div class="platforms">
+        ${Object.entries(inf.links||{}).filter(([,v])=>v).map(([k,v])=>
+          `<a class="platform-pill" href="${v}" target="_blank" rel="noopener">${PLATFORM_ICONS[k]||''}${PLATFORM_LABELS[k]||k}</a>`
+        ).join('')}
+      </div>
+      <button class="card-remove-btn" onclick="openRemoveModal('${inf.name.replace(/'/g,"\\'")}')">
+        <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        طلب الإزالة
+      </button>
+    </div>
+  `).join('');
+}
+
+// ── Avatar upload ─────────────────────────────────
+window.uploadAvatar = async function(input,id){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0];
+  if(file.size>1024*1024){alert('حجم الصورة يتجاوز 1MB');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const av=document.getElementById('av-'+id);
+    if(av){av.innerHTML=`<img src="${e.target.result}" alt="">`;av.style.background='transparent';}
+    await updateDoc(doc(db,'influencers',id),{photo:e.target.result});
+  };
+  reader.readAsDataURL(file);
+};
+
+// ── Remove modal ──────────────────────────────────
+let _removeName='';
+window.openRemoveModal=function(name){
+  _removeName=name;
+  document.getElementById('modal-inf-name').textContent=name;
+  document.getElementById('remove-modal').classList.add('open');
+};
+window.closeRemoveModal=function(){document.getElementById('remove-modal').classList.remove('open');};
+window.goToRemoveForm=function(){
+  closeRemoveModal();
+  switchTab('rem');
+  const sel=document.getElementById('rem-target');
+  for(const o of sel.options){if(o.value===_removeName){o.selected=true;break;}}
+  document.getElementById('nominate-section').scrollIntoView({behavior:'smooth'});
+};
+
+// ── Populate remove dropdown ──────────────────────
+function populateRemoveDropdown(){
+  const sel=document.getElementById('rem-target');
+  ALL_INFS.forEach(inf=>{
+    const o=document.createElement('option');
+    o.value=inf.name;o.textContent=inf.name;
+    sel.appendChild(o);
+  });
+}
+
+// ── Form tabs ─────────────────────────────────────
+window.switchTab=function(tab){
+  document.querySelectorAll('.form-tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='nom'?0:1)));
+  document.getElementById('tab-nom').classList.toggle('active',tab==='nom');
+  document.getElementById('tab-rem').classList.toggle('active',tab==='rem');
+};
+
+// ── Photo preview ─────────────────────────────────
+window.previewNomPhoto=function(input){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0];
+  if(file.size>1024*1024){input.value='';alert('حجم الصورة يتجاوز 1MB');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('nom-photo-preview').src=e.target.result;
+    document.getElementById('nom-photo-preview').style.display='block';
+    document.getElementById('nom-photo-inner').style.display='none';
+  };
+  reader.readAsDataURL(file);
+};
+
+// ── EmailJS notify ────────────────────────────────
+async function sendNotify(params){
+  try{
+    await fetch(`https://api.emailjs.com/api/v1.0/email/send`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({service_id:'service_7mkc35v',template_id:'template_w2inmnh',user_id:'Etoog51xcjOlpwsaT',template_params:params})
+    });
+  }catch(e){console.warn('notify failed',e);}
+}
+
+// ── Submit nomination ─────────────────────────────
+window.submitNomination=async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('nom-btn');
+  const errEl=document.getElementById('nom-error');
+  const name=document.getElementById('inf-name').value.trim();
+  const field=document.getElementById('inf-field').value;
+  const reason=document.getElementById('reason').value.trim();
+  const links={instagram:document.getElementById('link-instagram').value.trim(),snapchat:document.getElementById('link-snapchat').value.trim(),x:document.getElementById('link-x').value.trim(),youtube:document.getElementById('link-youtube').value.trim()};
+  const hasLink=Object.values(links).some(Boolean);
+  if(!name||!field||!reason){showErr(errEl,'يرجى ملء جميع الحقول الإلزامية');return;}
+  if(!hasLink){showErr(errEl,'يرجى تزويد رابط حساب واحد على الأقل');return;}
+  const prev=document.getElementById('nom-photo-preview');
+  const photo=(prev.style.display!=='none'&&prev.src&&!prev.src.endsWith('/'))? prev.src:null;
+  btn.disabled=true;btn.textContent='جارٍ الإرسال...';
+  try{
+    await addDoc(collection(db,'nominations'),{name,field,fieldLabel:FIELD_LABELS[field]||field,links,reason,photo,status:'pending',submittedAt:new Date().toISOString()});
+    await sendNotify({type:'📋 ترشيح مؤثر جديد',name,field:FIELD_LABELS[field]||field,details:reason,links:Object.entries(links).filter(([,v])=>v).map(([k,v])=>`${k}: ${v}`).join(' | ')||'—',date:new Date().toLocaleString('ar-SA')});
+    document.getElementById('nom-form').style.display='none';
+    document.getElementById('nom-success').style.display='block';
+  }catch(err){showErr(errEl,'حدث خطأ — حاول مرة أخرى');btn.disabled=false;btn.textContent='إرسال الترشيح للمراجعة ←';}
+};
+
+window.resetNomForm=function(){
+  document.getElementById('nom-form').reset();
+  document.getElementById('nom-form').style.display='block';
+  document.getElementById('nom-success').style.display='none';
+  document.getElementById('nom-photo-preview').style.display='none';
+  document.getElementById('nom-photo-inner').style.display='flex';
+};
+
+// ── Submit removal ────────────────────────────────
+window.submitRemoval=async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('rem-btn');
+  const errEl=document.getElementById('rem-error');
+  const target=document.getElementById('rem-target').value;
+  const reason=document.getElementById('rem-reason').value;
+  const detail=document.getElementById('rem-detail').value.trim();
+  const ev1=document.getElementById('ev1').value.trim();
+  const ev2=document.getElementById('ev2').value.trim();
+  const ev3=document.getElementById('ev3').value.trim();
+  if(!target||!reason||!detail){showErr(errEl,'يرجى ملء جميع الحقول الإلزامية');return;}
+  if(!ev1&&!ev2&&!ev3){showErr(errEl,'يرجى تزويد دليل واحد على الأقل');return;}
+  btn.disabled=true;btn.textContent='جارٍ الإرسال...';
+  const evidence=[ev1,ev2,ev3].filter(Boolean);
+  try{
+    // increment removal count
+    const q2=query(collection(db,'influencers'),where('name','==',target),where('status','==','active'));
+    const s2=await getDocs(q2);
+    if(!s2.empty){const d=s2.docs[0];await updateDoc(doc(db,'influencers',d.id),{removalCount:(d.data().removalCount||0)+1});}
+    await addDoc(collection(db,'removals'),{target,reason,detail,evidence,status:'pending',submittedAt:new Date().toISOString()});
+    await sendNotify({type:'🚨 طلب إزالة مؤثر',name:target,field:reason,details:detail,links:evidence.join(' | ')||'—',date:new Date().toLocaleString('ar-SA')});
+    document.getElementById('rem-form').style.display='none';
+    document.getElementById('rem-success').style.display='block';
+  }catch(err){showErr(errEl,'حدث خطأ — حاول مرة أخرى');btn.disabled=false;btn.textContent='إرسال طلب الإزالة ←';}
+};
+
+function showErr(el,msg){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',4000);}
+
+// ── Modal backdrop ────────────────────────────────
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+
+// ── Init ──────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
