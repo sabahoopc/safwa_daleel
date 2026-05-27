@@ -47,7 +47,10 @@ button{cursor:pointer;font-family:'Tajawal',sans-serif}
 /* ── DASHBOARD LAYOUT ── */
 .dashboard{display:none;min-height:100vh}
 .dashboard.open{display:grid;grid-template-columns:230px 1fr}
-@media(max-width:768px){.dashboard.open{grid-template-columns:1fr}.sidebar{display:none}}
+@media(max-width:768px){
+  .dashboard.open{grid-template-columns:1fr}
+  .sidebar{display:none}
+}
 
 /* ── SIDEBAR ── */
 .sidebar{background:var(--bg-card);border-left:.5px solid var(--border);display:flex;flex-direction:column;padding:1.5rem 0;position:sticky;top:0;height:100vh;overflow-y:auto}
@@ -64,8 +67,29 @@ button{cursor:pointer;font-family:'Tajawal',sans-serif}
 .badge-amber{background:var(--amber-light);color:var(--amber)}
 .badge-red{background:var(--red-light);color:var(--red)}
 
+/* ── MOBILE TOP BAR ── */
+.mob-topbar{display:none;background:var(--bg-card);border-bottom:.5px solid var(--border);padding:.875rem 1.25rem;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.mob-topbar-title{font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px}
+.mob-topbar-title svg{width:18px;height:18px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mob-logout{background:transparent;border:.5px solid var(--red-mid);color:var(--red);border-radius:var(--radius-md);padding:6px 12px;font-size:12px;font-weight:500;font-family:'Tajawal',sans-serif}
+@media(max-width:768px){.mob-topbar{display:flex}}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mob-bottom-nav{display:none;position:fixed;bottom:0;right:0;left:0;background:var(--bg-card);border-top:.5px solid var(--border);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.mob-bottom-nav-inner{display:grid;grid-template-columns:repeat(3,1fr)}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:.75rem .5rem;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-family:'Tajawal',sans-serif;font-size:11px;position:relative;transition:color .15s}
+.mob-nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mob-nav-btn.active{color:var(--green)}
+.mob-nav-badge{position:absolute;top:8px;right:calc(50% - 18px);background:var(--green);color:white;font-size:10px;font-weight:700;padding:1px 5px;border-radius:10px;min-width:16px;text-align:center;line-height:1.4}
+.mob-nav-badge.amber{background:var(--amber)}
+.mob-nav-badge.red{background:var(--red)}
+@media(max-width:768px){.mob-bottom-nav{display:block}}
+
 /* ── MAIN ── */
 .admin-main{padding:2rem;overflow-x:auto}
+@media(max-width:768px){
+  .admin-main{padding:1rem;padding-bottom:80px}
+}
 .tab{display:none}.tab.active{display:block}
 .tab-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}
 .tab-header h2{font-size:20px;font-weight:500}
@@ -155,6 +179,15 @@ tbody tr:hover{background:var(--bg)}
 <!-- ── DASHBOARD ── -->
 <div class="dashboard" id="dashboard">
 
+  <!-- MOBILE TOP BAR -->
+  <div class="mob-topbar">
+    <div class="mob-topbar-title">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      إدارة المؤثرين
+    </div>
+    <button class="mob-logout" onclick="doLogout()">خروج</button>
+  </div>
+
   <aside class="sidebar">
     <div class="sidebar-logo">
       <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
@@ -243,6 +276,28 @@ tbody tr:hover{background:var(--bg)}
     </div>
 
   </main>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <div class="mob-bottom-nav">
+    <div class="mob-bottom-nav-inner">
+      <button class="mob-nav-btn active" data-tab="tab-infs" onclick="showTab('tab-infs')">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        المؤثرون
+        <span class="mob-nav-badge" id="mb-b-infs" style="display:none"></span>
+      </button>
+      <button class="mob-nav-btn" data-tab="tab-noms" onclick="showTab('tab-noms')">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        ترشيحات
+        <span class="mob-nav-badge amber" id="mb-b-noms" style="display:none"></span>
+      </button>
+      <button class="mob-nav-btn" data-tab="tab-rems" onclick="showTab('tab-rems')">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="15" y1="11" x2="21" y2="11"/></svg>
+        إزالات
+        <span class="mob-nav-badge red" id="mb-b-rems" style="display:none"></span>
+      </button>
+    </div>
+  </div>
+
 </div>
 
 <!-- ADD/EDIT MODAL -->
@@ -377,19 +432,26 @@ function startListeners(){
     onSnapshot(collection(db,'influencers'),snap=>{
       const all=snap.docs.map(d=>({id:d.id,...d.data()}));
       renderInfsTable(all.filter(i=>i.status==='active'));
-      document.getElementById('b-infs').textContent=all.filter(i=>i.status==='active').length;
+      const cnt=all.filter(i=>i.status==='active').length;
+      document.getElementById('b-infs').textContent=cnt;
+      const mb=document.getElementById('mb-b-infs');
+      mb.textContent=cnt;mb.style.display=cnt?'block':'none';
     }),
     onSnapshot(collection(db,'nominations'),snap=>{
       const all=snap.docs.map(d=>({id:d.id,...d.data()}));
       renderNomsTable(all);
       const p=all.filter(n=>n.status==='pending').length;
       document.getElementById('b-noms').textContent=p||'';
+      const mb=document.getElementById('mb-b-noms');
+      mb.textContent=p;mb.style.display=p?'block':'none';
     }),
     onSnapshot(collection(db,'removals'),snap=>{
       const all=snap.docs.map(d=>({id:d.id,...d.data()}));
       renderRemsTable(all);
       const p=all.filter(r=>r.status==='pending').length;
       document.getElementById('b-rems').textContent=p||'';
+      const mb=document.getElementById('mb-b-rems');
+      mb.textContent=p;mb.style.display=p?'block':'none';
     })
   );
 }
@@ -400,6 +462,7 @@ window.showTab=function(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.s-link[data-tab]').forEach(l=>l.classList.toggle('active',l.dataset.tab===id));
+  document.querySelectorAll('.mob-nav-btn[data-tab]').forEach(l=>l.classList.toggle('active',l.dataset.tab===id));
 };
 
 // ── INFLUENCERS TABLE ──
