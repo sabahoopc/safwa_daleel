@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دليل مؤثري صفوى — تعرّف على المبادرة</title>
+  <meta name="description" content="دليل مؤثري صفوى — منصة مجتمعية لإبراز الأصوات المؤثرة والمفيدة في مدينة صفوى، مرشَّحون من الجمهور ومُقيَّمون بمعايير أخلاقية واضحة">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1D9E75;--green-dark:#0F6E56;--green-light:#E1F5EE;--green-mid:#9FE1CB;
+  --green-glow:rgba(29,158,117,.15);
+  --red:#A32D2D;--red-light:#FCEBEB;--red-mid:#F09595;
+  --amber:#854F0B;--amber-light:#FAEEDA;--amber-mid:#EF9F27;
+  --bg:#F5F5F3;--bg-card:#FFFFFF;--bg-muted:#EEEDE8;
+  --border:#E0E0D8;--border-mid:#CCCCCC;
+  --text:#1A1A1A;--text-muted:#666;--text-hint:#999;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:20px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06);
+  --shadow-md:0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Tajawal',sans-serif;direction:rtl;background:var(--bg);color:var(--text);font-size:16px;line-height:1.6;overflow-x:hidden}
+a{text-decoration:none}
+button{cursor:pointer;font-family:'Tajawal',sans-serif}
+.container{max-width:900px;margin:0 auto;padding:0 1.5rem}
+
+/* ── HEADER ── */
+.site-header{background:var(--bg-card);border-bottom:.5px solid var(--border);position:sticky;top:0;z-index:50}
+.header-inner{max-width:900px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:500;font-size:15px;color:var(--text)}
+.logo svg{width:20px;height:20px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.header-cta{background:var(--green);color:white;border:none;border-radius:var(--radius-md);padding:8px 18px;font-size:13px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;transition:opacity .15s}
+.header-cta:hover{opacity:.88}
+
+/* ── HERO ── */
+.hero{padding:5rem 0 4rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-120px;right:50%;transform:translateX(50%);width:600px;height:600px;background:radial-gradient(circle,var(--green-glow) 0%,transparent 70%);pointer-events:none;z-index:0}
+.hero-inner{position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-light);color:var(--green-dark);font-size:12px;font-weight:700;padding:6px 16px;border-radius:var(--radius-xl);margin-bottom:1.5rem;border:.5px solid var(--green-mid)}
+.hero-badge span{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse-dot 2s ease-in-out infinite}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.hero h1{font-size:42px;font-weight:900;line-height:1.25;margin-bottom:1.25rem;color:var(--text)}
+.hero h1 .accent{color:var(--green)}
+.hero-desc{font-size:17px;color:var(--text-muted);max-width:580px;margin:0 auto 2.5rem;line-height:1.9}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:white;border:none;border-radius:var(--radius-md);padding:.875rem 2rem;font-size:15px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;transition:opacity .15s,transform .15s;box-shadow:0 4px 16px rgba(29,158,117,.3)}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-muted);border:.5px solid var(--border-mid);border-radius:var(--radius-md);padding:.875rem 2rem;font-size:15px;font-weight:500;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all .15s}
+.btn-ghost:hover{background:var(--bg-muted);color:var(--text)}
+@media(max-width:640px){.hero h1{font-size:28px}.hero-desc{font-size:15px}}
+
+/* ── STATS ROW ── */
+.stats-band{background:var(--bg-card);border-top:.5px solid var(--border);border-bottom:.5px solid var(--border);padding:2rem 0}
+.stats-inner{display:grid;grid-template-columns:repeat(3,1fr);gap:0;max-width:900px;margin:0 auto;padding:0 1.5rem}
+.stat-item{text-align:center;padding:1rem;border-left:.5px solid var(--border)}
+.stat-item:last-child{border-left:none}
+.stat-num{font-size:32px;font-weight:900;color:var(--green);line-height:1}
+.stat-label{font-size:13px;color:var(--text-muted);margin-top:4px}
+@media(max-width:480px){.stat-num{font-size:24px}.stat-label{font-size:12px}}
+
+/* ── SECTION SHARED ── */
+section{padding:4rem 0}
+.section-badge{display:inline-block;background:var(--green-light);color:var(--green-dark);font-size:12px;font-weight:700;padding:4px 14px;border-radius:var(--radius-xl);margin-bottom:1rem}
+.section-title{font-size:26px;font-weight:700;margin-bottom:.75rem;line-height:1.35}
+.section-sub{font-size:15px;color:var(--text-muted);line-height:1.8;margin-bottom:2.5rem}
+@media(max-width:640px){.section-title{font-size:22px}}
+
+/* ── GOALS ── */
+.goals-section{background:var(--bg-card);border-top:.5px solid var(--border);border-bottom:.5px solid var(--border)}
+.goals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.goal-card{background:var(--bg);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;transition:box-shadow .2s,transform .2s}
+.goal-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.goal-icon{width:48px;height:48px;background:var(--green-light);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:1rem}
+.goal-title{font-size:16px;font-weight:700;margin-bottom:.5rem}
+.goal-desc{font-size:13px;color:var(--text-muted);line-height:1.7}
+
+/* ── HOW IT WORKS ── */
+.how-section{background:var(--bg)}
+.steps{display:flex;flex-direction:column;gap:0;position:relative}
+.steps::before{content:"";position:absolute;right:24px;top:24px;bottom:24px;width:2px;background:linear-gradient(to bottom,var(--green-mid),transparent);z-index:0}
+@media(max-width:640px){.steps::before{display:none}}
+.step{display:flex;gap:1.5rem;align-items:flex-start;padding:1.5rem 0;position:relative;z-index:1}
+.step-num{width:48px;height:48px;border-radius:50%;background:var(--green);color:white;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 6px var(--green-light)}
+.step-body{padding-top:8px}
+.step-title{font-size:17px;font-weight:700;margin-bottom:.35rem}
+.step-desc{font-size:14px;color:var(--text-muted);line-height:1.7}
+
+/* ── CRITERIA ── */
+.criteria-section{background:var(--bg-card);border-top:.5px solid var(--border);border-bottom:.5px solid var(--border)}
+.criteria-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:600px){.criteria-cols{grid-template-columns:1fr}}
+.criteria-card{border-radius:var(--radius-lg);padding:1.5rem}
+.criteria-card--ok{background:var(--green-light);border:.5px solid var(--green-mid)}
+.criteria-card--no{background:var(--red-light);border:.5px solid var(--red-mid)}
+.criteria-card-title{font-size:14px;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.criteria-card--ok .criteria-card-title{color:var(--green-dark)}
+.criteria-card--no .criteria-card-title{color:var(--red)}
+.criteria-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.criteria-list li{display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:1.6}
+.criteria-list li .ic{width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px}
+.criteria-card--ok .ic{background:var(--green);color:white}
+.criteria-card--no .ic{background:var(--red);color:white}
+.criteria-card--ok li{color:var(--green-dark)}
+.criteria-card--no li{color:var(--red)}
+
+/* ── WARNING BOX ── */
+.warn-box{background:var(--amber-light);border:.5px solid var(--amber-mid);border-radius:var(--radius-md);padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:12px;margin-top:1.5rem}
+.warn-box svg{width:20px;height:20px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin-top:2px}
+.warn-box p{font-size:13px;color:var(--amber);line-height:1.7}
+
+/* ── REMOVAL SECTION ── */
+.removal-section{background:var(--bg)}
+.removal-info{background:var(--bg-card);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem}
+.removal-info h3{font-size:16px;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
+.removal-info h3 svg{width:18px;height:18px;stroke:var(--red);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.removal-info p{font-size:14px;color:var(--text-muted);line-height:1.8}
+.removal-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:1.25rem}
+.removal-step{background:var(--bg-muted);border-radius:var(--radius-md);padding:1rem;font-size:13px;color:var(--text-muted);line-height:1.7;display:flex;gap:10px;align-items:flex-start}
+.removal-step strong{color:var(--text);display:block;margin-bottom:3px}
+.step-icon{font-size:20px;flex-shrink:0}
+
+/* ── CTA SECTION ── */
+.cta-section{background:linear-gradient(135deg,var(--green-dark),var(--green));padding:5rem 0;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(255,255,255,.08),transparent 60%)}
+.cta-section h2{font-size:30px;font-weight:900;color:white;margin-bottom:1rem;line-height:1.3}
+.cta-section p{font-size:16px;color:rgba(255,255,255,.8);margin-bottom:2.5rem;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.8}
+.btn-white{display:inline-flex;align-items:center;gap:8px;background:white;color:var(--green-dark);border:none;border-radius:var(--radius-md);padding:.875rem 2rem;font-size:15px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;transition:opacity .15s,transform .15s;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.btn-white:hover{opacity:.95;transform:translateY(-1px)}
+.btn-white-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:white;border:1.5px solid rgba(255,255,255,.5);border-radius:var(--radius-md);padding:.875rem 2rem;font-size:15px;font-weight:500;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all .15s}
+.btn-white-ghost:hover{background:rgba(255,255,255,.1);border-color:white}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* ── FAQ ── */
+.faq-section{background:var(--bg-card);border-top:.5px solid var(--border)}
+.faq-list{display:flex;flex-direction:column;gap:0}
+.faq-item{border-bottom:.5px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{width:100%;background:transparent;border:none;text-align:right;padding:1.25rem 0;font-size:15px;font-weight:600;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;font-family:'Tajawal',sans-serif}
+.faq-q svg{width:18px;height:18px;stroke:var(--green);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;transition:transform .2s}
+.faq-item.open .faq-q svg{transform:rotate(45deg)}
+.faq-a{display:none;font-size:14px;color:var(--text-muted);line-height:1.8;padding-bottom:1.25rem}
+.faq-item.open .faq-a{display:block}
+
+/* ── FOOTER ── */
+.site-footer{padding:2rem 0;text-align:center;border-top:.5px solid var(--border)}
+.site-footer p{font-size:13px;color:var(--text-hint)}
+.site-footer a{color:var(--green)}
+
+/* ── DIVIDER ── */
+.divider{height:.5px;background:var(--border);margin:0}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      دليل مؤثري صفوى
+    </div>
+    <a href="/influencers.html" class="header-cta">عرض الدليل ←</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span></span>
+        صفوى — المنطقة الشرقية
+      </div>
+      <h1>أبرز <span class="accent">أصوات صفوى</span><br>المؤثرة والمفيدة</h1>
+      <p class="hero-desc">
+        دليل مجتمعي يجمع المؤثرين الاجتماعيين في مدينة صفوى — يُرشِّحهم الجمهور، ويُقيِّمهم معيار واحد:
+        <strong>الفائدة الحقيقية للمجتمع</strong>
+      </p>
+      <div class="hero-btns">
+        <a href="/influencers.html" class="btn-primary">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          استعرض الدليل
+        </a>
+        <a href="#nominate-cta" class="btn-ghost">رشِّح مؤثراً ↓</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- GOALS -->
+<section class="goals-section">
+  <div class="container">
+    <div class="section-badge">لماذا هذا الدليل؟</div>
+    <h2 class="section-title">أهداف المبادرة</h2>
+    <p class="section-sub">انطلقت المبادرة من حاجة مجتمعية حقيقية — إبراز الأصوات المفيدة في صفوى وتسهيل الوصول إليها.</p>
+    <div class="goals-grid">
+      <div class="goal-card">
+        <div class="goal-icon">🌟</div>
+        <div class="goal-title">إبراز التميّز المحلي</div>
+        <div class="goal-desc">تسليط الضوء على مؤثري صفوى الذين يقدمون محتوى ذا قيمة حقيقية ويستحقون الوصول والانتشار.</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">🤝</div>
+        <div class="goal-title">ربط المجتمع بمصادره</div>
+        <div class="goal-desc">توفير مرجع موحد يسهّل على أهالي صفوى العثور على المختصين والمفيدين في مجالات متنوعة.</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">⚖️</div>
+        <div class="goal-title">معايير أخلاقية واضحة</div>
+        <div class="goal-desc">الإدراج مشروط بمعايير أخلاقية صريحة — ليس كل حساب يستحق الإبراز، بل من يضيف قيمة فعلية.</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">👥</div>
+        <div class="goal-title">صوت الجمهور هو المحرّك</div>
+        <div class="goal-desc">الجمهور هو من يُرشِّح ويُقيِّم — الإدارة تراجع فقط وتضمن الالتزام بالمعايير.</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">🛡️</div>
+        <div class="goal-title">حماية المجتمع</div>
+        <div class="goal-desc">آلية واضحة لإزالة أي مؤثر يُخل بالمعايير أو يقدم محتوى ضاراً، بناءً على بلاغات موثقة.</div>
+      </div>
+      <div class="goal-card">
+        <div class="goal-icon">📈</div>
+        <div class="goal-title">دعم المؤثر الحقيقي</div>
+        <div class="goal-desc">منح المؤثر المحلي المفيد منصة إضافية للوصول إلى جمهور أوسع في مجتمعه.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="container">
+    <div class="section-badge">كيف يعمل الدليل؟</div>
+    <h2 class="section-title">آلية العمل خطوة بخطوة</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">١</div>
+        <div class="step-body">
+          <div class="step-title">الترشيح من الجمهور</div>
+          <div class="step-desc">أي شخص يستطيع ترشيح مؤثر يرى فيه فائدة للمجتمع — يُزوِّد روابط حساباته ويشرح سبب الترشيح. الهوية سرية تماماً.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">٢</div>
+        <div class="step-body">
+          <div class="step-title">مراجعة الإدارة</div>
+          <div class="step-desc">تراجع الإدارة الطلب وتتحقق من استيفاء المعايير المحددة — الحساب العام، جودة المحتوى، الصلة بصفوى والمنطقة الشرقية.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">٣</div>
+        <div class="step-body">
+          <div class="step-title">الإدراج في الدليل</div>
+          <div class="step-desc">عند القبول يُضاف المؤثر للدليل مع بياناته ومنصاته، ويصبح ظاهراً لجميع زوار الصفحة.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">٤</div>
+        <div class="step-body">
+          <div class="step-title">المتابعة المستمرة</div>
+          <div class="step-desc">يبقى المؤثر في الدليل طالما يلتزم بالمعايير. أي إخلال يُفعِّل آلية البلاغ والإزالة.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CRITERIA -->
+<section class="criteria-section">
+  <div class="container">
+    <div class="section-badge">من يدخل الدليل؟</div>
+    <h2 class="section-title">معايير الإدراج بالتفصيل</h2>
+    <p class="section-sub">المعايير مزدوجة — شروط يجب توافرها، وموانع تمنع الإدراج أو تستوجب الإزالة.</p>
+
+    <div class="criteria-cols">
+      <div class="criteria-card criteria-card--ok">
+        <div class="criteria-card-title">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--green-dark);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><polyline points="20 6 9 17 4 12"/></svg>
+          شروط القبول
+        </div>
+        <ul class="criteria-list">
+          <li><span class="ic">✓</span><span>الحساب <strong>عام</strong> وليس خاصاً على جميع المنصات المُدرَجة</span></li>
+          <li><span class="ic">✓</span><span>يقدم محتوى يضيف <strong>قيمة إيجابية</strong> للمجتمع — تعليمي، توعوي، ثقافي، مهني، أو تجاري نافع</span></li>
+          <li><span class="ic">✓</span><span>له <strong>صلة بصفوى</strong> أو المنطقة الشرقية — مقيم أو منتسب</span></li>
+          <li><span class="ic">✓</span><span>يمارس <strong>نشاطاً منتظماً</strong> ومستمراً على المنصة المُرشَّح عليها</span></li>
+          <li><span class="ic">✓</span><span>يلتزم <strong>بأخلاقيات النشر</strong> وفق الأنظمة والقوانين المحلية</span></li>
+          <li><span class="ic">✓</span><span>محتواه يُضيف للمجتمع ولا يكتفي <strong>بالترفيه الفارغ</strong></span></li>
+        </ul>
+      </div>
+
+      <div class="criteria-card criteria-card--no">
+        <div class="criteria-card-title">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--red);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          موانع الإدراج
+        </div>
+        <ul class="criteria-list">
+          <li><span class="ic">✕</span><span>أي <strong>محتوى تنمر</strong> أو إساءة لأشخاص أو فئات</span></li>
+          <li><span class="ic">✕</span><span>نشر <strong>معلومات مضللة</strong> أو مزيفة بشكل متعمد</span></li>
+          <li><span class="ic">✕</span><span>أي <strong>تحريض أو خطاب كراهية</strong> بأي شكل كان</span></li>
+          <li><span class="ic">✕</span><span>محتوى <strong>مخالف للأنظمة</strong> والقوانين المحلية</span></li>
+          <li><span class="ic">✕</span><span>حساب <strong>خاص أو متوقف</strong> عن النشر</span></li>
+          <li><span class="ic">✕</span><span>محتوى يضرّ بقيم <strong>التماسك الاجتماعي</strong> في المجتمع</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <p><strong>تنبيه مهم:</strong> الإدراج في الدليل ليس لقباً دائماً — في حال إخلال المؤثر بأي من هذه المعايير، تحتفظ الإدارة بحق الإزالة الفورية دون إشعار مسبق. المعايير ليست قيوداً بل ضمانة لجودة الدليل وثقة المجتمع به.</p>
+    </div>
+  </div>
+</section>
+
+<!-- REMOVAL MECHANISM -->
+<section class="removal-section">
+  <div class="container">
+    <div class="section-badge">الشفافية والمساءلة</div>
+    <h2 class="section-title">آلية الإزالة والمتابعة</h2>
+    <p class="section-sub">الدليل لا يكتفي بالإدراج — هناك آلية واضحة لمحاسبة من يُخل بالمعايير.</p>
+
+    <div class="removal-info">
+      <h3>
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        كيف يعمل نظام البلاغات؟
+      </h3>
+      <p>أي زائر يلاحظ إخلالاً بالمعايير يستطيع تقديم طلب إزالة موثق — مع شرح تفصيلي وأدلة داعمة. الهوية سرية تماماً. الإدارة تراجع كل بلاغ، وعند تراكم البلاغات الموثقة والمقنعة بحق مؤثر معين، يُزال من الدليل فوراً. البلاغات الكيدية غير الموثقة لا تُؤخذ بعين الاعتبار.</p>
+
+      <div class="removal-steps">
+        <div class="removal-step">
+          <span class="step-icon">📝</span>
+          <div>
+            <strong>تقديم البلاغ</strong>
+            اختر المؤثر، حدد السبب، أرفق الأدلة — الهوية سرية
+          </div>
+        </div>
+        <div class="removal-step">
+          <span class="step-icon">🔍</span>
+          <div>
+            <strong>مراجعة الإدارة</strong>
+            تُراجع الإدارة الأدلة وتتحقق من صحة البلاغ
+          </div>
+        </div>
+        <div class="removal-step">
+          <span class="step-icon">⚖️</span>
+          <div>
+            <strong>اتخاذ القرار</strong>
+            عند ثبوت الإخلال أو تكرار البلاغات المقنعة تتم الإزالة
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="container">
+    <div class="section-badge">أسئلة شائعة</div>
+    <h2 class="section-title">ماذا تريد أن تعرف؟</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          هل يستطيع المؤثر ترشيح نفسه؟
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-a">لا — الترشيح مقصور على الجمهور فقط. فكرة الدليل أن يكون انعكاساً حقيقياً لتقدير المجتمع، وليس منبراً للترويج الذاتي. إذا كان المؤثر يستحق الإدراج فسيُرشِّحه متابعوه.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          هل الإدراج في الدليل مجاني؟
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-a">نعم، الإدراج مجاني تماماً وسيبقى كذلك. الدليل مبادرة مجتمعية غير ربحية هدفها خدمة أهالي صفوى وليس تحقيق مكاسب مادية.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ما المجالات التي يشملها الدليل؟
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-a">الدليل مفتوح لجميع المجالات المفيدة: تعليم وتطوير ذات، صحة ولياقة، ثقافة وتراث، ريادة أعمال، تقنية وبرمجة، تغطيات تجارية وفعاليات، إعلام وصحافة، فن وإبداع، بيئة ومجتمع — وغيرها.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          هل يجب أن يكون المؤثر من سكان صفوى؟
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-a">يُشترط أن تكون له صلة بمدينة صفوى تحديداً — سواء كان مقيماً أو منتسباً لها. طالما أن تأثيره يصب في خدمة مجتمع صفوى فهو مؤهل للترشيح.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          كم يستغرق قبول الترشيح؟
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-a">تراجع الإدارة طلبات الترشيح بشكل دوري. لا يوجد وقت محدد مضمون لكن الهدف أن لا تتجاوز المراجعة أسبوعاً من تاريخ تقديم الطلب.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ماذا لو رُفض ترشيحي؟
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-a">الرفض لا يعني أن المؤثر سيئ — قد يعني أن بعض المعايير لم تكتمل بعد. يمكن إعادة الترشيح في أي وقت إذا تغير الوضع أو توافرت معطيات جديدة.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="nominate-cta">
+  <div class="container">
+    <h2>تعرف مؤثراً يستحق الإبراز؟</h2>
+    <p>رشِّحه الآن — لا يستغرق الأمر أكثر من دقيقتين، وهويتك ستبقى سرية تماماً</p>
+    <div class="cta-btns">
+      <a href="/influencers.html#nominate" class="btn-white">
+        رشِّح مؤثراً الآن ←
+      </a>
+      <a href="/influencers.html" class="btn-white-ghost">
+        استعرض الدليل
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <p>دليل مؤثري صفوى — مبادرة مجتمعية مستقلة · جزء من <a href="/directory.html">دليل صفوى</a></p>
+    <p style="margin-top:6px">تواصل معنا: <a href="mailto:one.safwa.1@gmail.com">one.safwa.1@gmail.com</a></p>
+  </div>
+</footer>
+
+<script>
+function toggleFaq(btn){
+  const item=btn.closest('.faq-item');
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));
+  if(!isOpen) item.classList.add('open');
+}
+</script>
+</body>
+</html>
