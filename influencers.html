@@ -293,7 +293,6 @@ button{cursor:pointer;font-family:'Tajawal',sans-serif}
               <input type="url" id="link-snapchat"  placeholder="رابط سناب شات" style="width:100%;font-size:14px;font-family:'Tajawal',sans-serif;padding:9px 12px;border:.5px solid var(--border-mid);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text);outline:none;direction:rtl">
               <input type="url" id="link-x"         placeholder="رابط إكس"      style="width:100%;font-size:14px;font-family:'Tajawal',sans-serif;padding:9px 12px;border:.5px solid var(--border-mid);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text);outline:none;direction:rtl">
               <input type="url" id="link-youtube"   placeholder="رابط يوتيوب"   style="width:100%;font-size:14px;font-family:'Tajawal',sans-serif;padding:9px 12px;border:.5px solid var(--border-mid);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text);outline:none;direction:rtl">
-              <input type="url" id="link-tiktok"   placeholder="رابط تيك توك"   style="width:100%;font-size:14px;font-family:'Tajawal',sans-serif;padding:9px 12px;border:.5px solid var(--border-mid);border-radius:var(--radius-md);background:var(--bg-card);color:var(--text);outline:none;direction:rtl">
             </div>
           </fieldset>
           <div class="form-group">
@@ -422,13 +421,12 @@ const db = getFirestore(initializeApp({
 const FL={education:'تعليم وتطوير ذات',health:'صحة ولياقة',culture:'ثقافة وتراث',business:'ريادة أعمال',tech:'تقنية وبرمجة',coverage:'تغطيات تجارية وفعاليات',media:'إعلام وصحافة',art:'فن وإبداع',community:'بيئة ومجتمع'};
 const OK=['الحساب عام وليس خاصاً على جميع المنصات المُدرَجة','يقدم محتوى يضيف قيمة إيجابية للمجتمع','الصلة بمدينة صفوى أو المنطقة الشرقية','نشاط منتظم ومستمر على المنصة','يلتزم بأخلاقيات النشر وفق الأنظمة المحلية'];
 const NO=['خلو الحساب من مقاطع أو منشورات التنمر','لا تحريض ولا إساءة ولا معلومات مضللة','لا خطاب كراهية أو محتوى مخالف للأنظمة'];
-const PL={youtube:'يوتيوب',instagram:'انستجرام',snapchat:'سناب',x:'إكس',tiktok:'تيك توك'};
+const PL={youtube:'يوتيوب',instagram:'انستجرام',snapchat:'سناب',x:'إكس'};
 const PI={
   youtube:`<svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 001.95-1.95A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>`,
   instagram:`<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`,
   snapchat:`<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>`,
-  x:`<svg viewBox="0 0 24 24"><path d="M4 4l11.733 16H20L8.267 4z"/><path d="M4 20l6.768-6.768M20 4l-6.768 6.768"/></svg>`,
-  tiktok:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>`
+  x:`<svg viewBox="0 0 24 24"><path d="M4 4l11.733 16H20L8.267 4z"/><path d="M4 20l6.768-6.768M20 4l-6.768 6.768"/></svg>`
 };
 const AC=['av-teal','av-blue','av-coral','av-purple','av-amber','av-pink','av-green','av-gray'];
 const pc=n=>AC[n.charCodeAt(0)%AC.length];
@@ -439,10 +437,9 @@ let ALL=[];
 async function load(){
   const snap=await getDocs(query(collection(db,'influencers'),where('status','==','active')));
   ALL=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const ns=await getDocs(collection(db,'nominations'));
   document.getElementById('stat-infs').textContent=ALL.length;
   document.getElementById('stat-fields').textContent=new Set(ALL.map(i=>i.field)).size;
-  document.getElementById('stat-noms').textContent=ns.docs.filter(d=>d.data().status==='pending').length;
+  document.getElementById('stat-noms').textContent='—';
   buildFilters(); renderCards(ALL); renderCriteria(); fillRemSelect();
 }
 
@@ -559,7 +556,7 @@ window.submitNom=async function(e){
   const name=document.getElementById('inf-name').value.trim();
   const field=document.getElementById('inf-field').value;
   const reason=document.getElementById('reason').value.trim();
-  const links={instagram:document.getElementById('link-instagram').value.trim(),snapchat:document.getElementById('link-snapchat').value.trim(),x:document.getElementById('link-x').value.trim(),youtube:document.getElementById('link-youtube').value.trim(),tiktok:document.getElementById('link-tiktok').value.trim()};
+  const links={instagram:document.getElementById('link-instagram').value.trim(),snapchat:document.getElementById('link-snapchat').value.trim(),x:document.getElementById('link-x').value.trim(),youtube:document.getElementById('link-youtube').value.trim()};
   if(!name||!field||!reason){showErr(err,'يرجى ملء جميع الحقول الإلزامية');return;}
   if(!Object.values(links).some(Boolean)){showErr(err,'يرجى تزويد رابط حساب واحد على الأقل');return;}
   const prev=document.getElementById('nom-photo-preview');
