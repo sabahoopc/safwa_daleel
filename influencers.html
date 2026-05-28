@@ -211,7 +211,6 @@ button{cursor:pointer;font-family:'Tajawal',sans-serif}
     <div class="stats-row">
       <div class="stat-card"><div class="stat-num" id="stat-infs">—</div><div class="stat-label">مؤثر مُدرَج</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-fields">—</div><div class="stat-label">مجال</div></div>
-      <div class="stat-card"><div class="stat-num" id="stat-noms">—</div><div class="stat-label">ترشيح قيد المراجعة</div></div>
     </div>
   </div>
 </section>
@@ -439,7 +438,6 @@ async function load(){
   ALL=snap.docs.map(d=>({id:d.id,...d.data()}));
   document.getElementById('stat-infs').textContent=ALL.length;
   document.getElementById('stat-fields').textContent=new Set(ALL.map(i=>i.field)).size;
-  document.getElementById('stat-noms').textContent='—';
   buildFilters(); renderCards(ALL); renderCriteria(); fillRemSelect();
 }
 
