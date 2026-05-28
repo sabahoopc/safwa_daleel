@@ -193,7 +193,6 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
         <span id="visit-count">...</span>
         <span>زيارة</span>
       </div>
-      <a href="/influencers.html" class="btn-inf" style="text-decoration:none;background:transparent;border:1px solid var(--orange);color:var(--orange);border-radius:8px;padding:8px 14px;font-weight:600;font-size:12px;white-space:nowrap">⭐ مؤثرو صفوى</a>
       <button class="btn-p" onclick="openM('pricing')">💰 الإعلان المميز</button>
       <button class="btn-a" onclick="openM('request')">+ أضف مشروعك مجاناً</button>
       <button onclick="location.reload()" title="تحديث" style="background:var(--surface);border:1px solid #2a2a2a;color:var(--muted);border-radius:8px;padding:8px 11px;font-size:16px;display:none" class="mob-refresh">🔄</button>
@@ -269,8 +268,7 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
   </div>
   <div style="display:flex;align-items:center;gap:13px">
     <div style="font-size:20px;font-weight:800;color:var(--orange)">٥٠ ريال<span style="font-size:13px;color:var(--muted);font-weight:400"> / شهر</span></div>
-    <a href="/influencers.html" class="btn-p" style="text-decoration:none">⭐ مؤثرو صفوى</a>
-      <button class="btn-a" onclick="openM('pricing')">اعرف أكثر</button>
+    <button class="btn-a" onclick="openM('pricing')">اعرف أكثر</button>
   </div>
 </div></div>
 
@@ -298,11 +296,11 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
 <footer>
   <div style="display:flex;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
     <a href="https://whatsapp.com/channel/0029Vb8Fbkk17EmykSRXHm3I" target="_blank" style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #25d366;color:#25d366;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none"><span style="font-size:18px">📢</span> قناة واتساب</a>
-    <a href="https://wa.me/966597904227" target="_blank"
+    <a href="https://wa.me/966XXXXXXXXXX" target="_blank"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #2a5a2a;color:#4caf50;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">💬</span> تواصل عبر واتساب
     </a>
-    <a href="one.safwa.1@gmail.com"
+    <a href="mailto:info@1safwa.com"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a1a2a;border:1px solid #2a2a5a;color:#4a90d9;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">✉️</span> راسلنا بالإيميل
     </a>
@@ -656,7 +654,10 @@ function renderForm(){
   </div>
   <div style="background:#141414;border:1px solid #252525;border-radius:8px;padding:10px 13px;margin-top:10px;margin-bottom:10px;display:flex;align-items:flex-start;gap:9px">
     <input type="checkbox" id="rterms" style="margin-top:3px;flex-shrink:0">
-    <label for="rterms" style="font-size:12px;color:var(--muted);cursor:pointer;line-height:1.6">أوافق على <a href="terms.html" target="_blank" style="color:var(--orange);font-weight:600">الشروط والأحكام</a> وأؤكد أن المعلومات المدخلة صحيحة وأن مشروعي يستوفي متطلبات الترخيص</label>
+    <label for="rterms" style="font-size:12px;color:var(--muted);cursor:pointer;line-height:1.7">
+      أتعهد بأن جميع المعلومات المقدمة صحيحة ودقيقة، وأتحمل المسؤولية الكاملة عن أي معلومات مضللة أو خاطئة قد تضر بالعملاء، وأُبرئ ذمة إدارة دليل صفوى من أي تبعات تترتب على ذلك.
+      كما أوافق على <a href="terms.html" target="_blank" style="color:var(--orange);font-weight:600">الشروط والأحكام</a>.
+    </label>
   </div>
   <div id="rerr" style="color:#e05c5c;font-size:12px;margin-bottom:10px;display:none"></div>
   <div style="display:flex;gap:8px;margin-top:4px">
@@ -673,13 +674,13 @@ function onCatChange(val, label) {
   if(!isAds) document.getElementById("rmawthooq").value="";
   const maroofLabel = document.getElementById("maaroof-label");
   const maroofHint  = document.getElementById("maaroof-hint");
+  // معروف اختياري للجميع
+  maroofLabel.innerHTML = 'رقم تسجيل معروف <span style="color:var(--muted);font-weight:400">(اختياري)</span>';
   if(isHome){
-    maroofLabel.innerHTML = 'رقم تسجيل معروف <span style="color:var(--orange)">*</span>';
-    maroofHint.innerHTML  = '⚠️ مطلوب للأسر المنتجة — سجّل مشروعك على <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">maaroof.com</a>';
-    maroofHint.style.color = "#f0a000";
+    maroofHint.innerHTML  = '💡 إذا كنت مسجّلاً في منصة <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a> أدخل رقمك';
+    maroofHint.style.color = "";
   } else {
-    maroofLabel.innerHTML = 'رقم تسجيل معروف <span style="color:var(--muted);font-weight:400">(اختياري — للأسر المنتجة)</span>';
-    maroofHint.innerHTML  = 'إذا كنت أسرة منتجة مسجّلة في <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a>، أدخل رقم التسجيل';
+    maroofHint.innerHTML  = 'للأسر المنتجة المسجّلة في <a href="https://maaroof.com" target="_blank" style="color:var(--orange)">معروف</a>';
     maroofHint.style.color = "";
   }
 }
@@ -778,15 +779,8 @@ async function submitReq(){
     document.getElementById("rmawthooq").focus();
     return;
   }
-  // التحقق من رقم معروف للأسر المنتجة
   const isHome = document.getElementById("rcat").value==="homeprod";
   const maaroof = document.getElementById("rmaaroof").value.trim();
-  if(isHome && !maaroof){
-    errEl.style.display="block";
-    errEl.textContent="⚠️ رقم تسجيل معروف مطلوب للأسر المنتجة";
-    document.getElementById("rmaaroof").focus();
-    return;
-  }
   // التحقق من الموافقة على الشروط
   if(!document.getElementById("rterms").checked){
     errEl.style.display="block";
