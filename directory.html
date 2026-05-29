@@ -344,13 +344,13 @@ function getCat(id){return CATS.find(c=>c.id===id)||{icon:"🏢",label:""};}
 
 async function load(){
   try{
-    const [bizData, catData] = await Promise.all([
+    const [_expire, bizData, catData] = await Promise.all([
       // تلقائياً ألغِ الإعلانات المنتهية
       fetch(SUPA_URL+"/rest/v1/rpc/auto_expire_promotions",{method:"POST",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},body:"{}"}).catch(()=>{}),
       fetch(SUPA_URL+"/rest/v1/businesses?select=id,name,category,phone,whatsapp,location,maps_url,description,tags,website,instagram,twitter,snapchat,tiktok,promoted,badge,ad_text,ad_grad,likes_count&hidden=eq.false&order=promoted.desc,created_at.desc",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
       fetch(SUPA_URL+"/rest/v1/custom_categories?select=*",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
     ]);
-    ALL = bizData[1]||[];
+    ALL = bizData||[];
     if(catData&&catData.length) CATS=[...DEF_CATS,...catData.map(c=>{return{id:c.id,label:c.label,icon:c.icon}})];
     renderCatGrid();
     initBanner();
