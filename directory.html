@@ -911,7 +911,7 @@ async function loadPopupAd(){
   try{
     const today = new Date().toISOString().split("T")[0];
     const data = await fetch(
-      SUPA_URL+"/rest/v1/popup_ads?select=*&active=eq.true&start_date=lte."+today+"&end_date=gte."+today+"&order=created_at.desc&limit=1",
+      SUPA_URL+"/rest/v1/popup_ads?select=id,business_id,title,description,cta_text,bg_color,ad_image,active,start_date,end_date&active=eq.true&start_date=lte."+today+"&end_date=gte."+today+"&order=created_at.desc&limit=1",
       {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
     ).then(r=>r.json());
 
@@ -932,18 +932,18 @@ async function loadPopupAd(){
 
     popupBizId = biz.id;
     showPopupAd(ad, biz);
-    sessionStorage.setItem(seenKey,"1");
-  }catch(e){ console.warn("Popup failed:", e); }
+    sessionStorage.setItem(seenKey,"1");  }catch(e){ console.warn("Popup failed:", e); }
 }
 
 function showPopupAd(ad, biz){
   const cat = getCat(biz.category);
   // خلفية
   document.getElementById("popup-img-bg").style.background = ad.bg_color||"linear-gradient(135deg,#1a0d04,#f26522)";
-  // صورة
-  if(biz.img_data){
+  // صورة — أولوية لصورة الإعلان ثم صورة المشروع
+  const imgSrc = ad.ad_image || biz.img_data;
+  if(imgSrc){
     const img = document.getElementById("popup-img");
-    img.src = biz.img_data; img.style.display="block";
+    img.src = imgSrc; img.style.display="block";
   }
   // لوغو
   const logoEl = document.getElementById("popup-logo");
