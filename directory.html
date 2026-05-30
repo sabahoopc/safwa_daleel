@@ -910,10 +910,12 @@ let popupTimerInterval = null;
 async function loadPopupAd(){
   try{
     const today = new Date().toISOString().split("T")[0];
+    console.log("loadPopupAd - today:", today);
     const data = await fetch(
       SUPA_URL+"/rest/v1/popup_ads?select=id,business_id,title,description,cta_text,bg_color,ad_image,active,start_date,end_date&active=eq.true&start_date=lte."+today+"&end_date=gte."+today+"&order=created_at.desc&limit=1",
       {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
     ).then(r=>r.json());
+    console.log("popup data:", data);
 
     if(!data||!data.length) return;
     const ad = data[0];
