@@ -925,11 +925,9 @@ async function loadPopupAd(){
     const today = new Date().toISOString().split("T")[0];
     const data = await fetch(
       SUPA_URL+"/rest/v1/popup_ads?select=id,business_id,title,description,cta_text,bg_color,ad_image,active,start_date,end_date&active=eq.true&start_date=lte."+today+"&end_date=gte."+today+"&order=created_at.desc&limit=2",
-      {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
+      {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Accept":"application/json"}}
     ).then(r=>r.json());
     if(!data||!data.length) return;
-    const seenKey = "popup_seen_"+today;
-    if(sessionStorage.getItem(seenKey)) return;
     const bizIds = [...new Set(data.map(d=>d.business_id))];
     const bizData = await fetch(
       SUPA_URL+"/rest/v1/businesses?select=id,name,category,logo_data,img_data&id=in.("+bizIds.join(",")+")",
@@ -937,7 +935,6 @@ async function loadPopupAd(){
     ).then(r=>r.json());
     const getBiz = id => bizData&&bizData.find(b=>b.id===id);
     showPopupAds(data, getBiz);
-    sessionStorage.setItem(seenKey,"1");
   }catch(e){ console.warn("Popup failed:", e); }
 }
 
