@@ -1,5 +1,5 @@
 // دليل صفوى — Service Worker
-const CACHE = 'daleel-safwa-v2';
+const CACHE = 'daleel-safwa-v3';
 const ASSETS = ['/', '/directory.html', '/terms.html', '/landing.html'];
 
 self.addEventListener('install', e => {
