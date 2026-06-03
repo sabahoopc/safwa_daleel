@@ -1,10 +1,10 @@
-// دليل صفوى — Service Worker v3
-const CACHE = 'daleel-safwa-v3';
-const ASSETS = ['/', '/directory.html', '/terms.html', '/landing.html'];
+// دليل صفوى — Service Worker v4
+const CACHE = 'daleel-safwa-v4';
+// لا نخزّن directory.html في الـ cache لضمان تحميل أحدث نسخة دائماً
+const ASSETS = ['/terms.html', '/landing.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-  // تفعيل فوري بدون انتظار
   self.skipWaiting();
 });
 
@@ -14,7 +14,6 @@ self.addEventListener('activate', e => {
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     )
   );
-  // السيطرة على كل التبويبات المفتوحة فوراً
   self.clients.claim();
 });
 
@@ -30,7 +29,13 @@ self.addEventListener('fetch', e => {
     e.request.method !== 'GET'
   ) return;
 
-  // شبكة أولاً دائماً — لضمان تحميل أحدث نسخة
+  // directory.html و index.html — شبكة أولاً دائماً بدون cache
+  if (url.includes('directory.html') || url.endsWith('/') || url.includes('index.html')) {
+    e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    return;
+  }
+
+  // باقي الملفات — شبكة أولاً ثم cache
   e.respondWith(
     fetch(e.request)
       .then(res => {
