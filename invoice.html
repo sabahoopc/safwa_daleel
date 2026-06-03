@@ -51,7 +51,7 @@ body{font-family:"Cairo",sans-serif;background:#f0ede8;min-height:100vh;display:
 .period-item{flex:1;min-width:130px;background:#f7f5f2;border-radius:12px;padding:14px;text-align:center}
 .period-label{font-size:11px;color:#999;font-weight:600;margin-bottom:5px}
 .period-value{font-size:15px;font-weight:800;color:#1a1a1a}
-.inv-footer{border-top:1px solid #ede9e2;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#faf9f7}
+.inv-footer{border-top:1px solid #ede9e2;padding:24px 40px;flex-wrap:wrap;gap:12px;background:#faf9f7}
 .inv-footer-brand{font-size:12px;color:#999;display:flex;align-items:center;gap:8px}
 .inv-footer-brand img{width:24px;height:24px;object-fit:contain;opacity:.5}
 .inv-footer-contact{font-size:12px;color:#999;text-align:left}
@@ -206,6 +206,23 @@ function render(inv){
     </div>
 
     <div class="inv-footer">
+      <div style="width:100%;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid #ede9e2">
+        <div style="font-size:10px;font-weight:700;color:#f26522;letter-spacing:1.5px;margin-bottom:10px">💳 معلومات التحويل البنكي</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
+          <div style="background:#fff;border:1px solid #ede9e2;border-radius:10px;padding:12px 14px">
+            <div style="font-size:10px;color:#aaa;font-weight:600;margin-bottom:3px">اسم البنك</div>
+            <div style="font-size:13px;font-weight:800;color:#1a1a1a">D360 بنك</div>
+          </div>
+          <div style="background:#fff;border:1px solid #ede9e2;border-radius:10px;padding:12px 14px">
+            <div style="font-size:10px;color:#aaa;font-weight:600;margin-bottom:3px">صاحب الحساب</div>
+            <div style="font-size:13px;font-weight:800;color:#1a1a1a">احمد بن سعيد بن سلمان آل قريش</div>
+          </div>
+          <div style="background:#fff;border:1px solid #ede9e2;border-radius:10px;padding:12px 14px">
+            <div style="font-size:10px;color:#aaa;font-weight:600;margin-bottom:3px">رقم الآيبان</div>
+            <div style="font-size:13px;font-weight:800;color:#1a1a1a;direction:ltr;letter-spacing:.5px">SA5136036036054582261626</div>
+          </div>
+        </div>
+      </div>
       <div class="inv-footer-brand">
         <img src="${LOGO}" alt="">
         دليل صفوى — 1safwa.com
