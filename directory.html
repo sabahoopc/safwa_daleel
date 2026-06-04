@@ -26,10 +26,52 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0a0a0a;--surface:#141414;--card:#1a1a1a;--border:#222;
+  --bg:#f5f0e8;--surface:#fff;--card:#fff;--border:#e0d8cc;
   --orange:#f26522;--orange-light:#ff8c42;--orange-dark:#c84d0a;
+  --text:#1a1a1a;--muted:#666;--pb:#fff8f0;--pborder:#f0c090;
+}
+/* ── Dark Theme Override ── */
+body.dark{
+  --bg:#0a0a0a;--surface:#141414;--card:#1a1a1a;--border:#222;
   --text:#f0f0f0;--muted:#777;--pb:#1f1408;--pborder:#7a3010;
 }
+body.dark header{background:linear-gradient(135deg,#111,#1a0d04)!important}
+body.dark .sb{background:#141414!important;border-color:#333!important}
+body.dark .si{color:#f0f0f0!important}
+body.dark .cat-tile{background:#1a1a1a!important;border-color:#252525!important;box-shadow:none!important}
+body.dark .cat-tile-label{color:#f0f0f0!important}
+body.dark .cat-tile-count{background:#141414!important;color:#777!important}
+body.dark .card{background:#1a1a1a!important;border-color:#252525!important}
+body.dark .card.promo{background:#1f1408!important;border-color:#7a3010!important}
+body.dark .cn{color:#f0f0f0!important}
+body.dark .tag{background:#141414!important;border-color:#2a2a2a!important;color:#777!important}
+body.dark .mb{background:#111!important;border-color:#2a2a2a!important}
+body.dark .fi{background:#1a1a1a!important;border-color:#2a2a2a!important;color:#f0f0f0!important}
+body.dark .ov{background:rgba(0,0,0,.85)!important}
+body.dark .pc{background:#1f1005!important}
+body.dark .visit-badge{background:#141414!important;border-color:#2a2a2a!important}
+body.dark footer{border-top:1px solid #1a1a1a!important;color:#444!important}
+body.dark .pci{background:linear-gradient(135deg,#1f1005,#140a02)!important}
+body.dark .biz-header .back-btn{background:#141414!important;border-color:#2a2a2a!important;color:#f0f0f0!important}
+
+/* Light theme explicit (default) */
+body:not(.dark) header{background:linear-gradient(135deg,#fff8f2,#fff0e0)}
+body:not(.dark) .sb{background:#fff;border-color:#ddd}
+body:not(.dark) .si{color:#1a1a1a}
+body:not(.dark) .cat-tile{background:#fff;border-color:#e0d8cc;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+body:not(.dark) .cat-tile:hover{border-color:var(--orange)}
+body:not(.dark) .cat-tile-label{color:#1a1a1a}
+body:not(.dark) .card{background:#fff;border-color:#e0d8cc}
+body:not(.dark) .card.promo{background:#fff8f0}
+body:not(.dark) .cn{color:#1a1a1a}
+body:not(.dark) .mb{background:#fff;border-color:#e0d8cc}
+body:not(.dark) .fi{background:#f9f6f0;border-color:#ddd;color:#1a1a1a}
+body:not(.dark) .ov{background:rgba(0,0,0,.5)}
+body:not(.dark) .visit-badge{background:#fff;border-color:#e0d8cc}
+
+/* Theme toggle button */
+.theme-btn{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--text);transition:.2s;white-space:nowrap}
+.theme-btn:hover{border-color:var(--orange);color:var(--orange)}
 body{background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,sans-serif;min-height:100vh}
 a{text-decoration:none}
 button{cursor:pointer;font-family:inherit}
@@ -49,34 +91,6 @@ header{background:linear-gradient(135deg,#111,#1a0d04);border-bottom:2px solid v
   .ha .btn-a{font-size:11px;padding:7px 10px}
   .visit-badge{display:none}
 }
-
-/* ── Light Theme ── */
-body.light{
-  --bg:#f5f0e8;--surface:#fff;--card:#fff;--border:#e0d8cc;
-  --text:#1a1a1a;--muted:#666;--pb:#fff8f0;--pborder:#f0c090;
-}
-body.light header{background:linear-gradient(135deg,#fff8f2,#fff0e0);border-bottom:2px solid var(--orange)}
-body.light .sb{background:#fff;border-color:#ddd}
-body.light .si{color:#1a1a1a}
-body.light .cat-tile{background:#fff;border-color:#e0d8cc;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-body.light .cat-tile:hover{border-color:var(--orange);box-shadow:0 8px 24px rgba(242,101,34,.15)}
-body.light .cat-tile-label{color:#1a1a1a}
-body.light .cat-tile-count{background:#f5f0e8;color:#666}
-body.light .card{background:#fff;border-color:#e0d8cc}
-body.light .card.promo{background:#fff8f0;border-color:var(--pborder)}
-body.light .cn{color:#1a1a1a}
-body.light .tag{background:#f5f0e8;border-color:#ddd;color:#666}
-body.light .mb{background:#fff;border-color:#e0d8cc}
-body.light .fi{background:#f9f6f0;border-color:#ddd;color:#1a1a1a}
-body.light .fi:focus{border-color:var(--orange)}
-body.light .ov{background:rgba(0,0,0,.5)}
-body.light .pc{background:#fff8f0}
-body.light .visit-badge{background:#fff;border-color:#e0d8cc}
-body.light footer{border-top:1px solid #e0d8cc;color:#999}
-body.light .pci{background:linear-gradient(135deg,#fff8f0,#fff0e0)}
-body.light .biz-header .back-btn{background:#fff;border-color:#e0d8cc;color:#1a1a1a}
-body.light .nl-form-wrap input{background:#fff;border-color:#ddd;color:#1a1a1a}
-body.light .cat-grid .cat-tile.has-promo{background:#fff8f0}
 
 /* Theme toggle button */
 .theme-btn{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--text);transition:.2s;white-space:nowrap}
@@ -1121,26 +1135,43 @@ async function trackVisit(){
 
 // ── Theme System ──────────────────────────
 function initTheme(){
-  const saved = localStorage.getItem("sd_theme")||"dark";
-  applyTheme(saved);
+  const saved = localStorage.getItem("sd_theme");
+  if(saved){
+    // إذا اختار الزائر يدوياً احترم اختياره
+    applyTheme(saved);
+  } else {
+    // اتبع إعداد النظام تلقائياً
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    applyTheme(prefersDark ? "dark" : "light");
+  }
+  // استمع لتغييرات النظام (وضع ليلي تلقائي)
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e=>{
+    // فقط إذا لم يختر الزائر يدوياً
+    if(!localStorage.getItem("sd_theme")){
+      applyTheme(e.matches ? "dark" : "light");
+    }
+  });
 }
 
 function applyTheme(theme){
-  if(theme==="light"){
-    document.body.classList.add("light");
-    const btn = document.getElementById("theme-btn");
-    if(btn) btn.innerHTML = "☀️ فاتح";
-  } else {
+  if(theme==="dark"){
+    document.body.classList.add("dark");
     document.body.classList.remove("light");
     const btn = document.getElementById("theme-btn");
     if(btn) btn.innerHTML = "🌙 داكن";
+  } else {
+    document.body.classList.remove("dark");
+    document.body.classList.add("light");
+    const btn = document.getElementById("theme-btn");
+    if(btn) btn.innerHTML = "☀️ فاتح";
   }
-  localStorage.setItem("sd_theme", theme);
 }
 
 function toggleTheme(){
-  const isLight = document.body.classList.contains("light");
-  applyTheme(isLight ? "dark" : "light");
+  const isDark = document.body.classList.contains("dark");
+  const newTheme = isDark ? "light" : "dark";
+  localStorage.setItem("sd_theme", newTheme);
+  applyTheme(newTheme);
 }
 
 initTheme();
