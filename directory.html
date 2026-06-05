@@ -972,20 +972,22 @@ async function submitReq(){
       body:JSON.stringify(row)
     });
     if(res.ok||res.status===201){
+      // احفظ البيانات قبل استبدال HTML النموذج
+      const ownerEmailVal = ownerEmail;
+      const ownerNameVal  = owner;
+      const bizNameVal    = name;
+
       document.getElementById("req-body").innerHTML=`
       <div class="sw2">
         <div style="font-size:52px;margin-bottom:14px">✅</div>
         <div style="font-size:18px;font-weight:700;color:var(--orange);margin-bottom:10px">تم إرسال طلبك!</div>
         <div style="font-size:14px;color:var(--muted);line-height:1.9">طلبك قيد المراجعة<br>سيتم إضافة مشروعك خلال<br><strong style="color:var(--orange);font-size:16px">٢ إلى ٥ أيام عمل</strong></div>
       </div>`;
-      rLogoData=null;rImgData=null;
-      // إرسال إيميل تأكيد للتاجر بعد تأخير بسيط
-      const ownerEmailVal = document.getElementById("roe").value.trim();
-      const bizNameVal    = document.getElementById("rn").value.trim();
-      const ownerNameVal  = document.getElementById("ro").value.trim();
+      rLogoData=null; rImgData=null;
+      // إرسال إيميل تأكيد للتاجر
       if(ownerEmailVal){
         console.log("Sending confirm email to:", ownerEmailVal);
-        setTimeout(()=>sendConfirmEmail(ownerEmailVal, ownerNameVal, bizNameVal), 500);
+        setTimeout(()=>sendConfirmEmail(ownerEmailVal, ownerNameVal, bizNameVal), 300);
       }
     } else throw new Error("فشل");
   }catch(e){
