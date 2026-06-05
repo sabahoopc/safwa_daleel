@@ -608,8 +608,8 @@ async function openBiz(id){
   let h="";
   if(b.promoted) h+=`<div style="display:inline-block;background:linear-gradient(135deg,var(--orange-dark),var(--orange));color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:18px;margin-bottom:11px">${b.badge||"مميز"}</div>`;
   if(b.img_data) h+=`
-    <div style="position:relative;margin-bottom:14px;cursor:zoom-in" onclick="openFullImg('${b.id}')">
-      <img src="${b.img_data}" style="width:100%;border-radius:10px;object-fit:cover;max-height:200px" alt="صورة المنتجات">
+    <div style="position:relative;margin-bottom:14px;cursor:zoom-in" onclick="openFullImg(this)">
+      <img src="${b.img_data}" style="width:100%;border-radius:10px;object-fit:cover;max-height:200px" alt="صورة المنتجات" data-full="${b.img_data}">
       <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px;backdrop-filter:blur(4px)">
         🔍 اضغط لعرض كاملاً
       </div>
@@ -1160,10 +1160,11 @@ function popupOpenBiz(idx){
 }
 
 
-function openFullImg(bizId){
-  const b = ALL.find(x=>x.id===bizId);
-  if(!b||!b.img_data) return;
-  document.getElementById("fullimg-src").src = b.img_data;
+function openFullImg(el){
+  const img = el.querySelector ? el.querySelector("img[data-full]") : null;
+  const src = img ? img.getAttribute("data-full") : null;
+  if(!src) return;
+  document.getElementById("fullimg-src").src = src;
   const modal = document.getElementById("modal-fullimg");
   modal.style.display="flex";
   document.body.style.overflow="hidden";
@@ -1177,20 +1178,14 @@ function closeFullImg(){
 async function shareBiz(bizId){
   const b = ALL.find(x=>x.id===bizId);
   if(!b) return;
-  const shareData = {
-    title: b.name + " — دليل صفوى",
-    text: `${b.name}\n${b.description||""}\n📍 ${b.location||""}`,
-    url: "https://1safwa.com"
-  };
-  try{
-    if(navigator.share){
-      await navigator.share(shareData);
-    } else {
-      // fallback — نسخ الرابط
-      await navigator.clipboard.writeText(`${b.name}\n${b.description||""}\n📍 ${b.location||""}\n🌐 1safwa.com`);
-      alert("تم نسخ معلومات المشروع — يمكنك لصقها في أي مكان");
-    }
-  }catch(e){ console.warn("Share failed:", e); }
+  const text = `🏪 ${b.name}\n${b.description?b.description+"\n":""}📍 ${b.location||""}\n\n🌐 تصفح دليل صفوى: https://1safwa.com`;
+  const shareData = { title: b.name + " — دليل صفوى", text, url: "https://1safwa.com" };
+  // Web Share API — يعمل على الجوال في المتصفح والتطبيق
+  if(navigator.share && navigator.canShare && navigator.canShare(shareData)){
+    try{ await navigator.share(shareData); return; }catch(e){}
+  }
+  // Fallback — واتساب مباشر
+  window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");
 }
 
 function openM(id){document.getElementById("modal-"+id).classList.add("open");document.body.style.overflow="hidden";}
