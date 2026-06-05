@@ -1,6 +1,5 @@
-// دليل صفوى — Service Worker v4
+// دليل صفوى — Service Worker v5
 const CACHE = 'daleel-safwa-v5';
-// لا نخزّن directory.html في الـ cache لضمان تحميل أحدث نسخة دائماً
 const ASSETS = ['/terms.html', '/landing.html'];
 
 self.addEventListener('install', e => {
@@ -19,24 +18,27 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = e.request.url;
+  const method = e.request.method;
 
-  // لا تتدخل في طلبات API أو غير GET
+  // تجاهل كل طلبات غير GET تماماً بدون أي تدخل
+  if (method !== 'GET') return;
+
+  // تجاهل كل الـ APIs والخدمات الخارجية
   if (
     url.includes('supabase.co') ||
-    url.includes('functions/v1') ||
     url.includes('googleapis.com') ||
     url.includes('googletagmanager') ||
-    url.includes('fonts.g') ||
-    e.request.method !== 'GET'
+    url.includes('resend.com') ||
+    url.includes('onesignal.com')
   ) return;
 
-  // directory.html و index.html — شبكة أولاً دائماً بدون cache
+  // directory.html و index.html — شبكة أولاً دائماً
   if (url.includes('directory.html') || url.endsWith('/') || url.includes('index.html')) {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
 
-  // باقي الملفات — شبكة أولاً ثم cache
+  // باقي الملفات الثابتة — شبكة أولاً ثم cache
   e.respondWith(
     fetch(e.request)
       .then(res => {
