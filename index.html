@@ -480,6 +480,9 @@ async function load(){
     trackVisit();
     // نافذة الإعلان — بعد ثانيتين من التحميل
     setTimeout(loadPopupAd, 2000);
+    // فتح مشروع مباشرة إذا كان الرابط يحتوي ?biz=ID
+    const bizParam = new URLSearchParams(location.search).get("biz");
+    if(bizParam) setTimeout(()=>openBiz(parseInt(bizParam)), 600);
   }catch(e){
     document.getElementById("cat-grid").innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">تعذّر تحميل البيانات</div>`;
   }
@@ -1178,13 +1181,11 @@ function closeFullImg(){
 async function shareBiz(bizId){
   const b = ALL.find(x=>x.id===bizId);
   if(!b) return;
-  const text = `🏪 ${b.name}\n${b.description?b.description+"\n":""}📍 ${b.location||""}\n\n🌐 تصفح دليل صفوى: https://1safwa.com`;
-  const shareData = { title: b.name + " — دليل صفوى", text, url: "https://1safwa.com" };
-  // Web Share API — يعمل على الجوال في المتصفح والتطبيق
-  if(navigator.share && navigator.canShare && navigator.canShare(shareData)){
-    try{ await navigator.share(shareData); return; }catch(e){}
+  const url  = `https://1safwa.com/?biz=${bizId}`;
+  const text = `🏪 ${b.name}\n${b.description?b.description+"\n":""}📍 ${b.location||""}\n\n🔗 ${url}`;
+  if(navigator.share){
+    try{ await navigator.share({ title: b.name + " — دليل صفوى", text }); return; }catch(e){}
   }
-  // Fallback — واتساب مباشر
   window.open("https://wa.me/?text="+encodeURIComponent(text),"_blank");
 }
 
