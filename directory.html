@@ -983,7 +983,10 @@ async function submitReq(){
       const ownerEmailVal = document.getElementById("roe").value.trim();
       const bizNameVal    = document.getElementById("rn").value.trim();
       const ownerNameVal  = document.getElementById("ro").value.trim();
-      if(ownerEmailVal) setTimeout(()=>sendConfirmEmail(ownerEmailVal, ownerNameVal, bizNameVal), 500);
+      if(ownerEmailVal){
+        console.log("Sending confirm email to:", ownerEmailVal);
+        setTimeout(()=>sendConfirmEmail(ownerEmailVal, ownerNameVal, bizNameVal), 500);
+      }
     } else throw new Error("فشل");
   }catch(e){
     btn.textContent="إرسال الطلب";btn.disabled=false;
