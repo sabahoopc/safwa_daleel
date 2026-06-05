@@ -1,5 +1,5 @@
 // دليل صفوى — Service Worker v4
-const CACHE = 'daleel-safwa-v4';
+const CACHE = 'daleel-safwa-v5';
 // لا نخزّن directory.html في الـ cache لضمان تحميل أحدث نسخة دائماً
 const ASSETS = ['/terms.html', '/landing.html'];
 
@@ -23,6 +23,7 @@ self.addEventListener('fetch', e => {
   // لا تتدخل في طلبات API أو غير GET
   if (
     url.includes('supabase.co') ||
+    url.includes('functions/v1') ||
     url.includes('googleapis.com') ||
     url.includes('googletagmanager') ||
     url.includes('fonts.g') ||
