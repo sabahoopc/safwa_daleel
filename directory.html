@@ -979,11 +979,11 @@ async function submitReq(){
         <div style="font-size:14px;color:var(--muted);line-height:1.9">طلبك قيد المراجعة<br>سيتم إضافة مشروعك خلال<br><strong style="color:var(--orange);font-size:16px">٢ إلى ٥ أيام عمل</strong></div>
       </div>`;
       rLogoData=null;rImgData=null;
-      // إرسال إيميل تأكيد للتاجر
+      // إرسال إيميل تأكيد للتاجر بعد تأخير بسيط
       const ownerEmailVal = document.getElementById("roe").value.trim();
       const bizNameVal    = document.getElementById("rn").value.trim();
       const ownerNameVal  = document.getElementById("ro").value.trim();
-      if(ownerEmailVal) sendConfirmEmail(ownerEmailVal, ownerNameVal, bizNameVal);
+      if(ownerEmailVal) setTimeout(()=>sendConfirmEmail(ownerEmailVal, ownerNameVal, bizNameVal), 500);
     } else throw new Error("فشل");
   }catch(e){
     btn.textContent="إرسال الطلب";btn.disabled=false;
