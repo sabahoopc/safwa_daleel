@@ -432,6 +432,17 @@ const DEF_CATS = [
   {id:"women",label:"مراكز نسائية",icon:"💄"},{id:"electronics",label:"إلكترونيات",icon:"🔌"},
   {id:"clothing",label:"ملابس",icon:"👗"},{id:"gold",label:"ذهب",icon:"💍"},
   {id:"sweets",label:"حلويات",icon:"🍰"},
+  {id:"services",label:"خدمات",icon:"🔧"},
+  {id:"beauty",label:"تجميل",icon:"💅"},
+  {id:"ads",label:"إعلانات",icon:"📣"},
+  {id:"juices",label:"عصائر وآيسكريم",icon:"🧃"},
+  {id:"decor",label:"ديكور",icon:"🛋️"},
+  {id:"foodcarts",label:"عربات طعام",icon:"🍔"},
+  {id:"optics",label:"بصريات",icon:"👓"},
+  {id:"perfumes",label:"عطورات وبخور",icon:"🕌"},
+  {id:"bikes",label:"دراجات وألعاب",icon:"🚲"},
+  {id:"furniture",label:"مفروشات",icon:"🛋️"},
+  {id:"photography",label:"تصوير",icon:"📸"},
 ];
 
 let ALL=[], CATS=[...DEF_CATS], activeCat=null, bannerIdx=0, bannerTimer=null, bannerBiz=null;
@@ -968,11 +979,52 @@ async function submitReq(){
         <div style="font-size:14px;color:var(--muted);line-height:1.9">طلبك قيد المراجعة<br>سيتم إضافة مشروعك خلال<br><strong style="color:var(--orange);font-size:16px">٢ إلى ٥ أيام عمل</strong></div>
       </div>`;
       rLogoData=null;rImgData=null;
+      // إرسال إيميل تأكيد للتاجر
+      const ownerEmailVal = document.getElementById("roe").value.trim();
+      const bizNameVal    = document.getElementById("rn").value.trim();
+      const ownerNameVal  = document.getElementById("ro").value.trim();
+      if(ownerEmailVal) sendConfirmEmail(ownerEmailVal, ownerNameVal, bizNameVal);
     } else throw new Error("فشل");
   }catch(e){
     btn.textContent="إرسال الطلب";btn.disabled=false;
     errEl.style.display="block";errEl.textContent="⚠️ تعذّر الإرسال، تأكد من اتصال الإنترنت";
   }
+}
+
+async function sendConfirmEmail(email, name, bizName){
+  try{
+    const html = `<!DOCTYPE html><html dir="rtl" lang="ar"><body style="margin:0;padding:0;background:#f5f5f5;font-family:'Segoe UI',Tahoma,sans-serif">
+    <div style="max-width:520px;margin:20px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
+      <div style="background:linear-gradient(135deg,#1a0d04,#f26522);padding:28px 24px;text-align:center">
+        <div style="font-size:22px;font-weight:900;color:#fff">دليل صفوى</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:4px">1safwa.com</div>
+      </div>
+      <div style="padding:28px 24px">
+        <div style="font-size:36px;text-align:center;margin-bottom:16px">📋</div>
+        <h2 style="font-size:18px;font-weight:800;color:#1a1a1a;margin:0 0 12px;text-align:center">تم استلام طلبك!</h2>
+        <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 12px">أهلاً ${name}،</p>
+        <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 16px">تم استلام طلب إضافة <strong style="color:#f26522">${bizName}</strong> في دليل صفوى بنجاح. طلبك الآن قيد المراجعة وسنتواصل معك خلال <strong>٢ إلى ٥ أيام عمل</strong> بعد اعتماد مشروعك.</p>
+        <div style="background:#fff8f0;border:1px solid #fde4c8;border-radius:10px;padding:14px;margin-bottom:20px">
+          <div style="font-size:13px;color:#555;line-height:1.8">
+            ⏳ <strong>المراجعة تستغرق:</strong> ٢ إلى ٥ أيام عمل<br>
+            📧 <strong>سيصلك إيميل</strong> فور اعتماد مشروعك<br>
+            📱 <strong>للاستفسار:</strong> تواصل معنا على واتساب
+          </div>
+        </div>
+        <div style="text-align:center">
+          <a href="https://wa.me/966597904227" style="display:inline-block;background:#25d366;color:#fff;padding:11px 24px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none">💬 تواصل معنا</a>
+        </div>
+      </div>
+      <div style="background:#f9f9f9;padding:16px 24px;text-align:center;font-size:11px;color:#999;border-top:1px solid #eee">
+        دليل صفوى — 1safwa.com | <a href="mailto:one.safwa.1@gmail.com" style="color:#f26522">one.safwa.1@gmail.com</a>
+      </div>
+    </div></body></html>`;
+    await fetch(SUPA_URL+"/functions/v1/send-email",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({to:email, subject:"تم استلام طلبك — دليل صفوى", html, fromName:"دليل صفوى"})
+    });
+  }catch(e){ console.warn("Confirm email failed:", e); }
 }
 
 async function subscribeNewsletter(){
