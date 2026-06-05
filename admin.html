@@ -313,7 +313,7 @@ window.openReqDetail = async function openReqDetail(id) {
   document.getElementById("req-detail-body").innerHTML = html;
   document.getElementById("req-detail-footer").innerHTML = r.status==="pending"
     ? `<button type="button" class="btn btn-green" onclick="approveReq(${r.id});closeM('req')">✅ قبول وإضافة</button>
-       <button type="button" class="btn btn-red" onclick="rejectReq(${r.id});closeM('req')">✕ رفض</button>
+       <button type="button" class="btn btn-red" onclick="closeM('req');rejectReq(${r.id})">✕ رفض</button>
        <button type="button" class="btn btn-ghost" onclick="closeM('req')">إغلاق</button>`
     : `<button type="button" class="btn btn-ghost" onclick="closeM('req')">إغلاق</button>`;
   openM("req");
@@ -341,16 +341,126 @@ window.approveReq = async function approveReq(id) {
     toast("✅ تم القبول وإضافة المشروع للدليل");  } catch(e) { toast("❌ فشل: "+e.message,true); }
 }
 
-window.rejectReq = async function rejectReq(id) {
+window.approveReq = async function approveReq(id) {
+  const r = REQUESTS.find(x=>x.id===id); if(!r) return;
   try {
+    const row = {
+      name:r.business_name, category:r.category, phone:r.phone||null,
+      whatsapp:r.whatsapp||null, location:r.location, maps_url:r.maps_url||null,
+      description:r.description||null, website:r.website||null,
+      instagram:r.instagram||null, twitter:r.twitter||null,
+      snapchat:r.snapchat||null, tiktok:r.tiktok||null,
+      logo_data:r.logo_data||null, img_data:r.img_data||null,
+      promoted:false, hidden:false,
+    };
+    const res = await supa("businesses","POST",row);
+    await supa("submission_requests?id=eq."+id,"PATCH",{status:"approved"});
+    r.status = "approved";
+    if (res&&res[0]) DB.unshift(mapFromDB(res[0]));
+    updateAll();
+    renderRequests();
+    toast("✅ تم القبول وإضافة المشروع للدليل");
+    // إيميل موافقة للتاجر
+    if(r.owner_email) sendAdminEmail(r.owner_email, "approval", r.owner_name, r.business_name);
+  } catch(e) { toast("❌ فشل: "+e.message,true); }
+}
+
+window.rejectReq = async function rejectReq(id) {
+  const r = REQUESTS.find(x=>x.id===id); if(!r) return;
+  // افتح نافذة إدخال سبب الرفض
+  document.getElementById("reject-id").value = id;
+  document.getElementById("reject-reason").value = "";
+  document.getElementById("reject-name").textContent = r.owner_name||"";
+  document.getElementById("reject-biz").textContent  = r.business_name||"";
+  openM("reject");
+}
+
+window.confirmReject = async function confirmReject() {
+  const id     = parseInt(document.getElementById("reject-id").value);
+  const reason = document.getElementById("reject-reason").value.trim();
+  const r      = REQUESTS.find(x=>x.id===id); if(!r) return;
+  if(!reason){ document.getElementById("reject-err").style.display="block"; return; }
+  document.getElementById("reject-err").style.display="none";
+  try{
     await supa("submission_requests?id=eq."+id,"PATCH",{status:"rejected"});
-    const r = REQUESTS.find(x=>x.id===id);
-    if(r) r.status="rejected";
+    r.status="rejected";
+    closeM("reject");
     updateSidebar();
     renderRequests();
     toast("تم رفض الطلب");
-  } catch(e) { toast("❌ فشل: "+e.message,true); }
+    // إيميل رفض للتاجر مع السبب
+    if(r.owner_email) sendAdminEmail(r.owner_email, "rejection", r.owner_name, r.business_name, reason);
+  }catch(e){ toast("❌ فشل: "+e.message,true); }
 }
+
+async function sendAdminEmail(email, type, name, bizName, reason=""){
+  try{
+    let subject, html;
+    if(type==="approval"){
+      subject = `🎉 تم اعتماد مشروعك في دليل صفوى`;
+      html = `<!DOCTYPE html><html dir="rtl" lang="ar"><body style="margin:0;padding:0;background:#f5f5f5;font-family:'Segoe UI',Tahoma,sans-serif">
+      <div style="max-width:520px;margin:20px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
+        <div style="background:linear-gradient(135deg,#1a0d04,#f26522);padding:28px 24px;text-align:center">
+          <div style="font-size:22px;font-weight:900;color:#fff">دليل صفوى</div>
+        </div>
+        <div style="padding:28px 24px">
+          <div style="font-size:48px;text-align:center;margin-bottom:14px">🎉</div>
+          <h2 style="font-size:18px;font-weight:800;color:#1a1a1a;text-align:center;margin:0 0 16px">تم اعتماد مشروعك!</h2>
+          <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 12px">أهلاً ${name}،</p>
+          <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 16px">يسعدنا إعلامك بأن مشروع <strong style="color:#f26522">${bizName}</strong> تم اعتماده وإضافته في دليل صفوى. يمكن لعملائك الآن إيجادك بسهولة.</p>
+          <div style="text-align:center;margin-bottom:20px">
+            <a href="https://1safwa.com" style="display:inline-block;background:linear-gradient(135deg,#f26522,#ff8c42);color:#fff;padding:12px 28px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none">🌐 تصفح الدليل</a>
+          </div>
+          <div style="background:#fff8f0;border:1px solid #fde4c8;border-radius:10px;padding:16px;margin-bottom:20px">
+            <div style="font-size:13px;font-weight:700;color:#f26522;margin-bottom:8px">💡 هل تريد مزيداً من الظهور؟</div>
+            <div style="font-size:13px;color:#555;line-height:1.8">
+              ⭐ <strong>الإعلان المميز</strong> — ظهور في البانر أعلى الصفحة — ٥٠ ريال/شهر<br>
+              🪟 <strong>النافذة المنبثقة</strong> — تظهر لكل زائر — ٣ ريال/يوم (أسبوعان كحد أدنى)
+            </div>
+          </div>
+          <div style="background:#f0fff4;border:1px solid #c6f6d5;border-radius:10px;padding:14px;font-size:13px;color:#276749;line-height:1.8">
+            📣 <strong>شارك الرابط مع عملائك:</strong><br>
+            أرسل رابط دليل صفوى لعملائك حتى يتمكنوا من إيجادك بسهولة<br>
+            <strong>1safwa.com</strong>
+          </div>
+        </div>
+        <div style="background:#f9f9f9;padding:16px 24px;text-align:center;font-size:11px;color:#999;border-top:1px solid #eee">
+          للاستفسار: <a href="https://wa.me/966597904227" style="color:#f26522">واتساب</a> | <a href="mailto:one.safwa.1@gmail.com" style="color:#f26522">one.safwa.1@gmail.com</a>
+        </div>
+      </div></body></html>`;
+    } else {
+      subject = `بخصوص طلب إضافة مشروعك في دليل صفوى`;
+      html = `<!DOCTYPE html><html dir="rtl" lang="ar"><body style="margin:0;padding:0;background:#f5f5f5;font-family:'Segoe UI',Tahoma,sans-serif">
+      <div style="max-width:520px;margin:20px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08)">
+        <div style="background:linear-gradient(135deg,#1a0d04,#f26522);padding:28px 24px;text-align:center">
+          <div style="font-size:22px;font-weight:900;color:#fff">دليل صفوى</div>
+        </div>
+        <div style="padding:28px 24px">
+          <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 12px">أهلاً ${name}،</p>
+          <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 16px">بعد مراجعة طلب إضافة مشروع <strong>${bizName}</strong>، لم نتمكن من قبوله في الوقت الحالي للسبب التالي:</p>
+          <div style="background:#fff5f5;border:1px solid #fed7d7;border-radius:10px;padding:14px;margin-bottom:20px;font-size:14px;color:#c53030;line-height:1.8">
+            ${reason}
+          </div>
+          <p style="font-size:14px;color:#555;line-height:1.8;margin:0 0 16px">يمكنك تصحيح المعلومات وإعادة تقديم الطلب مجدداً.</p>
+          <div style="text-align:center">
+            <a href="https://1safwa.com" style="display:inline-block;background:linear-gradient(135deg,#f26522,#ff8c42);color:#fff;padding:12px 28px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none">إعادة التقديم</a>
+          </div>
+        </div>
+        <div style="background:#f9f9f9;padding:16px 24px;text-align:center;font-size:11px;color:#999;border-top:1px solid #eee">
+          للاستفسار: <a href="https://wa.me/966597904227" style="color:#f26522">واتساب</a> | <a href="mailto:one.safwa.1@gmail.com" style="color:#f26522">one.safwa.1@gmail.com</a>
+        </div>
+      </div></body></html>`;
+    }
+    await fetch(SUPA_URL+"/functions/v1/send-email",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({to:email, subject, html, fromName:"دليل صفوى"})
+    });
+  }catch(e){ console.warn("Admin email failed:", e); }
+}
+
+window.sendAdminEmail = sendAdminEmail;
+window.confirmReject  = confirmReject;
 
 // ── Categories ────────────────────────────
 window.renderCatsTable = function renderCatsTable() {
@@ -1908,6 +2018,29 @@ tr:hover td{background:rgba(242,101,34,.04)}
     <div class="mf">
       <button type="button" class="btn btn-or" onclick="savePopupAd()">💾 حفظ الإعلان</button>
       <button type="button" class="btn btn-ghost" onclick="closeM('add-popup')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reject Reason Modal -->
+<div class="overlay" id="modal-reject" onclick="if(event.target===this)closeM('reject')">
+  <div class="modal" style="max-width:440px">
+    <div class="mh"><div class="mh-title">✕ رفض الطلب</div><button type="button" style="background:none;border:none;color:var(--mu);font-size:17px;cursor:pointer" onclick="closeM('reject')">✕</button></div>
+    <div class="mc">
+      <input type="hidden" id="reject-id">
+      <div style="background:var(--card2);border:1px solid var(--b2);border-radius:9px;padding:12px;margin-bottom:14px">
+        <div style="font-size:12px;color:var(--mu);margin-bottom:3px">الطلب</div>
+        <div style="font-size:14px;font-weight:700" id="reject-biz"></div>
+        <div style="font-size:12px;color:var(--mu);margin-top:2px" id="reject-name"></div>
+      </div>
+      <label class="flabel">سبب الرفض <span class="req">*</span></label>
+      <textarea class="finput" id="reject-reason" style="height:100px;resize:vertical" placeholder="مثال: المشروع لا يقع داخل مدينة صفوى..."></textarea>
+      <div style="font-size:12px;color:var(--mu);margin-top:-8px;margin-bottom:8px">سيصل هذا السبب للتاجر عبر البريد الإلكتروني</div>
+      <div id="reject-err" style="color:var(--re);font-size:12px;display:none;margin-bottom:8px">⚠️ يرجى كتابة سبب الرفض</div>
+    </div>
+    <div class="mf">
+      <button type="button" class="btn btn-red" onclick="confirmReject()">✕ تأكيد الرفض وإرسال الإيميل</button>
+      <button type="button" class="btn btn-ghost" onclick="closeM('reject')">إلغاء</button>
     </div>
   </div>
 </div>
