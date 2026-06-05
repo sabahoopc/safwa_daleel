@@ -358,11 +358,11 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
 <footer>
   <div style="display:flex;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
     <a href="https://whatsapp.com/channel/0029Vb8Fbkk17EmykSRXHm3I" target="_blank" style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #25d366;color:#25d366;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none"><span style="font-size:18px">📢</span> قناة واتساب</a>
-    <a href="https://wa.me/966597904227" target="_blank"
+    <a href="https://wa.me/966XXXXXXXXXX" target="_blank"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a2a1a;border:1px solid #2a5a2a;color:#4caf50;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">💬</span> تواصل عبر واتساب
     </a>
-    <a href="mailto:one.safwa.1@gmail.com"
+    <a href="mailto:info@1safwa.com"
        style="display:inline-flex;align-items:center;gap:7px;background:#1a1a2a;border:1px solid #2a2a5a;color:#4a90d9;padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;text-decoration:none">
       <span style="font-size:18px">✉️</span> راسلنا بالإيميل
     </a>
@@ -413,6 +413,12 @@ footer{text-align:center;padding:24px 20px;color:#444;font-size:11px;margin-top:
       سيُغلق تلقائياً خلال <span id="popup-timer">10</span> ثانية
     </div>
   </div>
+</div>
+
+<!-- Full Image Modal -->
+<div id="modal-fullimg" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.95);align-items:center;justify-content:center;padding:16px" onclick="closeFullImg()">
+  <button onclick="closeFullImg()" style="position:absolute;top:16px;left:16px;background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+  <img id="fullimg-src" src="" alt="" style="max-width:100%;max-height:90vh;border-radius:12px;object-fit:contain">
 </div>
 
 <div class="ov" id="modal-business" onclick="if(event.target===this)closeM('business')">
@@ -601,7 +607,13 @@ async function openBiz(id){
   const logo=b.logo_data?`<img src="${b.logo_data}" alt="" style="width:100%;height:100%;object-fit:cover">`:`${cat.icon}`;
   let h="";
   if(b.promoted) h+=`<div style="display:inline-block;background:linear-gradient(135deg,var(--orange-dark),var(--orange));color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:18px;margin-bottom:11px">${b.badge||"مميز"}</div>`;
-  if(b.img_data) h+=`<img src="${b.img_data}" style="width:100%;border-radius:10px;margin-bottom:14px;object-fit:cover;max-height:180px" alt="صورة المنتجات">`;
+  if(b.img_data) h+=`
+    <div style="position:relative;margin-bottom:14px;cursor:zoom-in" onclick="openFullImg('${b.id}')">
+      <img src="${b.img_data}" style="width:100%;border-radius:10px;object-fit:cover;max-height:200px" alt="صورة المنتجات">
+      <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:4px 10px;border-radius:20px;backdrop-filter:blur(4px)">
+        🔍 اضغط لعرض كاملاً
+      </div>
+    </div>`;
   h+=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
     <div style="width:58px;height:58px;border-radius:9px;background:#252525;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;overflow:hidden">${logo}</div>
     <div><div style="font-size:18px;font-weight:700">${b.name}</div><div style="font-size:12px;color:var(--muted);margin-top:3px">${cat.icon} ${cat.label}</div></div>
@@ -622,12 +634,16 @@ async function openBiz(id){
   if(b.website) h+=`<div style="margin-bottom:12px;padding:12px;background:var(--card);border-radius:9px;border:1px solid #252525"><div style="font-weight:700;font-size:12px;margin-bottom:7px">🌐 الموقع الإلكتروني</div><a href="${b.website}" target="_blank" style="color:var(--orange);font-size:13px;font-weight:600;word-break:break-all">${b.website.replace(/^https?:\/\//,"")}</a></div>`;
   // زر الإعجاب
   const liked = isLiked(b.id);
-  h+=`<div style="display:flex;gap:10px;margin-top:16px;align-items:center">
+  h+=`<div style="display:flex;gap:10px;margin-top:16px;align-items:center;flex-wrap:wrap">
     <button id="like-btn-${b.id}" onclick="toggleLike(${b.id})"
       style="display:flex;align-items:center;gap:7px;background:${liked?"#1f1408":"var(--card)"};border:1px solid ${liked?"var(--orange)":"#2a2a2a"};color:${liked?"var(--orange)":"var(--muted)"};border-radius:9px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;font-family:inherit">
       <span style="font-size:16px">${liked?"❤️":"🤍"}</span>
       <span id="like-count-${b.id}">${b.likes_count||0}</span>
       مفيد
+    </button>
+    <button onclick="shareBiz(${b.id})"
+      style="display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid #2a2a2a;color:var(--muted);border-radius:9px;padding:10px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+      📤 مشاركة
     </button>`;
   if(b.phone)    h+=`<a href="tel:${b.phone}" style="flex:1;background:var(--orange);color:#fff;border:none;border-radius:9px;padding:12px;text-align:center;font-weight:700;font-size:13px">📞 اتصال</a>`;
   if(b.whatsapp) h+=`<a href="https://wa.me/966${(b.whatsapp||"").replace(/^0/,"")}" target="_blank" style="flex:1;background:#25d366;color:#fff;border:none;border-radius:9px;padding:12px;text-align:center;font-weight:700;font-size:13px">💬 واتساب</a>`;
@@ -1143,6 +1159,39 @@ function popupOpenBiz(idx){
   if(id) setTimeout(()=>openBiz(id),400);
 }
 
+
+function openFullImg(bizId){
+  const b = ALL.find(x=>x.id===bizId);
+  if(!b||!b.img_data) return;
+  document.getElementById("fullimg-src").src = b.img_data;
+  const modal = document.getElementById("modal-fullimg");
+  modal.style.display="flex";
+  document.body.style.overflow="hidden";
+}
+
+function closeFullImg(){
+  document.getElementById("modal-fullimg").style.display="none";
+  document.body.style.overflow="";
+}
+
+async function shareBiz(bizId){
+  const b = ALL.find(x=>x.id===bizId);
+  if(!b) return;
+  const shareData = {
+    title: b.name + " — دليل صفوى",
+    text: `${b.name}\n${b.description||""}\n📍 ${b.location||""}`,
+    url: "https://1safwa.com"
+  };
+  try{
+    if(navigator.share){
+      await navigator.share(shareData);
+    } else {
+      // fallback — نسخ الرابط
+      await navigator.clipboard.writeText(`${b.name}\n${b.description||""}\n📍 ${b.location||""}\n🌐 1safwa.com`);
+      alert("تم نسخ معلومات المشروع — يمكنك لصقها في أي مكان");
+    }
+  }catch(e){ console.warn("Share failed:", e); }
+}
 
 function openM(id){document.getElementById("modal-"+id).classList.add("open");document.body.style.overflow="hidden";}
 function closeM(id){document.getElementById("modal-"+id).classList.remove("open");document.body.style.overflow="";}
