@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقديم جائزة — دليل صفوى</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--orange:#f26522;--orange-light:#ff8c42;--bg:#f5f0e8;--card:#fff;--text:#1a1a1a;--muted:#666;--border:#e0d8cc}
+body{font-family:"Cairo",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px 16px 60px;direction:rtl}
+.wrap{max-width:560px;margin:0 auto}
+.header{text-align:center;margin-bottom:28px}
+.logo{font-size:22px;font-weight:900;color:var(--orange);margin-bottom:6px}
+.header-sub{font-size:13px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.section-title{font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:4px}
+input,textarea,select{width:100%;background:#f9f6f0;border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;margin-bottom:14px;outline:none;font-family:"Cairo",sans-serif;direction:rtl}
+input:focus,textarea:focus,select:focus{border-color:var(--orange)}
+input[dir="ltr"]{direction:ltr;text-align:left}
+textarea{height:80px;resize:vertical}
+.hint{font-size:11px;color:var(--muted);margin-top:-10px;margin-bottom:12px;line-height:1.7}
+.req{color:var(--orange)}
+.submit-btn{width:100%;background:linear-gradient(135deg,var(--orange),var(--orange-light));color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:"Cairo",sans-serif;box-shadow:0 6px 20px rgba(242,101,34,.3)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.err{color:#e05c5c;font-size:12px;margin-bottom:12px;display:none}
+.success{text-align:center;padding:48px 20px}
+.success-icon{font-size:64px;margin-bottom:16px}
+.success-title{font-size:22px;font-weight:900;color:var(--orange);margin-bottom:10px}
+.success-sub{font-size:14px;color:var(--muted);line-height:1.8}
+.info-box{background:#fff8f0;border:1px solid #fde4c8;border-radius:10px;padding:14px;margin-bottom:20px;font-size:13px;color:#555;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo">🎁 دليل صفوى</div>
+    <div style="font-size:18px;font-weight:900;margin-bottom:6px">تقديم جائزة للزوار</div>
+    <div class="header-sub">أضف جائزة أو عرضاً خاصاً لزوار الدليل — يراجعها الفريق ويعتمدها خلال ٢٤ ساعة</div>
+  </div>
+
+  <div id="form-wrap">
+    <div class="info-box">
+      💡 <strong>كيف يعمل النظام:</strong><br>
+      • تملأ البيانات أدناه وترسل الطلب<br>
+      • نراجع الجائزة ونتواصل معك بالموافقة أو الرفض<br>
+      • عند الموافقة تظهر جائزتك لزوار دليل صفوى<br>
+      • الفائز يحصل على قسيمة بالكود ويأتي لمحلك لاستبدالها
+    </div>
+
+    <!-- بيانات التاجر -->
+    <div class="card">
+      <div class="section-title">بيانات صاحب المشروع</div>
+      <label>اسمك الكامل <span class="req">*</span></label>
+      <input id="p-owner" placeholder="محمد العمري">
+      <label>جوال التواصل <span class="req">*</span></label>
+      <input id="p-phone" type="tel" dir="ltr" placeholder="05xxxxxxxx">
+      <label>البريد الإلكتروني</label>
+      <input id="p-email" type="email" dir="ltr" placeholder="example@gmail.com">
+      <label>اسم مشروعك في الدليل <span class="req">*</span></label>
+      <input id="p-bizname" placeholder="مطعم الأصيل، مقهى لمة...">
+    </div>
+
+    <!-- تفاصيل الجائزة -->
+    <div class="card">
+      <div class="section-title">تفاصيل الجائزة</div>
+      <label>عنوان الجائزة <span class="req">*</span></label>
+      <input id="p-title" placeholder="وجبة مجانية، خصم 20% على الطلب...">
+      <label>وصف الجائزة وشروط الاستبدال <span class="req">*</span></label>
+      <textarea id="p-desc" placeholder="مثال: وجبة برجر مجانية لشخص واحد عند الزيارة — صالحة لشهر كامل — لا تشمل المشروبات"></textarea>
+      <label>كود التحقق الخاص بك <span class="req">*</span></label>
+      <input id="p-code" dir="ltr" placeholder="مثال: ASEEL2025" style="font-weight:700;letter-spacing:2px;font-size:16px">
+      <div class="hint">الكود الذي ستستخدمه للتحقق من قسيمة الفائز عند زيارته — اختر كلمة سهلة تتذكرها ولا تشاركها مع أحد</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <label>الكمية المتاحة <span class="req">*</span></label>
+          <input id="p-qty" type="number" min="1" value="5" placeholder="5">
+          <div class="hint">عدد القسائم التي ستوزعها</div>
+        </div>
+        <div>
+          <label>تاريخ انتهاء الجائزة</label>
+          <input id="p-expires" type="date">
+        </div>
+      </div>
+    </div>
+
+    <div id="p-err" class="err"></div>
+    <button class="submit-btn" id="p-submit" onclick="submitPrize()">📤 إرسال طلب الجائزة</button>
+  </div>
+
+  <!-- Success -->
+  <div id="success-wrap" style="display:none">
+    <div class="success">
+      <div class="success-icon">✅</div>
+      <div class="success-title">تم إرسال طلبك!</div>
+      <div class="success-sub">
+        سيراجع فريق دليل صفوى طلبك خلال <strong>٢٤ ساعة</strong><br>
+        وسيتم التواصل معك على الجوال المسجّل<br><br>
+        شكراً لمساهمتك في إثراء تجربة زوار صفوى 🌟
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
+
+async function submitPrize(){
+  const owner   = document.getElementById("p-owner").value.trim();
+  const phone   = document.getElementById("p-phone").value.trim();
+  const email   = document.getElementById("p-email").value.trim();
+  const bizname = document.getElementById("p-bizname").value.trim();
+  const title   = document.getElementById("p-title").value.trim();
+  const desc    = document.getElementById("p-desc").value.trim();
+  const code    = document.getElementById("p-code").value.trim().toUpperCase();
+  const qty     = parseInt(document.getElementById("p-qty").value)||5;
+  const expires = document.getElementById("p-expires").value;
+  const errEl   = document.getElementById("p-err");
+  errEl.style.display="none";
+
+  if(!owner||!phone||!bizname||!title||!desc||!code){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ جميع الحقول المطلوبة يجب تعبئتها";
+    return;
+  }
+  if(code.length < 4){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ كود التحقق يجب أن يكون ٤ أحرف على الأقل";
+    return;
+  }
+
+  const btn = document.getElementById("p-submit");
+  btn.disabled=true; btn.textContent="⏳ جاري الإرسال...";
+
+  try{
+    await fetch(SUPA_URL+"/rest/v1/lucky_prizes",{
+      method:"POST",
+      headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify({
+        owner_name:owner, owner_phone:phone, owner_email:email||null,
+        title, description:desc, prize_code:code,
+        quantity:qty, remaining:qty,
+        expires_at:expires||null,
+        status:"pending", active:false,
+        win_chance:20
+      })
+    });
+    document.getElementById("form-wrap").style.display="none";
+    document.getElementById("success-wrap").style.display="block";
+  }catch(e){
+    btn.disabled=false; btn.textContent="📤 إرسال طلب الجائزة";
+    errEl.style.display="block";
+    errEl.textContent="⚠️ تعذّر الإرسال، تحقق من اتصال الإنترنت";
+  }
+}
+</script>
+</body>
+</html>
