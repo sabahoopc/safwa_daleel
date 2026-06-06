@@ -511,6 +511,11 @@ function renderCatGrid(){
       <div class="cat-tile-icon">🗂️</div>
       <div class="cat-tile-label" style="color:var(--orange)">الكل</div>
       <div class="cat-tile-count">${ALL.length} مشروع</div>
+    </div>
+    <div class="cat-tile" onclick="location.href='lucky.html'" style="border-color:#f26522;background:linear-gradient(135deg,#f26522,#ff8c42)">
+      <div class="cat-tile-icon">🎁</div>
+      <div class="cat-tile-label" style="color:#fff;font-weight:900">جرّب حظك</div>
+      <div class="cat-tile-count" style="background:rgba(255,255,255,.2);color:#fff">هدايا يومية</div>
     </div>`;
 
   document.getElementById("cat-grid").innerHTML = allTile + usedCats.map(c=>`
