@@ -1090,6 +1090,22 @@ window.sendNewsletter = sendNewsletter;
 // ── Lucky Prizes ──────────────────────────
 let PRIZES = [], WINNERS = [];
 
+window.toggleTestMode = function toggleTestMode(){
+  const isTest = localStorage.getItem("lucky_test_mode")==="1";
+  if(isTest){
+    localStorage.removeItem("lucky_test_mode");
+    const btn = document.getElementById("test-mode-btn");
+    if(btn){ btn.textContent="🧪 وضع الاختبار"; btn.style.borderColor="#f0a000"; btn.style.color="#f0a000"; btn.style.background=""; }
+    toast("✅ تم إيقاف وضع الاختبار");
+  } else {
+    localStorage.setItem("lucky_test_mode","1");
+    const btn = document.getElementById("test-mode-btn");
+    if(btn){ btn.textContent="🔴 وضع اختبار نشط — اضغط لإيقافه"; btn.style.background="#f0a000"; btn.style.color="#000"; btn.style.borderColor="#f0a000"; }
+    toast("🧪 وضع الاختبار نشط — افتح lucky.html لاختبار الخاصية");
+    window.open("/lucky.html?test=1","_blank");
+  }
+}
+
 window.copyPrizeLink = function copyPrizeLink(){
   navigator.clipboard.writeText("https://1safwa.com/prize-submit.html")
     .then(()=>toast("✅ تم نسخ الرابط — أرسله للتجار"))
@@ -2086,6 +2102,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
     <div style="display:flex;gap:8px">
       <a href="/lucky.html" target="_blank" class="btn btn-ghost">👁️ معاينة</a>
       <a href="/prize-submit.html" target="_blank" class="btn btn-ghost">🔗 رابط التجار</a>
+      <button class="btn btn-ghost" id="test-mode-btn" onclick="toggleTestMode()" style="border-color:#f0a000;color:#f0a000">🧪 وضع الاختبار</button>
       <button class="btn btn-or" onclick="copyPrizeLink()">📋 نسخ الرابط</button>
     </div>
   </div>
