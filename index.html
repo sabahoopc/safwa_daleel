@@ -143,8 +143,11 @@ body:not(.dark) .mob-refresh{background:#fff!important;border-color:#ddd!importa
 .si{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:14px;padding:12px 0;direction:rtl;font-family:inherit}
 .cb{background:none;border:none;color:var(--muted);font-size:12px}
 
-/* ── VIEW SWITCHER ── */
-#view-cats{display:block}
+@keyframes luckyPulse{
+  0%,100%{background:linear-gradient(135deg,#f26522,#ff8c42);border-color:#f26522;box-shadow:0 0 0 rgba(242,101,34,.4)}
+  50%{background:linear-gradient(135deg,#111,#1a0d04);border-color:#f26522;box-shadow:0 0 18px rgba(242,101,34,.6)}
+}
+.lucky-tile{animation:luckyPulse 1.4s ease-in-out infinite;border:2px solid #f26522!important}
 #view-biz{display:none}
 
 /* Categories Grid */
@@ -497,26 +500,38 @@ async function load(){
 }
 
 // ── Category Grid ─────────────────────────
-function renderCatGrid(){
+async function renderCatGrid(){
   const counts = {};
   ALL.forEach(b=>{ counts[b.category] = (counts[b.category]||0)+1; });
-  const hasPromo = new Set(ALL.filter(b=>b.promoted).map(b=>b.category));
   const usedCats = CATS.filter(c=>counts[c.id]>0);
 
   document.getElementById("cats-page-title").textContent =
     `${usedCats.length} تصنيف — اضغط لعرض المشاريع`;
+
+  // تحقق من وجود جوائز نشطة
+  let hasLucky = false;
+  try{
+    const today = new Date().toISOString().split("T")[0];
+    const prizes = await fetch(
+      SUPA_URL+"/rest/v1/lucky_prizes?select=id&active=eq.true&status=eq.approved&remaining=gt.0&limit=1",
+      {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
+    ).then(r=>r.json());
+    hasLucky = prizes&&prizes.length>0;
+  }catch(e){}
+
+  const luckyTile = hasLucky ? `
+    <div class="cat-tile lucky-tile" onclick="location.href='lucky.html'">
+      <div class="cat-tile-icon">🎁</div>
+      <div class="cat-tile-label" style="color:#fff;font-weight:900">جرّب حظك</div>
+      <div class="cat-tile-count" style="background:rgba(255,255,255,.15);color:#fff">هدايا يومية</div>
+    </div>` : "";
 
   const allTile = `
     <div class="cat-tile" onclick="openCat('all')" style="border-color:var(--orange);background:linear-gradient(135deg,#1a0a02,#0f0f0f)">
       <div class="cat-tile-icon">🗂️</div>
       <div class="cat-tile-label" style="color:var(--orange)">الكل</div>
       <div class="cat-tile-count">${ALL.length} مشروع</div>
-    </div>
-    <div class="cat-tile" onclick="location.href='lucky.html'" style="border-color:#f26522;background:linear-gradient(135deg,#f26522,#ff8c42)">
-      <div class="cat-tile-icon">🎁</div>
-      <div class="cat-tile-label" style="color:#fff;font-weight:900">جرّب حظك</div>
-      <div class="cat-tile-count" style="background:rgba(255,255,255,.2);color:#fff">هدايا يومية</div>
-    </div>`;
+    </div>${luckyTile}`;
 
   document.getElementById("cat-grid").innerHTML = allTile + usedCats.map(c=>`
     <div class="cat-tile" onclick="openCat('${c.id}')">
