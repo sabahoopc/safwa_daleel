@@ -102,6 +102,7 @@ window.loadAll = async function loadAll() {
     if (catData && catData.length) CATS = [...DEFAULT_CATS, ...catData.map(c=>{return{id:c.id,label:c.label,icon:c.icon}})];
     REQUESTS = reqData||[];
     updateAll();
+    loadMaintenanceStatus();
   } catch(e) {
     toast("⚠️ تعذّر الاتصال: "+e.message, true);
   }
@@ -1435,7 +1436,47 @@ window.exportClients = function exportClients(){
   toast(`✅ تم تصدير ${approved.length} عميل`);
 }
 
-window.exportClients = exportClients;
+// ── Maintenance Mode ──────────────────────
+let maintenanceOn = false;
+
+async function loadMaintenanceStatus(){
+  try{
+    const data = await supa("site_settings?select=value&key=eq.maintenance_mode");
+    maintenanceOn = data&&data[0]&&data[0].value==="true";
+    updateMaintenanceBtn();
+  }catch(e){}
+}
+
+function updateMaintenanceBtn(){
+  const btn = document.getElementById("maintenance-btn");
+  if(!btn) return;
+  if(maintenanceOn){
+    btn.textContent = "✅ إلغاء وضع الصيانة";
+    btn.style.background = "var(--gr)";
+  } else {
+    btn.textContent = "🔧 تفعيل وضع الصيانة";
+    btn.style.background = "";
+    btn.className = "btn btn-red";
+  }
+}
+
+window.toggleMaintenance = async function toggleMaintenance(){
+  const newVal = !maintenanceOn;
+  const msg = newVal
+    ? "⚠️ سيظهر للزوار رسالة الصيانة ولن يتمكنوا من الدخول. هل تريد المتابعة؟"
+    : "هل تريد إعادة فتح الموقع للزوار؟";
+  if(!confirm(msg)) return;
+  try{
+    await supa("site_settings?key=eq.maintenance_mode","PATCH",{value: newVal?"true":"false"});
+    maintenanceOn = newVal;
+    updateMaintenanceBtn();
+    toast(newVal ? "🔧 الموقع الآن في وضع الصيانة" : "✅ الموقع مفتوح للزوار");
+  }catch(e){ toast("❌ فشل: "+e.message, true); }
+}
+
+window.loadMaintenanceStatus = loadMaintenanceStatus;
+
+
 
 window.exportJSON = function exportJSON() {
   const a=document.createElement("a");
@@ -1613,6 +1654,11 @@ tr:hover td{background:rgba(242,101,34,.04)}
   <button class="sb-btn" data-go="newsletter">📧 النشرة البريدية</button>
   <button class="sb-btn" data-go="popupads">🪟 الإعلانات المنبثقة</button>
   <button class="sb-btn" data-go="export">📤 تصدير</button>
+  <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--b)">
+    <button id="maintenance-btn" onclick="toggleMaintenance()" class="btn btn-red" style="width:100%;justify-content:center">
+      🔧 تفعيل وضع الصيانة
+    </button>
+  </div>
 </aside>
 
 <main class="main">
