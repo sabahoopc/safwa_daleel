@@ -197,6 +197,7 @@ window.go = function go(id, btn) {
   if(id==="requests")   renderRequests();
   if(id==="categories") renderCatsTable();
   if(id==="clients")    renderClients();
+  if(id==="lucky")     loadLucky();
   if(id==="invoices")   loadInvoices();
   if(id==="newsletter") loadNewsletter();
   if(id==="popupads")   loadPopupAds();
@@ -1086,6 +1087,180 @@ window.deleteSubscriber = deleteSubscriber;
 window.previewNewsletter = previewNewsletter;
 window.sendNewsletter = sendNewsletter;
 
+// ── Lucky Prizes ──────────────────────────
+let PRIZES = [], WINNERS = [];
+
+window.copyPrizeLink = function copyPrizeLink(){
+  navigator.clipboard.writeText("https://1safwa.com/prize-submit.html")
+    .then(()=>toast("✅ تم نسخ الرابط — أرسله للتجار"))
+    .catch(()=>{ prompt("انسخ الرابط:", "https://1safwa.com/prize-submit.html"); });
+}
+
+window.loadLucky = async function loadLucky(){
+  try{
+    const [prizesData, winnersData] = await Promise.all([
+      supa("lucky_prizes?select=*&order=created_at.desc"),
+      supa("lucky_winners?select=*,lucky_prizes(title)&order=created_at.desc&limit=50"),
+    ]);
+    PRIZES  = prizesData||[];
+    WINNERS = winnersData||[];
+    renderPending();
+    renderPrizes();
+    renderWinners();
+  }catch(e){ toast("⚠️ تعذّر تحميل الجوائز",true); }
+}
+
+function renderPending(){
+  const pending = PRIZES.filter(p=>p.status==="pending");
+  const countEl = document.getElementById("pending-count");
+  if(countEl) countEl.textContent = pending.length||"";
+  const tbody = document.getElementById("pending-body");
+  if(!tbody) return;
+  if(!pending.length){ tbody.innerHTML=`<tr><td colspan="6"><div style="text-align:center;padding:20px;color:var(--mu)">لا توجد طلبات معلقة</div></td></tr>`; return; }
+  tbody.innerHTML = pending.map(p=>`<tr>
+    <td style="font-size:13px"><div style="font-weight:700">${esc(p.owner_name||"—")}</div><div style="font-size:11px;color:var(--mu)">${esc(p.owner_phone||"")}</div></td>
+    <td style="font-size:13px">${esc(p.title)}</td>
+    <td style="font-size:12px;color:var(--mu);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.description||"—")}</td>
+    <td style="font-size:13px;font-weight:700;color:var(--or);direction:ltr">${esc(p.prize_code||"—")}</td>
+    <td style="font-size:13px;text-align:center">${p.quantity}</td>
+    <td><div class="td-actions">
+      <button type="button" class="btn btn-green btn-sm" onclick="approvePrize(${p.id})">✅ موافقة</button>
+      <button type="button" class="btn btn-red btn-sm" onclick="openRejectPrize(${p.id})">✕ رفض</button>
+    </div></td>
+  </tr>`).join("");
+}
+
+function renderPrizes(){
+  const active = PRIZES.filter(p=>p.status==="approved");
+  const tbody = document.getElementById("prizes-body");
+  if(!tbody) return;
+  if(!active.length){ tbody.innerHTML=`<tr><td colspan="8"><div style="text-align:center;padding:20px;color:var(--mu)">لا توجد جوائز معتمدة</div></td></tr>`; return; }
+  tbody.innerHTML = active.map(p=>{
+    const winCount = WINNERS.filter(w=>w.prize_id===p.id).length;
+    const status   = !p.active?"موقوف":p.remaining<=0?"نفدت":"نشطة";
+    const statusColor = status==="نشطة"?"var(--gr)":status==="موقوف"?"var(--mu)":"#e05c5c";
+    return `<tr>
+      <td style="font-weight:700;font-size:13px">${esc(p.owner_name||"—")}</td>
+      <td style="font-size:13px">${esc(p.title)}</td>
+      <td style="font-size:13px;font-weight:700;color:var(--or);direction:ltr">${esc(p.prize_code||"—")}</td>
+      <td style="font-size:13px;text-align:center">${p.win_chance}%</td>
+      <td style="font-size:13px;text-align:center;font-weight:700;color:${p.remaining>0?"var(--or)":"#e05c5c"}">${p.remaining}/${p.quantity}</td>
+      <td style="font-size:12px;color:var(--mu)">${p.expires_at||"—"}</td>
+      <td style="font-size:13px;text-align:center;color:var(--or);font-weight:700">${winCount}</td>
+      <td><div class="td-actions">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="togglePrize(${p.id},${!p.active})">${p.active?"⏸️":"▶️"}</button>
+        <button type="button" class="btn btn-red btn-sm" onclick="deletePrize(${p.id})">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+
+function renderWinners(){
+  const tbody = document.getElementById("winners-body");
+  if(!tbody) return;
+  if(!WINNERS.length){ tbody.innerHTML=`<tr><td colspan="4"><div style="text-align:center;padding:24px;color:var(--mu)">لا يوجد فائزون بعد</div></td></tr>`; return; }
+  tbody.innerHTML = WINNERS.map(w=>`<tr>
+    <td style="font-size:13px;font-weight:700;color:var(--or);direction:ltr">${esc(w.code)}</td>
+    <td style="font-size:12px">${esc(w.lucky_prizes?.title||"—")}</td>
+    <td style="font-size:12px;color:var(--mu)">${new Date(w.created_at).toLocaleDateString("ar-SA")}</td>
+    <td><span style="font-size:12px;font-weight:700;color:${w.claimed?"var(--gr)":"var(--mu)"}">${w.claimed?"✅ مُستبدلت":"⏳ بانتظار الاستبدال"}</span></td>
+  </tr>`).join("");
+}
+
+window.approvePrize = async function approvePrize(id){
+  const p = PRIZES.find(x=>x.id===id); if(!p) return;
+  if(!confirm(`موافقة على جائزة "${p.title}" من ${p.owner_name}؟`)) return;
+  try{
+    await supa("lucky_prizes?id=eq."+id,"PATCH",{status:"approved", active:true});
+    await loadLucky();
+    toast("✅ تم اعتماد الجائزة — ستظهر للزوار فوراً");
+    // إيميل للتاجر إذا توفر
+    if(p.owner_email) sendPrizeEmail(p.owner_email, p.owner_name, p.title, "approval");
+  }catch(e){ toast("❌ فشل: "+e.message, true); }
+}
+
+window.openRejectPrize = function openRejectPrize(id){
+  const p = PRIZES.find(x=>x.id===id); if(!p) return;
+  document.getElementById("rp-id").value = id;
+  document.getElementById("rp-title").textContent = p.title;
+  document.getElementById("rp-owner").textContent = p.owner_name+" — "+p.owner_phone;
+  document.getElementById("rp-reason").value = "";
+  document.getElementById("rp-err").style.display = "none";
+  openM("reject-prize");
+}
+
+window.confirmRejectPrize = async function confirmRejectPrize(){
+  const id = parseInt(document.getElementById("rp-id").value);
+  const reason = document.getElementById("rp-reason").value.trim();
+  const p = PRIZES.find(x=>x.id===id); if(!p) return;
+  if(!reason){ document.getElementById("rp-err").style.display="block"; return; }
+  try{
+    await supa("lucky_prizes?id=eq."+id,"PATCH",{status:"rejected", active:false, rejection_reason:reason});
+    closeM("reject-prize");
+    await loadLucky();
+    toast("تم رفض الجائزة");
+    if(p.owner_email) sendPrizeEmail(p.owner_email, p.owner_name, p.title, "rejection", reason);
+  }catch(e){ toast("❌ فشل: "+e.message, true); }
+}
+
+async function sendPrizeEmail(email, name, prizeTitle, type, reason=""){
+  try{
+    const subject = type==="approval"
+      ? "✅ تم اعتماد جائزتك في دليل صفوى"
+      : "بخصوص طلب الجائزة في دليل صفوى";
+    const html = type==="approval" ? `
+      <!DOCTYPE html><html dir="rtl"><body style="font-family:Cairo,sans-serif;background:#f5f5f5;padding:20px">
+      <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#1a0d04,#f26522);padding:24px;text-align:center;color:#fff">
+          <div style="font-size:20px;font-weight:900">دليل صفوى</div>
+        </div>
+        <div style="padding:24px">
+          <div style="font-size:40px;text-align:center;margin-bottom:14px">🎉</div>
+          <p style="font-size:14px;color:#555">أهلاً ${name}،</p>
+          <p style="font-size:14px;color:#555;margin-top:10px">تم اعتماد جائزتك <strong style="color:#f26522">${prizeTitle}</strong> وستظهر الآن لزوار دليل صفوى!</p>
+          <div style="background:#fff8f0;border:1px solid #fde4c8;border-radius:10px;padding:14px;margin-top:16px;font-size:13px;color:#555;line-height:1.8">
+            📌 عند زيارة الفائز:<br>
+            اطلب منه إظهار قسيمة الفوز وتحقق من كود التحقق الخاص بك.
+          </div>
+          <div style="text-align:center;margin-top:20px">
+            <a href="https://1safwa.com/lucky.html" style="background:linear-gradient(135deg,#f26522,#ff8c42);color:#fff;padding:12px 24px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none">🎰 مشاهدة صفحة الجوائز</a>
+          </div>
+        </div>
+      </div></body></html>` : `
+      <!DOCTYPE html><html dir="rtl"><body style="font-family:Cairo,sans-serif;background:#f5f5f5;padding:20px">
+      <div style="max-width:500px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#1a0d04,#f26522);padding:24px;text-align:center;color:#fff">
+          <div style="font-size:20px;font-weight:900">دليل صفوى</div>
+        </div>
+        <div style="padding:24px">
+          <p style="font-size:14px;color:#555">أهلاً ${name}،</p>
+          <p style="font-size:14px;color:#555;margin-top:10px">بعد مراجعة طلب الجائزة <strong>${prizeTitle}</strong>، لم نتمكن من اعتمادها للسبب التالي:</p>
+          <div style="background:#fff5f5;border:1px solid #fed7d7;border-radius:10px;padding:14px;margin:14px 0;color:#c53030;font-size:14px">${reason}</div>
+          <p style="font-size:13px;color:#777">يمكنك تعديل التفاصيل وإعادة التقديم من خلال الرابط.</p>
+          <div style="text-align:center;margin-top:16px">
+            <a href="https://1safwa.com/prize-submit.html" style="background:linear-gradient(135deg,#f26522,#ff8c42);color:#fff;padding:12px 24px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none">إعادة التقديم</a>
+          </div>
+        </div>
+      </div></body></html>`;
+    await fetch(SUPA_URL+"/functions/v1/send-email",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({to:email, subject, html, fromName:"دليل صفوى"})
+    });
+  }catch(e){ console.warn("Prize email failed:", e); }
+}
+
+window.togglePrize = async function togglePrize(id, active){
+  try{ await supa("lucky_prizes?id=eq."+id,"PATCH",{active}); await loadLucky(); toast(active?"▶️ تم تفعيل الجائزة":"⏸️ تم إيقاف الجائزة"); }
+  catch(e){ toast("❌ فشل",true); }
+}
+
+window.deletePrize = async function deletePrize(id){
+  if(!confirm("حذف هذه الجائزة نهائياً؟")) return;
+  try{ await supa("lucky_prizes?id=eq."+id,"DELETE"); await loadLucky(); toast("🗑️ تم الحذف"); }
+  catch(e){ toast("❌ فشل",true); }
+}
+
 // ── Invoices ──────────────────────────────
 let INVOICES = [];
 
@@ -1674,6 +1849,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
   <hr class="sb-div">
   <div class="sb-sec">الإعدادات</div>
   <button class="sb-btn" data-go="categories">🗂️ التصنيفات</button>
+  <button class="sb-btn" data-go="lucky">🎰 جرّب حظك</button>
   <button class="sb-btn" data-go="invoices">🧾 الفواتير</button>
   <button class="sb-btn" data-go="newsletter">📧 النشرة البريدية</button>
   <button class="sb-btn" data-go="popupads">🪟 الإعلانات المنبثقة</button>
@@ -1900,6 +2076,70 @@ tr:hover td{background:rgba(242,101,34,.04)}
       </tr></thead>
       <tbody id="clients-body"></tbody>
     </table></div>
+  </div>
+</div>
+
+<!-- Lucky Prizes -->
+<div class="page" id="page-lucky">
+  <div class="ph">
+    <div><div class="ph-title">🎰 جرّب حظك</div><div class="ph-sub">إدارة جوائز التجار لزوار الدليل</div></div>
+    <div style="display:flex;gap:8px">
+      <a href="/lucky.html" target="_blank" class="btn btn-ghost">👁️ معاينة</a>
+      <a href="/prize-submit.html" target="_blank" class="btn btn-ghost">🔗 رابط التجار</a>
+      <button class="btn btn-or" onclick="copyPrizeLink()">📋 نسخ الرابط</button>
+    </div>
+  </div>
+
+  <!-- طلبات معلقة -->
+  <div style="margin-bottom:24px">
+    <div style="font-size:13px;font-weight:700;color:var(--or);margin-bottom:12px;display:flex;align-items:center;gap:8px">
+      ⏳ طلبات تنتظر المراجعة
+      <span id="pending-count" style="background:var(--or);color:#fff;border-radius:20px;padding:2px 8px;font-size:11px"></span>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>التاجر</th><th>المشروع</th><th>الجائزة</th><th>الكود</th><th>الكمية</th><th style="text-align:left">إجراءات</th></tr></thead>
+      <tbody id="pending-body"></tbody>
+    </table></div>
+  </div>
+
+  <!-- جوائز معتمدة -->
+  <div style="margin-bottom:24px">
+    <div style="font-size:13px;font-weight:700;color:var(--gr);margin-bottom:12px">✅ الجوائز النشطة</div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>المشروع</th><th>الجائزة</th><th>الكود</th><th>نسبة الفوز</th><th>المتبقي</th><th>الانتهاء</th><th>الفائزون</th><th style="text-align:left">إجراءات</th></tr></thead>
+      <tbody id="prizes-body"></tbody>
+    </table></div>
+  </div>
+
+  <!-- الفائزون -->
+  <div>
+    <div style="font-size:13px;font-weight:700;margin-bottom:12px">🏆 الفائزون</div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th>الكود</th><th>الجائزة</th><th>التاريخ</th><th>الحالة</th></tr></thead>
+      <tbody id="winners-body"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- Reject Prize Modal -->
+<div class="overlay" id="modal-reject-prize" onclick="if(event.target===this)closeM('reject-prize')">
+  <div class="modal" style="max-width:440px">
+    <div class="mh"><div class="mh-title">✕ رفض الجائزة</div><button type="button" style="background:none;border:none;color:var(--mu);font-size:17px;cursor:pointer" onclick="closeM('reject-prize')">✕</button></div>
+    <div class="mc">
+      <input type="hidden" id="rp-id">
+      <div style="background:var(--card2);border:1px solid var(--b2);border-radius:9px;padding:12px;margin-bottom:14px">
+        <div style="font-size:12px;color:var(--mu)">الجائزة</div>
+        <div style="font-size:14px;font-weight:700" id="rp-title"></div>
+        <div style="font-size:12px;color:var(--mu);margin-top:2px" id="rp-owner"></div>
+      </div>
+      <label class="flabel">سبب الرفض <span class="req">*</span></label>
+      <textarea class="finput" id="rp-reason" style="height:90px;resize:vertical" placeholder="مثال: الجائزة غير واضحة أو لا تنطبق على معايير الدليل..."></textarea>
+      <div id="rp-err" style="color:var(--re);font-size:12px;display:none;margin-bottom:8px">⚠️ يرجى كتابة سبب الرفض</div>
+    </div>
+    <div class="mf">
+      <button type="button" class="btn btn-red" onclick="confirmRejectPrize()">✕ رفض وإرسال إيميل</button>
+      <button type="button" class="btn btn-ghost" onclick="closeM('reject-prize')">إلغاء</button>
+    </div>
   </div>
 </div>
 
@@ -2195,6 +2435,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
 <div class="overlay" id="modal-mob-menu" onclick="if(event.target===this)closeM('mob-menu')">
   <div style="position:fixed;bottom:70px;left:0;right:0;background:#111;border-top:1px solid var(--b);border-radius:18px 18px 0 0;padding:16px;display:flex;flex-direction:column;gap:6px">
     <div style="font-size:11px;color:var(--mu);font-weight:700;letter-spacing:1px;padding:4px 8px 8px;border-bottom:1px solid var(--b);margin-bottom:4px">المزيد</div>
+    <button class="mob-menu-item" onclick="go('lucky',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">🎰 جرّب حظك</button>
     <button class="mob-menu-item" onclick="go('invoices',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">🧾 الفواتير</button>
     <button class="mob-menu-item" onclick="go('newsletter',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">📧 النشرة البريدية</button>
     <button class="mob-menu-item" onclick="go('popupads',null);closeM('mob-menu');setMobActive(document.getElementById('mob-more'))">🪟 الإعلانات المنبثقة</button>
