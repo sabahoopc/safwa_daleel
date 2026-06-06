@@ -465,6 +465,14 @@ function getCat(id){return CATS.find(c=>c.id===id)||{icon:"🏢",label:""};}
 
 async function load(){
   try{
+    // تحقق من وضع الصيانة أولاً
+    const settings = await fetch(SUPA_URL+"/rest/v1/site_settings?select=value&key=eq.maintenance_mode",{
+      headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}
+    }).then(r=>r.json()).catch(()=>[]);
+    if(settings&&settings[0]&&settings[0].value==="true"){
+      showMaintenance();
+      return;
+    }
     const [_expire, bizData, catData] = await Promise.all([
       // تلقائياً ألغِ الإعلانات المنتهية
       fetch(SUPA_URL+"/rest/v1/rpc/auto_expire_promotions",{method:"POST",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},body:"{}"}).catch(()=>{}),
@@ -1276,6 +1284,24 @@ async function trackVisit(){
   }catch(e){ console.warn("Visit counter failed"); }
 }
 
+
+function showMaintenance(){
+  document.body.innerHTML = `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:20px;direction:rtl">
+    <div style="text-align:center;max-width:460px">
+      <div style="font-size:72px;margin-bottom:20px">🔧</div>
+      <div style="font-size:26px;font-weight:900;color:var(--orange);margin-bottom:12px">الموقع تحت الصيانة</div>
+      <div style="font-size:16px;color:var(--muted);line-height:1.9;margin-bottom:28px">
+        نعمل على تطوير دليل صفوى لنقدم لك تجربة أفضل.<br>
+        سنعود قريباً إن شاء الله ✨
+      </div>
+      <a href="https://whatsapp.com/channel/0029Vb8Fbkk17EmykSRXHm3I" target="_blank"
+        style="display:inline-flex;align-items:center;gap:8px;background:#25d366;color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none">
+        📢 تابع قناتنا على واتساب للمستجدات
+      </a>
+    </div>
+  </div>`;
+}
 
 // ── Theme System ──────────────────────────
 function initTheme(){
