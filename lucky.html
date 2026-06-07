@@ -192,8 +192,8 @@ async function init(){
   // حمّل الجوائز
   try{
     const url = isTest
-      ? SUPA_URL+"/rest/v1/lucky_prizes?select=id,title,description,win_chance,remaining,expires_at,business_id,businesses(name,category,logo_data)&status=eq.approved"
-      : SUPA_URL+"/rest/v1/lucky_prizes?select=id,title,description,win_chance,remaining,expires_at,business_id,businesses(name,category,logo_data)&active=eq.true&status=eq.approved&remaining=gt.0";
+      ? SUPA_URL+"/rest/v1/lucky_prizes?select=id,title,description,win_chance,remaining,expires_at,prize_code,business_id,businesses(name,category,logo_data)&status=eq.approved"
+      : SUPA_URL+"/rest/v1/lucky_prizes?select=id,title,description,win_chance,remaining,expires_at,prize_code,business_id,businesses(name,category,logo_data)&active=eq.true&status=eq.approved&remaining=gt.0";
     const data = await fetch(url, {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json());
     prizes = data||[];
 
@@ -259,8 +259,8 @@ async function tryLuck(){
   if(!_isTest) localStorage.setItem(todayKey2, "1");
 
   if(winner){
-    // أنشئ كود فريد
-    const code = generateCode();
+    // استخدم كود التاجر مباشرة
+    const code = winner.prize_code || generateCode();
     try{
       // سجّل في قاعدة البيانات
       await fetch(SUPA_URL+"/rest/v1/lucky_winners",{
