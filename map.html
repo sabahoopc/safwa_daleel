@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خريطة مشاريع صفوى</title>
+<meta name="description" content="اكتشف مشاريع ومحلات مدينة صفوى على الخريطة">
+<link rel="canonical" href="https://1safwa.com/map.html">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--orange:#f26522;--bg:#0a0a0a;--card:#1a1a1a;--border:#252525;--text:#f0f0f0;--muted:#777}
+body{font-family:"Cairo",sans-serif;background:var(--bg);color:var(--text);height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+
+/* Header */
+.hdr{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#111;border-bottom:1px solid var(--border);flex-shrink:0;z-index:1000}
+.hdr-logo{font-size:15px;font-weight:900;color:var(--orange);white-space:nowrap}
+.search-wrap{flex:1;position:relative;max-width:420px}
+.search-wrap input{width:100%;background:#1a1a1a;border:1px solid var(--border);border-radius:10px;padding:9px 36px 9px 12px;color:var(--text);font-size:13px;font-family:"Cairo",sans-serif;outline:none}
+.search-wrap input:focus{border-color:var(--orange)}
+.search-wrap .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+.back-btn{color:var(--muted);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.back-btn:hover{color:var(--orange)}
+
+/* Filter chips */
+.filters{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;flex-shrink:0;background:#111;border-bottom:1px solid var(--border);scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-family:"Cairo",sans-serif;color:var(--muted);cursor:pointer;white-space:nowrap;transition:.15s}
+.chip:hover,.chip.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+
+/* Map */
+#map{flex:1;z-index:1}
+.leaflet-container{background:#1a1a1a}
+
+/* Stats bar */
+.stats-bar{background:#111;border-top:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:16px;flex-shrink:0;font-size:12px;color:var(--muted)}
+.stats-bar span{color:var(--orange);font-weight:700}
+
+/* Popup */
+.map-popup{font-family:"Cairo",sans-serif;direction:rtl;min-width:200px}
+.mp-name{font-size:14px;font-weight:900;color:#1a1a1a;margin-bottom:4px}
+.mp-cat{font-size:11px;color:#888;margin-bottom:8px}
+.mp-loc{font-size:11px;color:#666;margin-bottom:8px}
+.mp-btns{display:flex;gap:6px;flex-wrap:wrap}
+.mp-btn{font-size:11px;font-family:"Cairo",sans-serif;padding:5px 10px;border-radius:7px;border:none;cursor:pointer;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.mp-btn-or{background:#f26522;color:#fff}
+.mp-btn-gr{background:#25d366;color:#fff}
+.mp-btn-bl{background:#f0f0f0;color:#333}
+
+/* No location notice */
+.no-loc{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #333;border-radius:10px;padding:10px 16px;font-size:12px;color:var(--muted);z-index:500;white-space:nowrap;display:none}
+
+/* Loading */
+.map-loading{position:absolute;inset:0;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:12px}
+.map-loading .sp{width:36px;height:36px;border:3px solid #222;border-top:3px solid var(--orange);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <a href="/" class="back-btn">← الدليل</a>
+  <div class="hdr-logo">🗺️ خريطة صفوى</div>
+  <div class="search-wrap">
+    <input id="search" placeholder="ابحث عن مشروع..." oninput="filterMarkers()">
+    <span class="si">🔍</span>
+  </div>
+</div>
+
+<div class="filters" id="filters">
+  <div class="chip active" onclick="selectCat('all',this)">الكل</div>
+</div>
+
+<div style="position:relative;flex:1;display:flex;flex-direction:column">
+  <div id="map"></div>
+  <div class="map-loading" id="loading">
+    <div class="sp"></div>
+    <div style="font-size:13px;color:#777">جاري تحميل المشاريع...</div>
+  </div>
+  <div class="no-loc" id="no-loc">⚠️ بعض المشاريع ليس لديها موقع محدد</div>
+</div>
+
+<div class="stats-bar">
+  <div>يعرض <span id="shown-count">0</span> مشروع على الخريطة</div>
+  <div style="margin-right:auto;color:#555;font-size:11px">المشاريع بدون موقع لا تظهر</div>
+</div>
+
+<script>
+const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
+
+const DEF_CATS = [
+  {id:"restaurants",label:"مطاعم",icon:"🍽️"},{id:"groceries",label:"بقالات",icon:"🛒"},
+  {id:"supermarkets",label:"سوبرماركت",icon:"🏪"},{id:"realestate",label:"عقارات",icon:"🏠"},
+  {id:"homeprod",label:"أسر منتجة",icon:"🧺"},{id:"cafes",label:"مقاهي",icon:"☕"},
+  {id:"bookstores",label:"مكتبات",icon:"📚"},{id:"printing",label:"مطابع",icon:"🖨️"},
+  {id:"mobiles",label:"جوالات",icon:"📱"},{id:"nuts",label:"مكسرات",icon:"🥜"},
+  {id:"weddinghalls",label:"أفراح",icon:"💒"},{id:"barbers",label:"حلاقة",icon:"✂️"},
+  {id:"women",label:"مراكز نسائية",icon:"💄"},{id:"electronics",label:"إلكترونيات",icon:"🔌"},
+  {id:"clothing",label:"ملابس",icon:"👗"},{id:"gold",label:"ذهب",icon:"💍"},
+  {id:"sweets",label:"حلويات",icon:"🍰"},{id:"services",label:"خدمات",icon:"🔧"},
+  {id:"beauty",label:"تجميل",icon:"💅"},{id:"juices",label:"عصائر",icon:"🧃"},
+  {id:"decor",label:"ديكور",icon:"🛋️"},{id:"foodcarts",label:"عربات طعام",icon:"🍔"},
+  {id:"optics",label:"بصريات",icon:"👓"},{id:"perfumes",label:"عطورات",icon:"🕌"},
+  {id:"bikes",label:"دراجات",icon:"🚲"},{id:"furniture",label:"مفروشات",icon:"🛋️"},
+  {id:"photography",label:"تصوير",icon:"📸"},
+];
+function getCat(id){ return DEF_CATS.find(c=>c.id===id)||{label:id,icon:"🏢"}; }
+
+// استخراج الإحداثيات من روابط Google Maps
+function extractCoords(url){
+  if(!url) return null;
+  // نمط /@lat,lng
+  let m = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // نمط ?q=lat,lng
+  m = url.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // نمط /place/.../@lat,lng
+  m = url.match(/\/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  // نمط ll=lat,lng
+  m = url.match(/ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(m) return {lat:parseFloat(m[1]),lng:parseFloat(m[2])};
+  return null;
+}
+
+// أيقونة مخصصة
+function makeIcon(emoji, promoted){
+  const size = promoted ? 44 : 36;
+  const bg = promoted ? '#f26522' : '#1a1a1a';
+  const border = promoted ? '#ff8c42' : '#333';
+  return L.divIcon({
+    className:'',
+    html:`<div style="width:${size}px;height:${size}px;background:${bg};border:2px solid ${border};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${promoted?20:16}px;box-shadow:0 2px 8px rgba(0,0,0,.5);${promoted?'box-shadow:0 0 12px rgba(242,101,34,.6)':''}">${emoji}</div>`,
+    iconSize:[size,size],
+    iconAnchor:[size/2,size/2],
+    popupAnchor:[0,-(size/2+4)]
+  });
+}
+
+let map, ALL=[], markers=[], activeCat='all';
+
+async function init(){
+  // تهيئة الخريطة — مركز صفوى تقريباً
+  map = L.map('map',{zoomControl:false}).setView([26.643, 49.982], 13);
+  L.control.zoom({position:'bottomleft'}).addTo(map);
+
+  // خريطة OpenStreetMap مجانية
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'© OpenStreetMap © CARTO',
+    maxZoom:19
+  }).addTo(map);
+
+  // جلب البيانات
+  try{
+    const data = await fetch(
+      SUPA_URL+"/rest/v1/businesses?select=id,name,category,phone,whatsapp,location,maps_url,promoted,badge&hidden=eq.false&order=promoted.desc,created_at.desc",
+      {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
+    ).then(r=>r.json());
+    ALL = (data||[]).filter(b=>extractCoords(b.maps_url));
+    buildFilters();
+    renderMarkers();
+  }catch(e){
+    console.error(e);
+  }
+  document.getElementById("loading").style.display="none";
+
+  // إظهار تنبيه عدد بدون موقع
+  const noLocCount = (ALL.length);
+  if(noLocCount < (ALL.length)) {
+    const el = document.getElementById("no-loc");
+    el.style.display = "block";
+    setTimeout(()=>el.style.display="none", 4000);
+  }
+}
+
+function buildFilters(){
+  const usedCats = [...new Set(ALL.map(b=>b.category))];
+  const wrap = document.getElementById("filters");
+  usedCats.forEach(id=>{
+    const c = getCat(id);
+    const chip = document.createElement("div");
+    chip.className="chip";
+    chip.textContent=c.icon+" "+c.label;
+    chip.onclick=()=>selectCat(id,chip);
+    wrap.appendChild(chip);
+  });
+}
+
+function selectCat(cat, el){
+  activeCat = cat;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+  el.classList.add("active");
+  filterMarkers();
+}
+
+function filterMarkers(){
+  const q = document.getElementById("search").value.trim().toLowerCase();
+  markers.forEach(({marker,biz})=>{
+    const catMatch = activeCat==="all" || biz.category===activeCat;
+    const searchMatch = !q || biz.name.toLowerCase().includes(q) || (biz.location||"").toLowerCase().includes(q);
+    if(catMatch && searchMatch) marker.addTo(map);
+    else map.removeLayer(marker);
+  });
+  const visible = markers.filter(({marker})=>map.hasLayer(marker));
+  document.getElementById("shown-count").textContent = visible.length;
+}
+
+function renderMarkers(){
+  markers.forEach(({marker})=>map.removeLayer(marker));
+  markers = [];
+  const bounds = [];
+
+  ALL.forEach(b=>{
+    const coords = extractCoords(b.maps_url);
+    if(!coords) return;
+    const cat = getCat(b.category);
+    const icon = makeIcon(cat.icon, b.promoted);
+    const marker = L.marker([coords.lat, coords.lng], {icon});
+
+    const phone = b.whatsapp||b.phone||"";
+    const wa = phone ? `<a href="https://wa.me/${phone.replace(/\D/g,'')}" target="_blank" class="mp-btn mp-btn-gr">💬 واتساب</a>` : "";
+    const maps = `<a href="${b.maps_url}" target="_blank" class="mp-btn mp-btn-bl">🗺️ الخريطة</a>`;
+    const detail = `<a href="/?biz=${b.id}" class="mp-btn mp-btn-or">عرض المشروع</a>`;
+
+    marker.bindPopup(`
+      <div class="map-popup">
+        <div class="mp-name">${b.badge?b.badge+" ":""} ${b.name}</div>
+        <div class="mp-cat">${cat.icon} ${cat.label}${b.promoted?" · ⭐ مميز":""}</div>
+        ${b.location?`<div class="mp-loc">📍 ${b.location}</div>`:""}
+        <div class="mp-btns">${detail}${wa}${maps}</div>
+      </div>`,
+      {maxWidth:260, className:''}
+    );
+
+    markers.push({marker, biz:b});
+    bounds.push([coords.lat, coords.lng]);
+  });
+
+  filterMarkers();
+
+  // اضبط الخريطة لتشمل كل المشاريع
+  if(bounds.length){
+    map.fitBounds(bounds, {padding:[40,40], maxZoom:15});
+  }
+}
+
+init();
+</script>
+</body>
+</html>
