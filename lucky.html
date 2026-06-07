@@ -247,6 +247,15 @@ async function tryLuck(){
   document.getElementById("result-nowin").classList.remove("show");
   document.getElementById("spinner").style.display="block";
 
+  // تسجيل الضغطة
+  if(!_isTest){
+    fetch(SUPA_URL+"/rest/v1/lucky_clicks",{
+      method:"POST",
+      headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify({device_id:getDeviceId()})
+    }).catch(()=>{});
+  }
+
   // تأخير درامي
   await new Promise(r=>setTimeout(r,1800));
   document.getElementById("spinner").style.display="none";
