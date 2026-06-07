@@ -148,8 +148,7 @@ body:not(.dark) .mob-refresh{background:#fff!important;border-color:#ddd!importa
   50%{background:linear-gradient(135deg,#111,#1a0d04);border-color:#f26522;box-shadow:0 0 18px rgba(242,101,34,.6)}
 }
 .lucky-tile{animation:luckyPulse 1.4s ease-in-out infinite;border:2px solid #f26522!important}
-@keyframes hintFade{0%{opacity:0;transform:translateY(4px)}100%{opacity:1;transform:translateY(0)}}
-.lucky-hint{animation:hintFade .4s ease;font-size:10px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lucky-hint{font-size:10px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .3s ease}
 #view-biz{display:none}
 
 /* Categories Grid */
@@ -542,7 +541,7 @@ async function renderCatGrid(){
       <div class="cat-tile-count">${counts[c.id]} مشروع</div>
     </div>`).join("");
 
-  // ابدأ تدوير التلميحات إذا كان الزر ظاهراً
+  // ابدأ تدوير التلميحات دائماً إذا كان الزر ظاهراً
   if(hasLucky) startLuckyHints();
 }
 
@@ -565,10 +564,11 @@ function startLuckyHints(){
     const el = document.getElementById("lucky-hint");
     if(!el){ clearInterval(_luckyHintTimer); return; }
     i = (i+1) % hints.length;
-    el.style.animation = "none";
-    el.offsetHeight; // reflow
-    el.style.animation = "";
-    el.textContent = hints[i];
+    el.style.opacity = "0";
+    setTimeout(()=>{
+      el.textContent = hints[i];
+      el.style.opacity = "1";
+    }, 300);
   }, 4000);
 }
 
