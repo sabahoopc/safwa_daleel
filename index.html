@@ -500,7 +500,7 @@ async function load(){
 }
 
 // ── Category Grid ─────────────────────────
-async function renderCatGrid(){
+function renderCatGrid(){
   const counts = {};
   ALL.forEach(b=>{ counts[b.category] = (counts[b.category]||0)+1; });
   const usedCats = CATS.filter(c=>counts[c.id]>0);
@@ -508,22 +508,12 @@ async function renderCatGrid(){
   document.getElementById("cats-page-title").textContent =
     `${usedCats.length} تصنيف — اضغط لعرض المشاريع`;
 
-  // تحقق من وجود جوائز معتمدة
-  let hasLucky = false;
-  try{
-    const prizes = await fetch(
-      SUPA_URL+"/rest/v1/lucky_prizes?select=id&status=eq.approved&limit=1",
-      {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
-    ).then(r=>r.json());
-    hasLucky = Array.isArray(prizes) && prizes.length > 0;
-  }catch(e){ hasLucky = false; }
-
-  const luckyTile = hasLucky ? `
+  const luckyTile = `
     <div class="cat-tile lucky-tile" onclick="location.href='lucky.html'">
       <div class="cat-tile-icon">🎁</div>
       <div class="cat-tile-label" style="color:#fff;font-weight:900">جرّب حظك</div>
       <div class="cat-tile-count" style="background:rgba(255,255,255,.15);color:#fff">هدايا يومية</div>
-    </div>` : "";
+    </div>`;
 
   const allTile = `
     <div class="cat-tile" onclick="openCat('all')" style="border-color:var(--orange);background:linear-gradient(135deg,#1a0a02,#0f0f0f)">
