@@ -118,8 +118,10 @@ body{font-family:"Cairo",sans-serif;background:var(--bg);color:#fff;min-height:1
           <div style="font-size:11px;color:#999">🏪 من <span id="w-prize-biz"></span></div>
         </div>
         <div class="coupon-label">كود القسيمة</div>
-        <div class="coupon-code" id="w-code"></div>
+        <div id="w-code-locked" style="font-size:22px;font-weight:900;letter-spacing:4px;direction:ltr;text-align:center;filter:blur(8px);user-select:none;color:var(--orange);padding:8px 0">XXXX-XXXXXX</div>
+        <div id="w-code" class="coupon-code" style="display:none"></div>
         <div class="coupon-expires" id="w-expires"></div>
+        <div style="font-size:11px;color:#777;text-align:center;margin-top:6px">🔒 أكمل بياناتك أدناه لكشف الكود</div>
       </div>
       <div style="background:#111;border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:#777;line-height:1.8">
         📌 <strong style="color:#999">كيفية الاستبدال:</strong><br>
@@ -342,10 +344,14 @@ function showWin(winData, isReplay){
     document.getElementById("try-note").style.display="none";
     document.getElementById("prizes-preview").style.display="none";
     const acceptBtn = document.getElementById("accept-btn");
-    // تحقق إذا كان قبل مسبقاً
     if(localStorage.getItem("lucky_accepted_"+code)){
+      // سبق قبوله — اكشف الكود مباشرة
       acceptBtn.textContent = "✅ تم قبول الهدية";
       acceptBtn.disabled = true;
+      document.getElementById("w-code-locked").style.display = "none";
+      document.getElementById("w-code").style.display = "block";
+      document.getElementById("winner-name").disabled = true;
+      document.getElementById("winner-phone").disabled = true;
     }
   }
 
@@ -386,11 +392,16 @@ function acceptPrize(){
     body:JSON.stringify({claimed:true, winner_name:name, winner_phone:phone})
   }).then(()=>{
     btn.textContent = "✅ تم قبول الهدية — وفّر لك دليل صفوى!";
+    // اكشف الكود
+    document.getElementById("w-code-locked").style.display = "none";
+    document.getElementById("w-code").style.display = "block";
     document.getElementById("winner-form").style.background="#0a1a0a";
     document.getElementById("winner-form").style.borderRadius="9px";
     document.getElementById("winner-form").style.padding="12px";
   }).catch(()=>{
     btn.textContent = "✅ تم قبول الهدية — وفّر لك دليل صفوى!";
+    document.getElementById("w-code-locked").style.display = "none";
+    document.getElementById("w-code").style.display = "block";
   });
 }
 
