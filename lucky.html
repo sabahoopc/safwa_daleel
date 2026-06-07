@@ -287,17 +287,11 @@ async function tryLuck(){
     // استخدم كود التاجر مباشرة
     const code = winner.prize_code || generateCode();
     try{
-      // سجّل في قاعدة البيانات
+      // سجّل في قاعدة البيانات — لا تنقص الكمية إلا عند القبول
       await fetch(SUPA_URL+"/rest/v1/lucky_winners",{
         method:"POST",
         headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
         body:JSON.stringify({prize_id:winner.id, device_id:getDeviceId(), code, claimed:false})
-      });
-      // انقص الكمية
-      await fetch(SUPA_URL+"/rest/v1/lucky_prizes?id=eq."+winner.id,{
-        method:"PATCH",
-        headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
-        body:JSON.stringify({remaining: winner.remaining-1})
       });
     }catch(e){ console.warn("DB save failed"); }
 
@@ -391,8 +385,13 @@ function acceptPrize(){
     headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
     body:JSON.stringify({claimed:true, winner_name:name, winner_phone:phone})
   }).then(()=>{
+    // انقص الكمية عند القبول فقط
+    fetch(SUPA_URL+"/rest/v1/lucky_prizes?id=eq."+currentWin.prize.id,{
+      method:"PATCH",
+      headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({remaining: Math.max(0,(currentWin.prize.remaining||1)-1)})
+    }).catch(()=>{});
     btn.textContent = "✅ تم قبول الهدية — وفّر لك دليل صفوى!";
-    // اكشف الكود
     document.getElementById("w-code-locked").style.display = "none";
     document.getElementById("w-code").style.display = "block";
     document.getElementById("winner-form").style.background="#0a1a0a";
@@ -413,19 +412,7 @@ async function rejectPrize(){
   acceptBtn.style.display  = "none";
   rejectBtn.style.display  = "none";
   try{
-    // اجلب القيمة الحالية من DB
-    const prizeData = await fetch(
-      SUPA_URL+"/rest/v1/lucky_prizes?select=remaining&id=eq."+currentWin.prize.id,
-      {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
-    ).then(r=>r.json());
-    const currentRemaining = prizeData?.[0]?.remaining || 0;
-    // أعد الكمية +1
-    await fetch(SUPA_URL+"/rest/v1/lucky_prizes?id=eq."+currentWin.prize.id,{
-      method:"PATCH",
-      headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
-      body:JSON.stringify({remaining: currentRemaining+1})
-    });
-    // احذف سجل الفائز
+    // احذف سجل الفائز فقط — الكمية لم تتغير
     await fetch(SUPA_URL+"/rest/v1/lucky_winners?code=eq."+currentWin.code,{
       method:"DELETE",
       headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}
