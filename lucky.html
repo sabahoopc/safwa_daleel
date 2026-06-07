@@ -234,6 +234,8 @@ async function init(){
 
 async function tryLuck(){
   if(!prizes.length) return;
+  // تحقق من وضع الاختبار مباشرة
+  const _isTest = isTest || new URLSearchParams(location.search).get("test")==="1" || localStorage.getItem("lucky_test_mode")==="1";
   const btn = document.getElementById("try-btn");
   btn.disabled = true;
   document.getElementById("result-win").classList.remove("show");
@@ -254,7 +256,7 @@ async function tryLuck(){
   }
 
   const todayKey2 = getTodayKey();
-  if(!isTest) localStorage.setItem(todayKey2, "1");
+  if(!_isTest) localStorage.setItem(todayKey2, "1");
 
   if(winner){
     // أنشئ كود فريد
@@ -276,7 +278,7 @@ async function tryLuck(){
 
     const winData = { prize:winner, code, biz: winner.businesses };
     currentWin = winData;
-    localStorage.setItem(todayKey+"_win", JSON.stringify(winData));
+    if(!_isTest) localStorage.setItem(todayKey2+"_win", JSON.stringify(winData));
     showWin(winData, false);
   } else {
     showResult("nowin");
