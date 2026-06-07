@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /landing.html
+Allow: /influencers.html
+Allow: /lucky.html
+Allow: /terms.html
+
+# منع فهرسة صفحات الإدارة
+Disallow: /admin.html
+Disallow: /influencers-admin.html
+Disallow: /prize-submit.html
+
+Sitemap: https://1safwa.com/sitemap.xml
