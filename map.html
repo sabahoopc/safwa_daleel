@@ -109,6 +109,12 @@ const DEF_CATS = [
 ];
 function getCat(id){ return DEF_CATS.find(c=>c.id===id)||{label:id,icon:"🏢"}; }
 
+// أولوية: أعمدة lat/lng، ثم استخراج من الرابط
+function getCoords(b){
+  if(b.lat && b.lng) return {lat:b.lat, lng:b.lng};
+  return extractCoords(b.maps_url);
+}
+
 // استخراج الإحداثيات من روابط Google Maps
 function extractCoords(url){
   if(!url) return null;
@@ -157,10 +163,10 @@ async function init(){
   // جلب البيانات
   try{
     const data = await fetch(
-      SUPA_URL+"/rest/v1/businesses?select=id,name,category,phone,whatsapp,location,maps_url,promoted,badge&hidden=eq.false&order=promoted.desc,created_at.desc",
+      SUPA_URL+"/rest/v1/businesses?select=id,name,category,phone,whatsapp,location,maps_url,promoted,badge,lat,lng&hidden=eq.false&order=promoted.desc,created_at.desc",
       {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
     ).then(r=>r.json());
-    ALL = (data||[]).filter(b=>extractCoords(b.maps_url));
+    ALL = (data||[]).filter(b=>getCoords(b));
     buildFilters();
     renderMarkers();
   }catch(e){
@@ -215,7 +221,7 @@ function renderMarkers(){
   const bounds = [];
 
   ALL.forEach(b=>{
-    const coords = extractCoords(b.maps_url);
+    const coords = getCoords(b);
     if(!coords) return;
     const cat = getCat(b.category);
     const icon = makeIcon(cat.icon, b.promoted);
