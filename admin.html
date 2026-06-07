@@ -1772,9 +1772,14 @@ window.loadReport = async function loadReport(){
       supa("businesses?select=id&promoted=eq.true&hidden=eq.false"),
       supa("popup_ads?select=id&active=eq.true"),
       supa("lucky_prizes?select=id&created_at=gte."+weekAgo),
-      supa("lucky_prizes?select=id&status=eq.approved"),
+      supa("lucky_prizes?select=id,quantity,business_id&status=eq.approved"),
       supa("custom_categories?select=id,label"),
     ]);
+
+    // إجمالي الجوائز = مجموع الكميات
+    const totalPrizesQty = (allPrizes||[]).reduce((sum,p)=>sum+(p.quantity||0),0);
+    // عدد المشاريع المقدِّمة للجوائز (فريدة)
+    const uniquePrizeBiz = new Set((allPrizes||[]).map(p=>p.business_id).filter(Boolean)).size;
 
     // تصنيفات
     const DEF_CATS_LABELS = {
@@ -1810,7 +1815,8 @@ window.loadReport = async function loadReport(){
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px">
           ${card("🏪","إجمالي المشاريع",(allBiz||[]).length,"var(--or)")}
           ${card("🆕","مشاريع هذا الأسبوع",(newBiz||[]).length,"var(--gr)")}
-          ${card("🎁","جوائز معتمدة",(allPrizes||[]).length,"var(--or)")}
+          ${card("🎁","إجمالي الجوائز",totalPrizesQty,"var(--or)")}
+          ${card("🏪","مشاريع قدّمت جوائز",uniquePrizeBiz,"#a78bfa")}
           ${card("🎰","جوائز هذا الأسبوع",(newPrizes||[]).length,"#a78bfa")}
           ${card("⭐","إعلانات مميزة",(promoted||[]).length,"#f0a000")}
           ${card("🪟","نوافذ منبثقة نشطة",(popups||[]).length,"#38bdf8")}
