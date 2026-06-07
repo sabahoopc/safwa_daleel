@@ -1135,11 +1135,13 @@ function renderPending(){
   if(!pending.length){ tbody.innerHTML=`<tr><td colspan="6"><div style="text-align:center;padding:20px;color:var(--mu)">لا توجد طلبات معلقة</div></td></tr>`; return; }
   tbody.innerHTML = pending.map(p=>`<tr>
     <td style="font-size:13px"><div style="font-weight:700">${esc(p.owner_name||"—")}</div><div style="font-size:11px;color:var(--mu)">${esc(p.owner_phone||"")}</div></td>
-    <td style="font-size:13px"><div style="font-weight:700">${esc(p.title)}</div><div style="font-size:11px;color:var(--mu);margin-top:2px">${esc((p.description||"").substring(0,60))}${p.description&&p.description.length>60?"...":""}</div></td>
+    <td style="font-size:13px;font-weight:700">${esc(p.business_name||p.owner_name||"—")}</td>
+    <td style="font-size:13px"><div style="font-weight:700">${esc(p.title)}</div><div style="font-size:11px;color:var(--mu);margin-top:2px">${esc((p.description||"").substring(0,45))}${p.description&&p.description.length>45?"...":""}</div></td>
     <td style="font-size:13px;font-weight:700;color:var(--or);direction:ltr">${esc(p.prize_code||"—")}</td>
     <td style="font-size:13px;text-align:center">${p.quantity}</td>
     <td><div class="td-actions">
       <button type="button" class="btn btn-ghost btn-sm" onclick="viewPrizeDetails(${p.id})">👁️</button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="editPendingPrize(${p.id})">✏️</button>
       <button type="button" class="btn btn-green btn-sm" onclick="approvePrize(${p.id})">✅ موافقة</button>
       <button type="button" class="btn btn-red btn-sm" onclick="openRejectPrize(${p.id})">✕ رفض</button>
     </div></td>
@@ -1193,6 +1195,54 @@ function renderWinners(){
       </td>
     </tr>`;
   }).join("");
+}
+
+window.editPendingPrize = function editPendingPrize(id){
+  const p = PRIZES.find(x=>x.id===id); if(!p) return;
+  document.getElementById("ep-id").value = id;
+  document.getElementById("ep-owner").value = p.owner_name||"";
+  document.getElementById("ep-phone").value = p.owner_phone||"";
+  document.getElementById("ep-email").value = p.owner_email||"";
+  document.getElementById("ep-bizname").value = p.business_name||"";
+  document.getElementById("ep-title").value = p.title||"";
+  document.getElementById("ep-desc").value = p.description||"";
+  document.getElementById("ep-code").value = p.prize_code||"";
+  document.getElementById("ep-qty").value = p.quantity||"";
+  document.getElementById("ep-expires").value = p.expires_at||"";
+  document.getElementById("ep-err").style.display="none";
+  openM("edit-pending");
+}
+
+window.saveEditPrize = async function saveEditPrize(){
+  const id = parseInt(document.getElementById("ep-id").value);
+  const bizname = document.getElementById("ep-bizname").value.trim();
+  const title = document.getElementById("ep-title").value.trim();
+  const desc = document.getElementById("ep-desc").value.trim();
+  const code = document.getElementById("ep-code").value.trim().toUpperCase();
+  const qty = parseInt(document.getElementById("ep-qty").value)||5;
+  const exp = document.getElementById("ep-expires").value;
+  const errEl = document.getElementById("ep-err");
+  errEl.style.display="none";
+
+  if(!bizname||!title||!desc||!code){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ جميع الحقول مطلوبة";
+    return;
+  }
+
+  try{
+    await supa("lucky_prizes?id=eq."+id,"PATCH",{
+      business_name:bizname, title, description:desc,
+      prize_code:code, quantity:qty, remaining:qty,
+      expires_at:exp||null
+    });
+    closeM("edit-pending");
+    await loadLucky();
+    toast("✅ تم حفظ التعديلات");
+  }catch(e){
+    errEl.style.display="block";
+    errEl.textContent="❌ فشل: "+e.message;
+  }
 }
 
 window.viewPrizeDetails = function viewPrizeDetails(id){
@@ -2189,6 +2239,45 @@ tr:hover td{background:rgba(242,101,34,.04)}
       <thead><tr><th>الكود</th><th>المشروع</th><th>الجائزة</th><th>التاريخ</th><th style="text-align:left">الحالة</th></tr></thead>
       <tbody id="winners-body"></tbody>
     </table></div>
+  </div>
+</div>
+
+<!-- Edit Pending Prize Modal -->
+<div class="overlay" id="modal-edit-pending" onclick="if(event.target===this)closeM('edit-pending')">
+  <div class="modal" style="max-width:520px">
+    <div class="mh"><div class="mh-title">✏️ تعديل الطلب</div><button type="button" style="background:none;border:none;color:var(--mu);font-size:17px;cursor:pointer" onclick="closeM('edit-pending')">✕</button></div>
+    <div class="mc">
+      <input type="hidden" id="ep-id">
+      <label class="flabel">اسم صاحب المشروع</label>
+      <input class="finput" id="ep-owner" readonly style="background:#f0f0f0;cursor:not-allowed">
+      <label class="flabel">جوال التواصل</label>
+      <input class="finput" id="ep-phone" readonly style="background:#f0f0f0;cursor:not-allowed">
+      <label class="flabel">البريد الإلكتروني</label>
+      <input class="finput" id="ep-email" readonly style="background:#f0f0f0;cursor:not-allowed">
+      <label class="flabel">اسم المشروع <span class="req">*</span></label>
+      <input class="finput" id="ep-bizname">
+      <label class="flabel">عنوان الجائزة <span class="req">*</span></label>
+      <input class="finput" id="ep-title">
+      <label class="flabel">وصف الجائزة <span class="req">*</span></label>
+      <textarea class="finput" id="ep-desc" style="height:70px;resize:vertical"></textarea>
+      <label class="flabel">كود التحقق <span class="req">*</span></label>
+      <input class="finput" id="ep-code" style="font-weight:700;letter-spacing:2px;font-size:15px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <label class="flabel">الكمية <span class="req">*</span></label>
+          <input class="finput" id="ep-qty" type="number" min="1">
+        </div>
+        <div>
+          <label class="flabel">الانتهاء</label>
+          <input class="finput" id="ep-expires" type="date">
+        </div>
+      </div>
+      <div id="ep-err" style="color:var(--re);font-size:12px;display:none;margin-bottom:8px"></div>
+    </div>
+    <div class="mf">
+      <button type="button" class="btn btn-or" onclick="saveEditPrize()">💾 حفظ التعديلات</button>
+      <button type="button" class="btn btn-ghost" onclick="closeM('edit-pending')">إلغاء</button>
+    </div>
   </div>
 </div>
 
