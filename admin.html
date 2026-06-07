@@ -1201,6 +1201,7 @@ function renderWinners(){
         <div class="td-actions">
           <span style="font-size:12px;font-weight:700;color:${w.claimed?"var(--gr)":"var(--mu)"}">${w.claimed?"✅ مُستبدلت":"⏳ بانتظار"}</span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="previewCoupon('${esc(w.code)}','${esc(bizName)}','${esc(w.lucky_prizes?.title||"")}')" title="معاينة الكوبون">🎟️</button>
+          ${!w.claimed?`<button type="button" class="btn btn-ghost btn-sm" style="color:#f0a000;border-color:#f0a00033" onclick="restoreWinner(${w.id},${w.prize_id})" title="إعادة للجوائز النشطة">↩️</button>`:""}
         </div>
       </td>
     </tr>`;
@@ -1258,6 +1259,21 @@ window.saveEditPrize = async function saveEditPrize(){
 window.viewPrizeDetails = function viewPrizeDetails(id){
   const p = PRIZES.find(x=>x.id===id); if(!p) return;
   alert(`📋 تفاصيل الجائزة\n\n🏪 المشروع: ${p.business_name||p.owner_name||"—"}\n👤 صاحب المشروع: ${p.owner_name||"—"}\n📱 الجوال: ${p.owner_phone||"—"}\n\n🎁 الجائزة: ${p.title}\n\n📝 الوصف:\n${p.description||"—"}\n\n🔑 الكود: ${p.prize_code||"—"}\n📦 الكمية: ${p.quantity}\n📅 الانتهاء: ${p.expires_at||"غير محدد"}`);
+}
+
+window.restoreWinner = async function restoreWinner(winnerId, prizeId){
+  if(!confirm("إعادة هذه الجائزة للجوائز النشطة؟ سيتم حذف سجل الفائز.")) return;
+  try{
+    // احذف سجل الفائز
+    await supa("lucky_winners?id=eq."+winnerId,"DELETE");
+    // أعد الكمية +1
+    const prize = PRIZES.find(p=>p.id===prizeId);
+    if(prize){
+      await supa("lucky_prizes?id=eq."+prizeId,"PATCH",{remaining:(prize.remaining||0)+1});
+    }
+    await loadLucky();
+    toast("↩️ تم إعادة الجائزة للجوائز النشطة");
+  }catch(e){ toast("❌ فشل: "+e.message, true); }
 }
 
 window.previewCoupon = function previewCoupon(code, bizName, prizeTitle){
