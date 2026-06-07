@@ -125,9 +125,15 @@ body{font-family:"Cairo",sans-serif;background:var(--bg);color:#fff;min-height:1
         📌 <strong style="color:#999">كيفية الاستبدال:</strong><br>
         اذهب للمحل واعرض هذه الشاشة أو صورتها للموظف — سيتحقق من الكود ويسلمك هديتك.
       </div>
-      <button class="accept-btn" id="accept-btn" onclick="acceptPrize()">
-        ✅ قبلت الهدية — احفظ القسيمة
-      </button>
+      <div id="winner-form" style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#999;margin-bottom:10px">📝 أدخل بياناتك لتأكيد قبول الهدية</div>
+        <input id="winner-name" placeholder="الاسم الرباعي" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:9px;padding:11px 14px;color:#fff;font-size:14px;font-family:Cairo,sans-serif;margin-bottom:10px;outline:none;direction:rtl">
+        <input id="winner-phone" placeholder="رقم الجوال" type="tel" dir="ltr" style="width:100%;background:#1a1a1a;border:1px solid #333;border-radius:9px;padding:11px 14px;color:#fff;font-size:14px;font-family:Cairo,sans-serif;margin-bottom:10px;outline:none;text-align:right">
+        <div id="winner-form-err" style="color:#e05c5c;font-size:12px;display:none;margin-bottom:8px"></div>
+        <button class="accept-btn" id="accept-btn" onclick="acceptPrize()">
+          ✅ قبلت الهدية — احفظ القسيمة
+        </button>
+      </div>
       <button class="share-btn" id="reject-btn" onclick="rejectPrize()" style="color:#e05c5c;border-color:#e05c5c33;margin-bottom:10px">
         🚫 لا أقبل الهدية — خليها لغيري
       </button>
@@ -347,17 +353,45 @@ function showWin(winData, isReplay){
 }
 
 function acceptPrize(){
-  const btn = document.getElementById("accept-btn");
   if(!currentWin) return;
+  const name  = document.getElementById("winner-name").value.trim();
+  const phone = document.getElementById("winner-phone").value.trim();
+  const errEl = document.getElementById("winner-form-err");
+  errEl.style.display = "none";
+
+  // تحقق من الاسم الرباعي
+  if(!name || name.split(/\s+/).length < 4){
+    errEl.style.display = "block";
+    errEl.textContent = "⚠️ يرجى إدخال الاسم الرباعي كاملاً";
+    return;
+  }
+  if(!phone || phone.replace(/\D/g,"").length < 10){
+    errEl.style.display = "block";
+    errEl.textContent = "⚠️ يرجى إدخال رقم جوال صحيح";
+    return;
+  }
+
+  const btn = document.getElementById("accept-btn");
   localStorage.setItem("lucky_accepted_"+currentWin.code, "1");
-  btn.textContent = "✅ تم قبول الهدية — وفّر لك دليل صفوى!";
+  btn.textContent = "⏳ جاري التأكيد...";
   btn.disabled = true;
+  document.getElementById("winner-name").disabled  = true;
+  document.getElementById("winner-phone").disabled = true;
   document.getElementById("reject-btn").style.display = "none";
+
+  // حفظ البيانات في DB
   fetch(SUPA_URL+"/rest/v1/lucky_winners?code=eq."+currentWin.code,{
     method:"PATCH",
     headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
-    body:JSON.stringify({claimed:true})
-  }).catch(()=>{});
+    body:JSON.stringify({claimed:true, winner_name:name, winner_phone:phone})
+  }).then(()=>{
+    btn.textContent = "✅ تم قبول الهدية — وفّر لك دليل صفوى!";
+    document.getElementById("winner-form").style.background="#0a1a0a";
+    document.getElementById("winner-form").style.borderRadius="9px";
+    document.getElementById("winner-form").style.padding="12px";
+  }).catch(()=>{
+    btn.textContent = "✅ تم قبول الهدية — وفّر لك دليل صفوى!";
+  });
 }
 
 async function rejectPrize(){
