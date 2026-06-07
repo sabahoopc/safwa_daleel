@@ -153,10 +153,10 @@ body:not(.dark) .mob-refresh{background:#fff!important;border-color:#ddd!importa
 .cb{background:none;border:none;color:var(--muted);font-size:12px}
 
 @keyframes luckyPulse{
-  0%,100%{box-shadow:0 0 0 rgba(242,101,34,.4),inset 0 0 20px rgba(242,101,34,.3);filter:brightness(1)}
-  50%{box-shadow:0 0 20px rgba(242,101,34,.8),inset 0 0 30px rgba(242,101,34,.6);filter:brightness(0.7)}
+  0%,100%{background:#f26522;box-shadow:0 0 12px rgba(242,101,34,.6)}
+  50%{background:#111;box-shadow:0 0 20px rgba(242,101,34,.9)}
 }
-.lucky-tile{animation:luckyPulse 1.4s ease-in-out infinite!important;border:2px solid #f26522!important;background:linear-gradient(135deg,#f26522,#ff8c42)!important}
+.lucky-tile{animation:luckyPulse 1.4s ease-in-out infinite!important;border:2px solid #f26522!important}
 #view-biz{display:none}
 
 /* Categories Grid */
@@ -523,7 +523,7 @@ function renderCatGrid(){
       <div class="cat-tile-label" style="color:var(--orange)">الكل</div>
       <div class="cat-tile-count">${ALL.length} مشروع</div>
     </div>
-    <div class="cat-tile" onclick="location.href='lucky.html'" style="border:2px solid #f26522!important;background:linear-gradient(135deg,#f26522,#ff8c42)!important;animation:luckyPulse 1.4s ease-in-out infinite!important;display:block!important">
+    <div class="cat-tile lucky-tile" onclick="location.href='lucky.html'">
       <div class="cat-tile-icon">🎁</div>
       <div class="cat-tile-label" style="color:#fff;font-weight:900">جرّب حظك</div>
       <div class="cat-tile-count" style="background:rgba(255,255,255,.15);color:#fff">هدايا يومية</div>
