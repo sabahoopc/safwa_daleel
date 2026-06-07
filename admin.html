@@ -1196,6 +1196,8 @@ function renderWinners(){
       <td style="font-size:13px;font-weight:700;color:var(--or);direction:ltr">${esc(w.code)}</td>
       <td style="font-size:13px;font-weight:700">${esc(bizName)}</td>
       <td style="font-size:12px">${esc(w.lucky_prizes?.title||"—")}</td>
+      <td style="font-size:13px">${esc(w.winner_name||"—")}</td>
+      <td style="font-size:12px;direction:ltr">${esc(w.winner_phone||"—")}</td>
       <td style="font-size:12px;color:var(--mu)">${new Date(w.created_at).toLocaleDateString("ar-SA")}</td>
       <td>
         <div class="td-actions">
@@ -2397,7 +2399,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
   <div>
     <div style="font-size:13px;font-weight:700;margin-bottom:12px">🏆 الفائزون</div>
     <div style="overflow-x:auto"><table>
-      <thead><tr><th>الكود</th><th>المشروع</th><th>الجائزة</th><th>التاريخ</th><th style="text-align:left">الحالة</th></tr></thead>
+      <thead><tr><th>الكود</th><th>المشروع</th><th>الجائزة</th><th>الفائز</th><th>الجوال</th><th>التاريخ</th><th style="text-align:left">الحالة</th></tr></thead>
       <tbody id="winners-body"></tbody>
     </table></div>
   </div>
