@@ -508,16 +508,15 @@ async function renderCatGrid(){
   document.getElementById("cats-page-title").textContent =
     `${usedCats.length} تصنيف — اضغط لعرض المشاريع`;
 
-  // تحقق من وجود جوائز نشطة
+  // تحقق من وجود جوائز معتمدة
   let hasLucky = false;
   try{
-    const today = new Date().toISOString().split("T")[0];
     const prizes = await fetch(
-      SUPA_URL+"/rest/v1/lucky_prizes?select=id&active=eq.true&status=eq.approved&remaining=gt.0&limit=1",
+      SUPA_URL+"/rest/v1/lucky_prizes?select=id&status=eq.approved&limit=1",
       {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
     ).then(r=>r.json());
-    hasLucky = prizes&&prizes.length>0;
-  }catch(e){}
+    hasLucky = Array.isArray(prizes) && prizes.length > 0;
+  }catch(e){ hasLucky = false; }
 
   const luckyTile = hasLucky ? `
     <div class="cat-tile lucky-tile" onclick="location.href='lucky.html'">
