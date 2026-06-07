@@ -539,35 +539,6 @@ async function renderCatGrid(){
       <div class="cat-tile-label">${c.label}</div>
       <div class="cat-tile-count">${counts[c.id]} مشروع</div>
     </div>`).join("");
-
-  if(hasLucky) startLuckyHints();
-}
-
-let _luckyHintTimer = null;
-function startLuckyHints(){
-  clearInterval(_luckyHintTimer);
-  const hints = [
-    "هدايا يومية 🎁",
-    "🍽️ هدايا في المطاعم",
-    "☕ مفاجآت في المقاهي",
-    "🛒 عروض البقالات",
-    "💄 هدايا المراكز النسائية",
-    "🍰 حلويات مجانية!",
-    "🧃 مشروبات مجانية!",
-    "اكتشف ما في التصنيفات!",
-    "فرصتك اليوم هنا 👆",
-  ];
-  let i = 0;
-  _luckyHintTimer = setInterval(()=>{
-    const el = document.getElementById("lucky-hint");
-    if(!el){ clearInterval(_luckyHintTimer); return; }
-    i = (i+1) % hints.length;
-    el.style.opacity = "0";
-    setTimeout(()=>{
-      el.textContent = hints[i];
-      el.style.opacity = "1";
-    }, 300);
-  }, 4000);
 }
 
 // ── Open Category ─────────────────────────
