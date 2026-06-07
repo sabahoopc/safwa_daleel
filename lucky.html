@@ -360,24 +360,32 @@ function acceptPrize(){
   }).catch(()=>{});
 }
 
-function rejectPrize(){
+async function rejectPrize(){
   if(!currentWin) return;
   if(!confirm("هل أنت متأكد؟ ستُلغى قسيمتك وتعود الهدية لغيرك.")) return;
   const acceptBtn  = document.getElementById("accept-btn");
   const rejectBtn  = document.getElementById("reject-btn");
   acceptBtn.style.display  = "none";
   rejectBtn.style.display  = "none";
-  // أعد الكمية للجائزة +1
-  fetch(SUPA_URL+"/rest/v1/lucky_prizes?id=eq."+currentWin.prize.id,{
-    method:"PATCH",
-    headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
-    body:JSON.stringify({remaining: (currentWin.prize.remaining||0)+1})
-  }).catch(()=>{});
-  // احذف سجل الفائز
-  fetch(SUPA_URL+"/rest/v1/lucky_winners?code=eq."+currentWin.code,{
-    method:"DELETE",
-    headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}
-  }).catch(()=>{});
+  try{
+    // اجلب القيمة الحالية من DB
+    const prizeData = await fetch(
+      SUPA_URL+"/rest/v1/lucky_prizes?select=remaining&id=eq."+currentWin.prize.id,
+      {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
+    ).then(r=>r.json());
+    const currentRemaining = prizeData?.[0]?.remaining || 0;
+    // أعد الكمية +1
+    await fetch(SUPA_URL+"/rest/v1/lucky_prizes?id=eq."+currentWin.prize.id,{
+      method:"PATCH",
+      headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({remaining: currentRemaining+1})
+    });
+    // احذف سجل الفائز
+    await fetch(SUPA_URL+"/rest/v1/lucky_winners?code=eq."+currentWin.code,{
+      method:"DELETE",
+      headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}
+    });
+  }catch(e){ console.warn("Reject prize error:", e); }
   // امسح من localStorage
   const todayKey = getTodayKey();
   localStorage.removeItem(todayKey);
