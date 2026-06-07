@@ -128,6 +128,9 @@ body{font-family:"Cairo",sans-serif;background:var(--bg);color:#fff;min-height:1
       <button class="accept-btn" id="accept-btn" onclick="acceptPrize()">
         ✅ قبلت الهدية — احفظ القسيمة
       </button>
+      <button class="share-btn" id="reject-btn" onclick="rejectPrize()" style="color:#e05c5c;border-color:#e05c5c33;margin-bottom:10px">
+        🚫 لا أقبل الهدية — خليها لغيري
+      </button>
       <button class="share-btn" onclick="shareWin()">📤 شارك فرحتك</button>
     </div>
   </div>
@@ -349,12 +352,43 @@ function acceptPrize(){
   localStorage.setItem("lucky_accepted_"+currentWin.code, "1");
   btn.textContent = "✅ تم قبول الهدية — وفّر لك دليل صفوى!";
   btn.disabled = true;
-  // تحديث حالة الفوز في DB
+  document.getElementById("reject-btn").style.display = "none";
   fetch(SUPA_URL+"/rest/v1/lucky_winners?code=eq."+currentWin.code,{
     method:"PATCH",
     headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
     body:JSON.stringify({claimed:true})
   }).catch(()=>{});
+}
+
+function rejectPrize(){
+  if(!currentWin) return;
+  if(!confirm("هل أنت متأكد؟ ستُلغى قسيمتك وتعود الهدية لغيرك.")) return;
+  const acceptBtn  = document.getElementById("accept-btn");
+  const rejectBtn  = document.getElementById("reject-btn");
+  acceptBtn.style.display  = "none";
+  rejectBtn.style.display  = "none";
+  // أعد الكمية للجائزة +1
+  fetch(SUPA_URL+"/rest/v1/lucky_prizes?id=eq."+currentWin.prize.id,{
+    method:"PATCH",
+    headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({remaining: (currentWin.prize.remaining||0)+1})
+  }).catch(()=>{});
+  // احذف سجل الفائز
+  fetch(SUPA_URL+"/rest/v1/lucky_winners?code=eq."+currentWin.code,{
+    method:"DELETE",
+    headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}
+  }).catch(()=>{});
+  // امسح من localStorage
+  const todayKey = getTodayKey();
+  localStorage.removeItem(todayKey);
+  localStorage.removeItem(todayKey+"_win");
+  // أظهر رسالة شكر
+  document.getElementById("result-win").innerHTML = `
+    <div style="background:var(--card);border:1px solid #252525;border-radius:20px;padding:36px;text-align:center">
+      <div style="font-size:52px;margin-bottom:14px">🤝</div>
+      <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:10px">شكراً على كرمك!</div>
+      <div style="font-size:13px;color:#777;line-height:1.8">تم إعادة الهدية — ربما تسعد شخصاً آخر اليوم 😊<br>عد غداً لتجربة حظك مرة أخرى!</div>
+    </div>`;
 }
 
 function shareWin(){
