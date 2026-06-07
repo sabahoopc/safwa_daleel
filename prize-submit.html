@@ -140,6 +140,7 @@ async function submitPrize(){
       headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
       body:JSON.stringify({
         owner_name:owner, owner_phone:phone, owner_email:email||null,
+        business_name:bizname,
         title, description:desc, prize_code:code,
         quantity:qty, remaining:qty,
         expires_at:expires||null,
