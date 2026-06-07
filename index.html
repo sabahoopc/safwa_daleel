@@ -144,10 +144,10 @@ body:not(.dark) .mob-refresh{background:#fff!important;border-color:#ddd!importa
 .cb{background:none;border:none;color:var(--muted);font-size:12px}
 
 @keyframes luckyPulse{
-  0%,100%{background:linear-gradient(135deg,#f26522,#ff8c42);border-color:#f26522;box-shadow:0 0 0 rgba(242,101,34,.4)}
-  50%{background:linear-gradient(135deg,#111,#1a0d04);border-color:#f26522;box-shadow:0 0 18px rgba(242,101,34,.6)}
+  0%,100%{box-shadow:0 0 0 rgba(242,101,34,.4),inset 0 0 20px rgba(242,101,34,.3);filter:brightness(1)}
+  50%{box-shadow:0 0 20px rgba(242,101,34,.8),inset 0 0 30px rgba(242,101,34,.6);filter:brightness(0.7)}
 }
-.lucky-tile{animation:luckyPulse 1.4s ease-in-out infinite;border:2px solid #f26522!important}
+.lucky-tile{animation:luckyPulse 1.4s ease-in-out infinite!important;border:2px solid #f26522!important;background:linear-gradient(135deg,#f26522,#ff8c42)!important}
 #view-biz{display:none}
 
 /* Categories Grid */
