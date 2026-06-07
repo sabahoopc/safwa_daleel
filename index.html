@@ -148,7 +148,6 @@ body:not(.dark) .mob-refresh{background:#fff!important;border-color:#ddd!importa
   50%{background:linear-gradient(135deg,#111,#1a0d04);border-color:#f26522;box-shadow:0 0 18px rgba(242,101,34,.6)}
 }
 .lucky-tile{animation:luckyPulse 1.4s ease-in-out infinite;border:2px solid #f26522!important}
-.lucky-hint{font-size:10px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .3s ease}
 #view-biz{display:none}
 
 /* Categories Grid */
@@ -524,7 +523,7 @@ async function renderCatGrid(){
     <div class="cat-tile lucky-tile" onclick="location.href='lucky.html'">
       <div class="cat-tile-icon">🎁</div>
       <div class="cat-tile-label" style="color:#fff;font-weight:900">جرّب حظك</div>
-      <div class="cat-tile-count lucky-hint" style="background:rgba(255,255,255,.15);color:#fff" id="lucky-hint">هدايا يومية</div>
+      <div class="cat-tile-count" style="background:rgba(255,255,255,.15);color:#fff">هدايا يومية</div>
     </div>` : "";
 
   const allTile = `
@@ -541,7 +540,6 @@ async function renderCatGrid(){
       <div class="cat-tile-count">${counts[c.id]} مشروع</div>
     </div>`).join("");
 
-  // ابدأ تدوير التلميحات دائماً إذا كان الزر ظاهراً
   if(hasLucky) startLuckyHints();
 }
 
