@@ -112,6 +112,11 @@ body{font-family:"Cairo",sans-serif;background:var(--bg);color:#fff;min-height:1
       <div class="prize-title" id="w-title"></div>
       <div class="prize-desc" id="w-desc"></div>
       <div class="coupon">
+        <div style="background:rgba(242,101,34,.1);border-radius:8px;padding:12px;margin-bottom:14px;border-right:3px solid var(--orange)">
+          <div style="font-size:14px;font-weight:900;color:var(--orange);margin-bottom:4px" id="w-prize-title"></div>
+          <div style="font-size:12px;color:#ccc;line-height:1.6;margin-bottom:6px" id="w-prize-desc"></div>
+          <div style="font-size:11px;color:#999">🏪 من <span id="w-prize-biz"></span></div>
+        </div>
         <div class="coupon-label">كود القسيمة</div>
         <div class="coupon-code" id="w-code"></div>
         <div class="coupon-expires" id="w-expires"></div>
@@ -303,6 +308,12 @@ function showWin(winData, isReplay){
   document.getElementById("w-bizcat").textContent  = getCatIcon(biz?.category)+" "+biz?.name||"";
   document.getElementById("w-title").textContent   = prize.title;
   document.getElementById("w-desc").textContent    = prize.description||"";
+  
+  // تفاصيل الجائزة في الكوبون
+  document.getElementById("w-prize-title").textContent = prize.title;
+  document.getElementById("w-prize-desc").textContent = prize.description||"";
+  document.getElementById("w-prize-biz").textContent = biz?.name || "دليل صفوى";
+  
   document.getElementById("w-code").textContent    = code;
   document.getElementById("w-expires").textContent = prize.expires_at
     ? "صالحة حتى: "+new Date(prize.expires_at).toLocaleDateString("ar-SA")
