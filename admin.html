@@ -1155,8 +1155,8 @@ function renderPrizes(){
     const winCount = WINNERS.filter(w=>w.prize_id===p.id).length;
     const status   = !p.active?"موقوف":p.remaining<=0?"نفدت":"نشطة";
     const statusColor = status==="نشطة"?"var(--gr)":status==="موقوف"?"var(--mu)":"#e05c5c";
-    // اسم المشروع — إما من businesses join أو من owner_name
-    const bizName = p.businesses?.name || p.owner_name || "—";
+    // اسم المشروع — من الحقل المخصص أو من الجدول
+    const bizName = p.business_name || p.businesses?.name || p.owner_name || "—";
     return `<tr>
       <td style="font-weight:700;font-size:13px">${esc(bizName)}</td>
       <td style="font-size:13px">${esc(p.title)}</td>
@@ -1179,7 +1179,7 @@ function renderWinners(){
   if(!WINNERS.length){ tbody.innerHTML=`<tr><td colspan="5"><div style="text-align:center;padding:24px;color:var(--mu)">لا يوجد فائزون بعد</div></td></tr>`; return; }
   tbody.innerHTML = WINNERS.map(w=>{
     const prize = PRIZES.find(p=>p.id===w.prize_id);
-    const bizName = prize?.businesses?.name || prize?.owner_name || "—";
+    const bizName = prize?.business_name || prize?.businesses?.name || prize?.owner_name || "—";
     return `<tr>
       <td style="font-size:13px;font-weight:700;color:var(--or);direction:ltr">${esc(w.code)}</td>
       <td style="font-size:13px;font-weight:700">${esc(bizName)}</td>
@@ -1197,7 +1197,7 @@ function renderWinners(){
 
 window.viewPrizeDetails = function viewPrizeDetails(id){
   const p = PRIZES.find(x=>x.id===id); if(!p) return;
-  alert(`📋 تفاصيل الجائزة\n\n🏪 المشروع: ${p.owner_name||"—"}\n📱 الجوال: ${p.owner_phone||"—"}\n\n🎁 الجائزة: ${p.title}\n\n📝 الوصف:\n${p.description||"—"}\n\n🔑 الكود: ${p.prize_code||"—"}\n📦 الكمية: ${p.quantity}\n📅 الانتهاء: ${p.expires_at||"غير محدد"}`);
+  alert(`📋 تفاصيل الجائزة\n\n🏪 المشروع: ${p.business_name||p.owner_name||"—"}\n👤 صاحب المشروع: ${p.owner_name||"—"}\n📱 الجوال: ${p.owner_phone||"—"}\n\n🎁 الجائزة: ${p.title}\n\n📝 الوصف:\n${p.description||"—"}\n\n🔑 الكود: ${p.prize_code||"—"}\n📦 الكمية: ${p.quantity}\n📅 الانتهاء: ${p.expires_at||"غير محدد"}`);
 }
 
 window.previewCoupon = function previewCoupon(code, bizName, prizeTitle){
