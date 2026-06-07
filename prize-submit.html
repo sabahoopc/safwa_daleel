@@ -29,7 +29,11 @@ textarea{height:80px;resize:vertical}
 .success-icon{font-size:64px;margin-bottom:16px}
 .success-title{font-size:22px;font-weight:900;color:var(--orange);margin-bottom:10px}
 .success-sub{font-size:14px;color:var(--muted);line-height:1.8}
-.info-box{background:#fff8f0;border:1px solid #fde4c8;border-radius:10px;padding:14px;margin-bottom:20px;font-size:13px;color:#555;line-height:1.8}
+.dropdown-wrap{position:relative;margin-bottom:14px}
+.dropdown-list{display:none;position:absolute;top:100%;right:0;left:0;background:#fff;border:1px solid var(--orange);border-radius:9px;z-index:99;max-height:200px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.dropdown-item{padding:11px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.dropdown-item:hover{background:#fff8f0}
+.dropdown-item:last-child{border-bottom:none}
 </style>
 </head>
 <body>
@@ -59,7 +63,15 @@ textarea{height:80px;resize:vertical}
       <label>البريد الإلكتروني</label>
       <input id="p-email" type="email" dir="ltr" placeholder="example@gmail.com">
       <label>اسم مشروعك في الدليل <span class="req">*</span></label>
-      <input id="p-bizname" placeholder="مطعم الأصيل، مقهى لمة...">
+      <div class="dropdown-wrap">
+        <input id="p-bizname-search" placeholder="ابحث عن اسم مشروعك..." autocomplete="off"
+          oninput="filterBiz()" onfocus="showBizList()" onblur="hideBizList()"
+          style="margin-bottom:0">
+        <input type="hidden" id="p-bizid">
+        <input type="hidden" id="p-bizname">
+        <div class="dropdown-list" id="biz-dropdown"></div>
+      </div>
+      <div class="hint" style="margin-top:-10px">اختر مشروعك من القائمة — إذا لم يظهر فتأكد أنه مسجّل في <a href="/" style="color:var(--orange)">دليل صفوى</a> أولاً</div>
     </div>
 
     <!-- تفاصيل الجائزة -->
@@ -107,10 +119,65 @@ textarea{height:80px;resize:vertical}
 const SUPA_URL = "https://nymirlsjshrykhgxrylr.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55bWlybHNqc2hyeWtoZ3hyeWxyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNzU5NzMsImV4cCI6MjA5NDg1MTk3M30.-Ow1WzfGBqvu6NRGXQoSJ_ai0cE6-1_DBDFq8bDsmX8";
 
+let ALL_BIZ = [];
+
+// تحميل المشاريع عند فتح الصفحة
+async function loadBiz(){
+  try{
+    const data = await fetch(
+      SUPA_URL+"/rest/v1/businesses?select=id,name,category&hidden=eq.false&order=name.asc",
+      {headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}
+    ).then(r=>r.json());
+    ALL_BIZ = data||[];
+  }catch(e){ console.warn("Could not load businesses"); }
+}
+
+function showBizList(){
+  buildBizList(document.getElementById("p-bizname-search").value);
+  document.getElementById("biz-dropdown").style.display="block";
+}
+
+function hideBizList(){
+  setTimeout(()=>{ document.getElementById("biz-dropdown").style.display="none"; }, 180);
+}
+
+function filterBiz(){
+  // إذا عدّل البحث أعد تعيين الاختيار
+  document.getElementById("p-bizid").value="";
+  document.getElementById("p-bizname").value="";
+  buildBizList(document.getElementById("p-bizname-search").value);
+  document.getElementById("biz-dropdown").style.display="block";
+}
+
+function buildBizList(q=""){
+  const dd = document.getElementById("biz-dropdown");
+  const filtered = q
+    ? ALL_BIZ.filter(b=>b.name.toLowerCase().includes(q.toLowerCase()))
+    : ALL_BIZ;
+  if(!filtered.length){
+    dd.innerHTML=`<div style="padding:12px;color:#999;font-size:13px;text-align:center">لا توجد نتائج</div>`;
+    return;
+  }
+  dd.innerHTML = filtered.slice(0,20).map(b=>`
+    <div class="dropdown-item" onmousedown="pickBiz(${b.id},'${b.name.replace(/'/g,"\\'")}')">
+      <span style="font-size:16px">🏪</span>
+      <span>${b.name}</span>
+    </div>`).join("");
+}
+
+function pickBiz(id, name){
+  document.getElementById("p-bizid").value = id;
+  document.getElementById("p-bizname").value = name;
+  document.getElementById("p-bizname-search").value = name;
+  document.getElementById("p-bizname-search").style.borderColor = "";
+  document.getElementById("biz-dropdown").style.display="none";
+}
+
 async function submitPrize(){
   const owner   = document.getElementById("p-owner").value.trim();
   const phone   = document.getElementById("p-phone").value.trim();
   const email   = document.getElementById("p-email").value.trim();
+  const bizid   = document.getElementById("p-bizid").value;
   const bizname = document.getElementById("p-bizname").value.trim();
   const title   = document.getElementById("p-title").value.trim();
   const desc    = document.getElementById("p-desc").value.trim();
@@ -123,6 +190,13 @@ async function submitPrize(){
   if(!owner||!phone||!bizname||!title||!desc||!code){
     errEl.style.display="block";
     errEl.textContent="⚠️ جميع الحقول المطلوبة يجب تعبئتها";
+    if(!bizname) document.getElementById("p-bizname-search").style.borderColor="#e05c5c";
+    return;
+  }
+  if(!bizid){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ يجب اختيار المشروع من القائمة";
+    document.getElementById("p-bizname-search").style.borderColor="#e05c5c";
     return;
   }
   if(code.length < 4){
@@ -140,7 +214,7 @@ async function submitPrize(){
       headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},
       body:JSON.stringify({
         owner_name:owner, owner_phone:phone, owner_email:email||null,
-        business_name:bizname,
+        business_id:parseInt(bizid), business_name:bizname,
         title, description:desc, prize_code:code,
         quantity:qty, remaining:qty,
         expires_at:expires||null,
@@ -156,6 +230,8 @@ async function submitPrize(){
     errEl.textContent="⚠️ تعذّر الإرسال، تحقق من اتصال الإنترنت";
   }
 }
+
+loadBiz();
 </script>
 </body>
 </html>
