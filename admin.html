@@ -89,6 +89,7 @@ window.mapFromDB = function mapFromDB(r) {
     mawthooqLicense:r.mawthooq_license||null,
     maaroofLicense:r.maaroof_license||null,
     freelanceLicense:r.freelance_license||null,
+    lat:r.lat||null, lng:r.lng||null,
   };
 }
 
@@ -125,6 +126,7 @@ window.saveToSupabase = async function saveToSupabase(biz) {
     mawthooq_license:data.mawthooqLicense||null,
     maaroof_license:data.maaroofLicense||null,
     freelance_license:data.freelanceLicense||null,
+    lat:data.lat||null, lng:data.lng||null,
   };
   console.log("saveToSupabase:", {id, type: typeof id, promoted: row.promoted, ad_text: row.ad_text, ad_grad: row.ad_grad});
   const numId = Number(id);
@@ -743,7 +745,21 @@ window.openEdit = async function openEdit(id) {
     <div><label class="flabel">الجوال</label><input class="finput" id="e-phone" value="${esc(b.phone)}" dir="ltr" type="tel"></div>
     <div><label class="flabel">الواتساب</label><input class="finput" id="e-wa" value="${esc(b.whatsapp)}" dir="ltr" type="tel"></div>
     <div><label class="flabel">الموقع / الحي *</label><input class="finput" id="e-loc" value="${esc(b.location)}"></div>
-    <div><label class="flabel">📍 Google Maps</label><input class="finput" id="e-maps" value="${esc(b.mapsUrl)}" dir="ltr"></div>
+    <div style="grid-column:1/-1">
+      <label class="flabel">📍 Google Maps</label>
+      <input class="finput" id="e-maps" value="${esc(b.mapsUrl)}" dir="ltr" placeholder="https://maps.app.goo.gl/..." oninput="autoExtractCoords()">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+        <div>
+          <label class="flabel" style="font-size:10px">خط العرض (Lat)</label>
+          <input class="finput" id="e-lat" value="${esc(b.lat||'')}" dir="ltr" placeholder="26.643..." type="number" step="any">
+        </div>
+        <div>
+          <label class="flabel" style="font-size:10px">خط الطول (Lng)</label>
+          <input class="finput" id="e-lng" value="${esc(b.lng||'')}" dir="ltr" placeholder="49.982..." type="number" step="any">
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--mu);margin-top:4px">إذا كان الرابط مختصراً، افتحه في Google Maps واستخرج الإحداثيات من شريط العنوان (@lat,lng)</div>
+    </div>
     <div style="grid-column:1/-1"><label class="flabel">الوصف</label><textarea class="finput" id="e-desc" style="height:66px;resize:vertical">${esc(b.description)}</textarea></div>
     <div style="grid-column:1/-1"><label class="flabel">الكلمات المفتاحية</label><input class="finput" id="e-tags" value="${esc((b.tags||[]).join("، "))}"></div>
     <div style="grid-column:1/-1"><label class="flabel">🌐 الموقع الإلكتروني</label><input class="finput" id="e-web" value="${esc(b.website)}" dir="ltr"></div>
@@ -842,6 +858,8 @@ window.saveEdit = async function saveEdit() {
   b.mawthooqLicense = document.getElementById("e-mawthooq")?.value.trim()||null;
   b.maaroofLicense  = document.getElementById("e-maaroof")?.value.trim()||null;
   b.freelanceLicense= document.getElementById("e-freelance")?.value.trim()||null;
+  b.lat = parseFloat(document.getElementById("e-lat")?.value)||null;
+  b.lng = parseFloat(document.getElementById("e-lng")?.value)||null;
   // الصور — إذا رُفعت جديدة تستبدل القديمة، إذا حُذفت تصبح null
   if (editLogoData)    b.logoData = editLogoData;
   if (editLogoCleared) b.logoData = null;
@@ -858,6 +876,21 @@ window.saveEdit = async function saveEdit() {
 }
 
 // ── Actions ───────────────────────────────
+window.autoExtractCoords = function autoExtractCoords(){
+  const url = document.getElementById("e-maps")?.value.trim();
+  if(!url) return;
+  let lat=null, lng=null;
+  let m = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(!m) m = url.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(!m) m = url.match(/ll=(-?\d+\.\d+),(-?\d+\.\d+)/);
+  if(m){ lat=m[1]; lng=m[2]; }
+  if(lat && lng){
+    document.getElementById("e-lat").value = lat;
+    document.getElementById("e-lng").value = lng;
+    toast("✅ تم استخراج الإحداثيات تلقائياً");
+  }
+}
+
 window.toggleHide = async function toggleHide(id) {
   const b=DB.find(x=>x.id===id); if(!b)return;
   b.hidden=!b.hidden;
