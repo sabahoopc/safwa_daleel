@@ -1272,9 +1272,15 @@ window.togglePrize = async function togglePrize(id, active){
 }
 
 window.deletePrize = async function deletePrize(id){
-  if(!confirm("حذف هذه الجائزة نهائياً؟")) return;
-  try{ await supa("lucky_prizes?id=eq."+id,"DELETE"); await loadLucky(); toast("🗑️ تم الحذف"); }
-  catch(e){ toast("❌ فشل",true); }
+  if(!confirm("حذف هذه الجائزة وكل سجلات الفائزين المرتبطة بها؟")) return;
+  try{
+    // احذف الفائزين أولاً
+    await supa("lucky_winners?prize_id=eq."+id,"DELETE");
+    // ثم احذف الجائزة
+    await supa("lucky_prizes?id=eq."+id,"DELETE");
+    await loadLucky();
+    toast("🗑️ تم الحذف");
+  }catch(e){ toast("❌ فشل: "+e.message,true); }
 }
 
 // ── Invoices ──────────────────────────────
