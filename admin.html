@@ -1203,7 +1203,7 @@ function renderWinners(){
         <div class="td-actions">
           <span style="font-size:12px;font-weight:700;color:${w.claimed?"var(--gr)":"var(--mu)"}">${w.claimed?"✅ مُستبدلت":"⏳ بانتظار"}</span>
           <button type="button" class="btn btn-ghost btn-sm" onclick="previewCoupon('${esc(w.code)}','${esc(bizName)}','${esc(w.lucky_prizes?.title||"")}')" title="معاينة الكوبون">🎟️</button>
-          ${!w.claimed?`<button type="button" class="btn btn-ghost btn-sm" style="color:#f0a000;border-color:#f0a00033" onclick="restoreWinner(${w.id},${w.prize_id})" title="إعادة للجوائز النشطة">↩️</button>`:""}
+          <button type="button" class="btn btn-ghost btn-sm" style="color:#f0a000;border-color:#f0a00033" onclick="restoreWinner(${w.id},${w.prize_id})" title="إعادة للجوائز النشطة">↩️</button>
         </div>
       </td>
     </tr>`;
