@@ -172,6 +172,15 @@ window.updateDashboard = function updateDashboard() {
   document.getElementById("st-active").textContent = DB.filter(b=>!b.hidden).length;
   document.getElementById("st-promo").textContent  = DB.filter(b=>b.promoted).length;
   document.getElementById("st-req").textContent    = REQUESTS.filter(r=>r.status==="pending").length;
+  // ضغطات جرب حظك اليوم
+  const today = new Date().toISOString().split("T")[0];
+  fetch(SUPA_URL+"/rest/v1/lucky_clicks?select=id&clicked_at=gte."+today+"T00:00:00",{
+    headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Prefer":"count=exact","Range":"0-0"}
+  }).then(r=>{
+    const count = r.headers.get("content-range")?.split("/")?.[1]||"0";
+    const el = document.getElementById("st-lucky");
+    if(el) el.textContent = count;
+  }).catch(()=>{});
   const recent = [...DB].slice(0,5);
   document.getElementById("recent-list").innerHTML = recent.length
     ? recent.map(b=>`<div class="r-item"><div class="r-logo">${b.logoData?`<img src="${b.logoData}">`:getCat(b.category).icon}</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${b.name}</div><div style="font-size:11px;color:var(--mu)">${getCat(b.category).label}</div></div>${b.promoted?`<span class="badge-promo">مميز</span>`:""}</div>`).join("")
@@ -1991,6 +2000,7 @@ tr:hover td{background:rgba(242,101,34,.04)}
     <div class="stat"><div class="stat-n" id="st-active" style="color:var(--gr)">0</div><div class="stat-l">مشروع نشط</div></div>
     <div class="stat"><div class="stat-n" id="st-promo">0</div><div class="stat-l">إعلان مميز</div></div>
     <div class="stat"><div class="stat-n" id="st-req" style="color:#f0a000">0</div><div class="stat-l">طلب معلّق</div></div>
+    <div class="stat"><div class="stat-n" id="st-lucky" style="color:var(--or)">0</div><div class="stat-l">🎁 ضغطات اليوم</div></div>
   </div>
   <div class="panel" style="margin-bottom:18px"><div style="font-size:14px;font-weight:700;margin-bottom:12px">آخر المشاريع</div><div id="recent-list"></div></div>
   <div class="panel" style="background:linear-gradient(135deg,#1f1005,#140a02);border-color:#7a3010">
