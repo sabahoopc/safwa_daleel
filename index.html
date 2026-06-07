@@ -48,7 +48,7 @@ body.dark header{background:linear-gradient(135deg,#111,#1a0d04)!important}
 body.dark .sb{background:#141414!important;border-color:#333!important}
 body.dark .si{color:#f0f0f0!important}
 body.dark .cat-tile{background:#1a1a1a!important;border-color:#252525!important;box-shadow:none!important}
-body.dark .lucky-tile,body:not(.dark) .lucky-tile{background:#f26522!important;border-color:#f26522!important}
+body.dark .lucky-tile,body:not(.dark) .lucky-tile{background:linear-gradient(135deg,#f26522,#ff8c42)!important;border:2px solid #f26522!important}
 body.dark .cat-tile-label{color:#f0f0f0!important}
 body.dark .cat-tile-count{background:#141414!important;color:#777!important}
 body.dark .card{background:#1a1a1a!important;border-color:#252525!important}
@@ -154,8 +154,8 @@ body:not(.dark) .mob-refresh{background:#fff!important;border-color:#ddd!importa
 .cb{background:none;border:none;color:var(--muted);font-size:12px}
 
 @keyframes luckyPulse{
-  0%,100%{background:#f26522;box-shadow:0 0 12px rgba(242,101,34,.6)}
-  50%{background:#111;box-shadow:0 0 20px rgba(242,101,34,.9)}
+  0%,100%{box-shadow:0 0 8px rgba(242,101,34,.5),0 0 0 0 rgba(242,101,34,0)}
+  50%{box-shadow:0 0 24px rgba(242,101,34,1),0 0 0 6px rgba(242,101,34,.3)}
 }
 .lucky-tile{animation:luckyPulse 1.4s ease-in-out infinite!important;border:2px solid #f26522!important}
 #view-biz{display:none}
