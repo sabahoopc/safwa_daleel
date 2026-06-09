@@ -98,7 +98,43 @@ button{font-family:"Cairo",sans-serif;cursor:pointer}
 
 /* ── Layout ── */
 .main{max-width:1100px;margin:0 auto;padding:20px 20px 80px;display:grid;grid-template-columns:1fr 280px;gap:20px}
-@media(max-width:768px){.main{grid-template-columns:1fr;padding:14px 12px 80px}.topbar-actions{display:none}.hero-stats{display:none}.hero-search-inner input{font-size:14px}}
+@media(max-width:768px){
+  .main{grid-template-columns:1fr;padding:12px 12px 80px}
+  .topbar-actions{display:none}
+  .hero-stats{display:none}
+  .hero-search-inner input{font-size:14px}
+  /* هيدر الجوال */
+  .topbar{padding:10px 14px}
+  .topbar-logo{order:2;margin:0 auto}
+  .topbar-logo .topbar-sub{display:none}
+  .topbar-search{display:none}
+  .topbar-mob-btns{display:flex;gap:8px;order:1}
+  .topbar-mob-btns-r{display:flex;gap:8px;order:3}
+  /* Hero الجوال */
+  .hero{padding:20px 16px 22px}
+  .hero-text h1{font-size:26px}
+  /* إحصائيات منفصلة */
+  .mob-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;background:var(--bg)}
+  /* تصنيفات شبكة */
+  .mob-cats-section{background:var(--card);padding:14px 12px;border-bottom:1px solid var(--border);display:block}
+  .mob-cats-section .sec-label{margin-bottom:10px}
+  .mob-cats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .mob-cat-tile{background:var(--bg);border:1px solid var(--border2);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;transition:.15s}
+  .mob-cat-tile.active{background:var(--orange);border-color:var(--orange)}
+  .mob-cat-tile:hover{border-color:var(--orange)}
+  .mob-cat-tile .icon{font-size:22px;margin-bottom:4px}
+  .mob-cat-tile .label{font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mob-cat-tile .count{font-size:10px;color:var(--muted)}
+  .mob-cat-tile.active .label,.mob-cat-tile.active .count{color:#fff}
+  /* إخفاء شريط التصنيفات على الجوال */
+  .cats-bar-wrap{display:none}
+  /* بانر lucky على الجوال */
+  .mob-lucky-banner{margin:0 12px 14px;background:linear-gradient(135deg,#FFE66D,#FFBC42);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+  /* بطاقات عمود واحد */
+  .cards-grid{grid-template-columns:1fr}
+  /* إخفاء sidebar */
+  .sidebar{display:none}
+}
 
 /* ── Section Label ── */
 .sec-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -285,6 +321,10 @@ button{font-family:"Cairo",sans-serif;cursor:pointer}
 
 <!-- Topbar -->
 <div class="topbar">
+  <div class="topbar-mob-btns">
+    <button class="topbar-btn" style="padding:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px" onclick="document.getElementById('mob-search-bar').classList.toggle('show')">🔍</button>
+    <button class="topbar-btn" style="padding:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px">🔔</button>
+  </div>
   <div class="topbar-logo">
     <div class="topbar-icon">🏙️</div>
     <div>
@@ -302,7 +342,22 @@ button{font-family:"Cairo",sans-serif;cursor:pointer}
     <button class="topbar-btn lucky" onclick="location.href='lucky.html'">🎁 جرّب حظك</button>
     <button class="add-btn" onclick="openM('form')">➕ أضف مشروعك</button>
   </div>
+  <div class="topbar-mob-btns-r">
+    <button class="add-btn" style="padding:8px 12px;font-size:11px" onclick="openM('form')">➕ أضف</button>
+  </div>
 </div>
+<!-- Mobile search bar -->
+<div id="mob-search-bar" style="background:var(--card);padding:10px 14px;border-bottom:1px solid var(--border);display:none">
+  <div style="background:var(--bg);border:1px solid var(--border2);border-radius:11px;padding:9px 14px;display:flex;align-items:center;gap:8px">
+    <span>🔍</span>
+    <input style="flex:1;background:none;border:none;outline:none;font-size:14px;font-family:'Cairo',sans-serif;color:var(--text)" placeholder="ابحث عن مشروع..." oninput="onSearch(this.value)" id="mob-search-input">
+  </div>
+</div>
+<style>
+#mob-search-bar.show{display:block}
+.topbar-mob-btns,.topbar-mob-btns-r{display:none}
+@media(max-width:768px){.topbar-mob-btns,.topbar-mob-btns-r{display:flex}.topbar-logo{order:2;margin:0 auto}}
+</style>
 
 <!-- Visitor bar -->
 <div class="visitor-bar">👁️ زار الدليل <span id="visitor-count">...</span> مرة</div>
@@ -329,11 +384,45 @@ button{font-family:"Cairo",sans-serif;cursor:pointer}
   </div>
 </div>
 
-<!-- Categories Bar -->
+<!-- Categories Bar (desktop) -->
 <div class="cats-bar-wrap">
   <button class="arrow arrow-r hidden" id="cats-arrow-r" onclick="scrollCats(-1)" aria-label="يمين">›</button>
   <div class="cats-bar" id="cats-bar" onscroll="updateCatsArrows()"></div>
   <button class="arrow arrow-l hidden" id="cats-arrow-l" onclick="scrollCats(1)" aria-label="يسار">‹</button>
+</div>
+
+<!-- Mobile Stats -->
+<div class="mob-stats" id="mob-stats" style="display:none">
+  <div style="background:#F0FFF4;border:1px solid #B2F2BB;border-radius:12px;padding:12px;text-align:center">
+    <div style="font-size:18px;font-weight:700;color:#2DA44E" id="mob-visit-n">...</div>
+    <div style="font-size:10px;color:#2DA44E">زيارة</div>
+  </div>
+  <div style="background:#F0F9FF;border:1px solid #BAE0FF;border-radius:12px;padding:12px;text-align:center">
+    <div style="font-size:18px;font-weight:700;color:#0096D6" id="mob-cat-n">...</div>
+    <div style="font-size:10px;color:#0096D6">تصنيف</div>
+  </div>
+  <div style="background:#FFF5F0;border:1px solid #FFD5C0;border-radius:12px;padding:12px;text-align:center">
+    <div style="font-size:18px;font-weight:700;color:var(--orange)" id="mob-biz-n">...</div>
+    <div style="font-size:10px;color:var(--orange)">مشروع</div>
+  </div>
+</div>
+
+<!-- Mobile Cats Grid -->
+<div class="mob-cats-section" id="mob-cats-section" style="display:none">
+  <div class="sec-label">
+    <div class="sec-title">التصنيفات</div>
+    <div class="sec-more" onclick="selectCat('all', document.querySelector('.mob-cat-tile[data-cat=all]'))">عرض الكل</div>
+  </div>
+  <div class="mob-cats-grid" id="mob-cats-grid"></div>
+</div>
+
+<!-- Mobile Lucky Banner -->
+<div class="mob-lucky-banner" id="mob-lucky-banner" style="display:none">
+  <div>
+    <div style="font-size:13px;font-weight:700;color:#7A4500">🎁 جرّب حظك اليوم!</div>
+    <div style="font-size:10px;color:#9A5500;margin-top:2px">هدايا يومية من تجار صفوى</div>
+  </div>
+  <div style="background:rgba(0,0,0,0.12);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#5A3300;cursor:pointer" onclick="location.href='lucky.html'">جرّب ←</div>
 </div>
 
 <!-- Main -->
@@ -578,8 +667,18 @@ async function load(){
   document.getElementById("hero-cat-count").textContent=new Set(ALL.map(b=>b.category)).size;
   document.getElementById("hero-visit-count").textContent=fmt(visitCount);
 
+  // Mobile stats
+  const isMob=window.innerWidth<=768;
+  if(isMob){
+    document.getElementById("mob-stats").style.display="grid";
+    document.getElementById("mob-visit-n").textContent=fmt(visitCount);
+    document.getElementById("mob-cat-n").textContent=new Set(ALL.map(b=>b.category)).size;
+    document.getElementById("mob-biz-n").textContent=ALL.length;
+  }
+
   trackVisit();
   buildCatsBar();
+  buildMobCats();
   renderAll();
   initBanner();
   loadPopupAd();
@@ -587,11 +686,48 @@ async function load(){
   checkLucky();
 }
 
+// ── Mobile Cats Grid ─────────────────────
+function buildMobCats(){
+  if(window.innerWidth>768) return;
+  const usedCats=CATS.filter(c=>ALL.some(b=>b.category===c.id));
+  const sec=document.getElementById("mob-cats-section");
+  const grid=document.getElementById("mob-cats-grid");
+  if(!sec||!grid) return;
+  sec.style.display="block";
+  grid.innerHTML=`<div class="mob-cat-tile active" data-cat="all" onclick="selectMobCat('all',this)">
+    <div class="icon">🗂️</div>
+    <div class="label">الكل</div>
+    <div class="count">${ALL.length}</div>
+  </div>`+usedCats.slice(0,11).map(c=>{
+    const n=ALL.filter(b=>b.category===c.id).length;
+    return `<div class="mob-cat-tile" data-cat="${c.id}" onclick="selectMobCat('${c.id}',this)">
+      <div class="icon">${c.icon}</div>
+      <div class="label">${c.label}</div>
+      <div class="count">${n}</div>
+    </div>`;
+  }).join("");
+}
+
+function selectMobCat(cat,el){
+  activeCat=cat;
+  document.querySelectorAll(".mob-cat-tile").forEach(c=>c.classList.remove("active"));
+  el.classList.add("active");
+  renderAll();
+  // scroll to results
+  document.getElementById("main-grid").scrollIntoView({behavior:"smooth",block:"start"});
+}
+
 // ── Check Lucky ───────────────────────────
 async function checkLucky(){
   try{
     const prizes=await fetch(SUPA_URL+"/rest/v1/lucky_prizes?select=id&status=eq.approved&limit=1",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json());
-    if(prizes?.length>0) document.getElementById("sidebar-lucky").style.display="block";
+    if(prizes?.length>0){
+      document.getElementById("sidebar-lucky").style.display="block";
+      const mobBanner=document.getElementById("mob-lucky-banner");
+      if(mobBanner) mobBanner.style.display="flex";
+      // أضف lucky chip في شريط التصنيفات
+      buildCatsBar();
+    }
   }catch(e){}
 }
 
