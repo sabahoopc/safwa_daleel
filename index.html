@@ -956,28 +956,36 @@ function goBanner(idx){
 // ── Popup Ad ──────────────────────────────
 async function loadPopupAd(){
   try{
+    const ads=await fetch(SUPA_URL+"/rest/v1/popup_ads?select=*,businesses(id,name,category,whatsapp,phone,logo_data)&active=eq.true",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json());
+    if(!ads?.length) return;
+    // فلتر التاريخ محلياً
     const today=new Date().toISOString().split("T")[0];
-    const ads=await fetch(SUPA_URL+"/rest/v1/popup_ads?select=*,businesses(name,category,whatsapp,phone,logo_data)&active=eq.true&start_date=lte."+today+"&end_date=gte."+today,{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json());
-    if(!ads?.length)return;
-    const ad=ads[Math.floor(Math.random()*ads.length)];
+    const active=ads.filter(a=>{
+      const start=a.start_date?a.start_date.split("T")[0]:"2000-01-01";
+      const end=a.end_date?a.end_date.split("T")[0]:"2099-12-31";
+      return start<=today && today<=end;
+    });
+    if(!active.length) return;
+    const ad=active[Math.floor(Math.random()*active.length)];
     const biz=ad.businesses;
-    if(!biz)return;
+    if(!biz) return;
     const cat=getCat(biz.category);
     const waLink=biz.whatsapp?`https://wa.me/${biz.whatsapp.replace(/\D/g,"")}`:biz.phone?`https://wa.me/${biz.phone.replace(/\D/g,"")}`:"";
     document.getElementById("popup-content").innerHTML=`
       <div class="popup-img-wrap">
-        ${ad.ad_image?`<img src="${ad.ad_image}" alt="">`:`<div class="popup-icon" style="background:linear-gradient(135deg,var(--orange-light),var(--bg))">${cat.icon}</div>`}
+        ${ad.ad_image?`<img src="${ad.ad_image}" alt="" style="width:100%;height:auto;display:block">`:`<div class="popup-icon" style="background:linear-gradient(135deg,var(--orange-light),var(--bg));height:180px">${cat.icon}</div>`}
       </div>
       <div class="popup-body">
         <div class="popup-biz-name">${esc(biz.name)}</div>
-        <div class="popup-ad-text">${ad.ad_text?esc(ad.ad_text):"عرض خاص لزوار دليل صفوى!"}</div>
+        <div class="popup-ad-text">${ad.description?esc(ad.description):ad.title?esc(ad.title):"عرض خاص لزوار دليل صفوى!"}</div>
         <div class="popup-btns">
           ${waLink?`<a href="${waLink}" target="_blank" class="sheet-btn sheet-btn-wa" style="flex:1">💬 واتساب</a>`:""}
-          <button class="sheet-btn sheet-btn-share" style="flex:1" onclick="closePopup()">ربما لاحقاً</button>
+          <button class="sheet-btn sheet-btn-detail" style="flex:1;background:var(--orange-light);border-color:var(--orange-border);color:var(--orange)" onclick="closePopup();openBiz(${biz.id})">🏪 تفاصيل المشروع</button>
         </div>
+        <button class="sheet-btn sheet-btn-share" style="width:100%;margin-top:8px" onclick="closePopup()">ربما لاحقاً</button>
       </div>`;
     setTimeout(()=>document.getElementById("popup-overlay").classList.add("show"),2000);
-  }catch(e){}
+  }catch(e){ console.warn("Popup error:",e); }
 }
 function closePopup(){document.getElementById("popup-overlay").classList.remove("show");}
 
