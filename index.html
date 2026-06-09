@@ -81,7 +81,13 @@ button{font-family:"Cairo",sans-serif;cursor:pointer}
 .hero-search-inner input{flex:1;border:none;outline:none;font-size:13px;font-family:"Cairo",sans-serif;background:none;color:var(--text)}
 
 /* ── Categories ── */
-.cats-bar{background:var(--card);border-bottom:1px solid var(--border);padding:10px 20px;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.cats-bar-wrap{background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;position:relative}
+.cats-bar-wrap .arrow{width:36px;height:100%;min-height:44px;display:flex;align-items:center;justify-content:center;background:var(--card);border:none;cursor:pointer;font-size:16px;color:var(--text2);flex-shrink:0;transition:.15s;z-index:2}
+.cats-bar-wrap .arrow:hover{color:var(--orange)}
+.cats-bar-wrap .arrow.hidden{opacity:0;pointer-events:none}
+.cats-bar-wrap .arrow-r{border-left:1px solid var(--border)}
+.cats-bar-wrap .arrow-l{border-right:1px solid var(--border)}
+.cats-bar{flex:1;padding:10px 8px;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
 .cats-bar::-webkit-scrollbar{display:none}
 .cat-chip{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--text2);margin-left:6px;cursor:pointer;transition:.15s;white-space:nowrap;font-family:"Cairo",sans-serif}
 .cat-chip:first-child{margin-right:0}
@@ -324,7 +330,11 @@ button{font-family:"Cairo",sans-serif;cursor:pointer}
 </div>
 
 <!-- Categories Bar -->
-<div class="cats-bar" id="cats-bar"></div>
+<div class="cats-bar-wrap">
+  <button class="arrow arrow-r hidden" id="cats-arrow-r" onclick="scrollCats(-1)" aria-label="يمين">›</button>
+  <div class="cats-bar" id="cats-bar" onscroll="updateCatsArrows()"></div>
+  <button class="arrow arrow-l hidden" id="cats-arrow-l" onclick="scrollCats(1)" aria-label="يسار">‹</button>
+</div>
 
 <!-- Main -->
 <div class="main">
@@ -599,6 +609,24 @@ function buildCatsBar(){
     html+=`<span class="cat-chip" onclick="selectCat('${c.id}',this)">${c.icon} ${c.label} (${n})</span>`;
   });
   bar.innerHTML=html;
+  // تحديث السهمين بعد الرسم
+  setTimeout(updateCatsArrows, 50);
+}
+
+function scrollCats(dir){
+  const bar=document.getElementById("cats-bar");
+  bar.scrollBy({left:dir*200,behavior:"smooth"});
+}
+function updateCatsArrows(){
+  const bar=document.getElementById("cats-bar");
+  const arrowR=document.getElementById("cats-arrow-r");
+  const arrowL=document.getElementById("cats-arrow-l");
+  if(!bar||!arrowR||!arrowL)return;
+  // في RTL: scrollLeft سالب في بعض المتصفحات
+  const scrollLeft=Math.abs(bar.scrollLeft);
+  const maxScroll=bar.scrollWidth-bar.clientWidth;
+  arrowR.classList.toggle("hidden", scrollLeft<=2);
+  arrowL.classList.toggle("hidden", scrollLeft>=maxScroll-2);
 }
 
 function selectCat(cat,el){
