@@ -655,13 +655,14 @@ async function load(){
   const [bizData,customCats,statsData]=await Promise.all([
     fetch(SUPA_URL+"/rest/v1/businesses?select=id,name,category,phone,whatsapp,location,maps_url,description,tags,website,instagram,twitter,snapchat,tiktok,promoted,badge,ad_text,ad_grad,likes_count,mawthooq_license,maaroof_license,freelance_license&hidden=eq.false&order=promoted.desc,created_at.desc",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
     fetch(SUPA_URL+"/rest/v1/custom_categories?select=*",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
-    fetch(SUPA_URL+"/rest/v1/site_stats?select=value&key=eq.visitor_count",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
+    fetch(SUPA_URL+"/rest/v1/site_stats?select=*",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()).catch(()=>[]),
   ]);
 
   ALL=bizData||[];
   if(customCats?.length) CATS=[...DEF_CATS,...customCats.map(c=>({id:String(c.id),label:c.label,icon:c.icon||"📌"}))];
 
-  const visitCount=parseInt(statsData?.[0]?.value||"0");
+  const statsRow=(statsData||[]).find(x=>x.key==="visitor_count")||(statsData||[])[0];
+  const visitCount=parseInt(statsRow?.value||"0");
   const fmt=n=>n>=1000?(n/1000).toFixed(1)+"k":n;
   document.getElementById("visitor-count").textContent=fmt(visitCount);
   document.getElementById("hero-biz-count").textContent=ALL.length;
@@ -965,7 +966,7 @@ async function loadPopupAd(){
     const waLink=biz.whatsapp?`https://wa.me/${biz.whatsapp.replace(/\D/g,"")}`:biz.phone?`https://wa.me/${biz.phone.replace(/\D/g,"")}`:"";
     document.getElementById("popup-content").innerHTML=`
       <div class="popup-img-wrap">
-        ${ad.image_data?`<img src="${ad.image_data}" alt="">`:`<div class="popup-icon" style="background:linear-gradient(135deg,var(--orange-light),var(--bg))">${cat.icon}</div>`}
+        ${ad.ad_image?`<img src="${ad.ad_image}" alt="">`:`<div class="popup-icon" style="background:linear-gradient(135deg,var(--orange-light),var(--bg))">${cat.icon}</div>`}
       </div>
       <div class="popup-body">
         <div class="popup-biz-name">${esc(biz.name)}</div>
