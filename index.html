@@ -1057,35 +1057,81 @@ function renderForm(){
         <div class="price-desc">ظهور في أعلى النتائج والبانر</div>
       </div>
     </div>
+
     <label class="flabel">اسم المشروع <span style="color:var(--orange)">*</span></label>
     <input class="finput" id="f-name" placeholder="مطعم الأصيل...">
+
     <label class="flabel">التصنيف <span style="color:var(--orange)">*</span></label>
     <div class="cat-dropdown-wrap">
       <input class="finput" id="f-cat-search" placeholder="اختر التصنيف..." autocomplete="off" style="margin-bottom:0" oninput="filterFormCat()" onfocus="showFormCatList()" onblur="hideFormCatList()">
       <div class="cat-dropdown-list" id="f-cat-list"></div>
     </div>
-    <label class="flabel">رقم الجوال <span style="color:var(--orange)">*</span></label>
+
+    <div id="f-mawthooq-wrap" style="display:none">
+      <label class="flabel">رقم رخصة موثوق <span style="color:var(--orange)">*</span></label>
+      <input class="finput" id="f-mawthooq" placeholder="رقم الرخصة من منصة موثوق" dir="ltr">
+      <div style="font-size:11px;color:#e05c5c;margin-top:-8px;margin-bottom:12px">⚠️ مطلوب للمشاريع الإعلانية — تحقق من رخصتك على <a href="https://mawthooq.com" target="_blank" style="color:var(--orange)">mawthooq.com</a></div>
+    </div>
+
+    <label class="flabel">رقم تسجيل معروف <span style="color:var(--muted);font-weight:400">(اختياري — للأسر المنتجة)</span></label>
+    <input class="finput" id="f-maaroof" placeholder="رقم حسابك في منصة معروف" dir="ltr">
+
+    <label class="flabel">جوال المشروع <span style="color:var(--orange)">*</span></label>
     <input class="finput" id="f-phone" type="tel" dir="ltr" placeholder="05xxxxxxxx">
+
     <label class="flabel">واتساب (اختياري)</label>
     <input class="finput" id="f-wa" type="tel" dir="ltr" placeholder="05xxxxxxxx">
-    <label class="flabel">الحي / الموقع</label>
-    <input class="finput" id="f-loc" placeholder="الحي الشرقي، وسط البلد...">
-    <label class="flabel">وصف المشروع</label>
-    <textarea class="ftextarea" id="f-desc" placeholder="اكتب نبذة عن مشروعك..."></textarea>
-    <label class="flabel">رابط Google Maps</label>
+
+    <label class="flabel">الحي / الموقع في صفوى <span style="color:var(--orange)">*</span></label>
+    <input class="finput" id="f-loc" placeholder="حي النخيل، الشارع الرئيسي...">
+    <div style="font-size:11px;color:#e05c5c;margin-top:-8px;margin-bottom:12px">⚠️ يجب أن يكون المشروع داخل مدينة صفوى</div>
+
+    <label class="flabel">📍 رابط Google Maps (اختياري)</label>
     <input class="finput" id="f-maps" dir="ltr" placeholder="https://maps.app.goo.gl/...">
-    <label class="flabel">البريد الإلكتروني <span style="color:var(--orange)">*</span></label>
-    <input class="finput" id="f-email" type="email" dir="ltr" placeholder="example@gmail.com">
+
+    <label class="flabel">وصف المشروع</label>
+    <textarea class="ftextarea" id="f-desc" placeholder="نبذة عن ما تقدمه..."></textarea>
+
+    <label class="flabel" style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px">التواصل الاجتماعي (اختياري)</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><label class="flabel">📸 Instagram</label><input class="finput" id="f-ig" placeholder="https://instagram.com/..." dir="ltr"></div>
+      <div><label class="flabel">👻 Snapchat</label><input class="finput" id="f-sc" placeholder="https://snapchat.com/add/..." dir="ltr"></div>
+      <div><label class="flabel">𝕏 Twitter</label><input class="finput" id="f-tw" placeholder="https://x.com/..." dir="ltr"></div>
+      <div><label class="flabel">🎵 TikTok</label><input class="finput" id="f-tt" placeholder="https://tiktok.com/@..." dir="ltr"></div>
+    </div>
+    <label class="flabel">🌐 الموقع الإلكتروني</label>
+    <input class="finput" id="f-web" placeholder="https://..." dir="ltr">
+
     <label class="flabel">شعار المشروع</label>
     <div class="file-box" onclick="document.getElementById('f-logo').click()">
-      <div id="f-logo-box">📷</div>
+      <div id="f-logo-box">🏷️</div>
       <div class="file-box-label">اضغط لرفع الشعار</div>
     </div>
     <input type="file" id="f-logo" accept="image/*" style="display:none" onchange="prevFile(this,'f-logo-box',true)">
+
+    <label class="flabel" style="margin-top:4px">صورة المنتجات / القائمة</label>
+    <div class="file-box" onclick="document.getElementById('f-img').click()">
+      <div id="f-img-box">📷</div>
+      <div class="file-box-label">اضغط لرفع صورة</div>
+    </div>
+    <input type="file" id="f-img" accept="image/*" style="display:none" onchange="prevFile(this,'f-img-box',false)">
+
+    <label class="flabel" style="margin-top:4px">شهادة العمل الحر <span style="color:var(--muted);font-weight:400">(اختياري)</span></label>
+    <input class="finput" id="f-freelance" placeholder="رقم شهادة العمل الحر إن وجدت" dir="ltr">
+
+    <label class="flabel">البريد الإلكتروني <span style="color:var(--orange)">*</span></label>
+    <input class="finput" id="f-email" type="email" dir="ltr" placeholder="example@gmail.com">
+
+    <div class="check-row">
+      <input type="checkbox" id="f-promo">
+      <label for="f-promo" style="cursor:pointer;font-size:13px">🚀 أريد الإعلان المميز — <strong>٥٠ ريال / شهر</strong></label>
+    </div>
+
     <div class="check-row">
       <input type="checkbox" id="f-agree">
       <label for="f-agree">أوافق على <a href="/terms.html" target="_blank" style="color:var(--orange)">شروط وأحكام</a> دليل صفوى وأتعهد بصحة المعلومات</label>
     </div>
+
     <div class="err-msg" id="f-err"></div>
     <div class="modal-foot" style="padding:0;border:none">
       <button class="btn-or" onclick="submitReq()">📤 إرسال الطلب</button>
@@ -1102,7 +1148,14 @@ function buildFormCatList(q){
 function showFormCatList(){document.getElementById("f-cat-list").classList.add("show");buildFormCatList("");}
 function hideFormCatList(){setTimeout(()=>document.getElementById("f-cat-list")?.classList.remove("show"),180);}
 function filterFormCat(){buildFormCatList(document.getElementById("f-cat-search").value);document.getElementById("f-cat-list").classList.add("show");}
-function pickFormCat(id,label){formCatId=id;formCatLabel=label;document.getElementById("f-cat-search").value=label;document.getElementById("f-cat-list").classList.remove("show");}
+function pickFormCat(id,label){
+  formCatId=id;formCatLabel=label;
+  document.getElementById("f-cat-search").value=label;
+  document.getElementById("f-cat-list").classList.remove("show");
+  // إظهار موثوق للإعلانات فقط
+  const mwWrap=document.getElementById("f-mawthooq-wrap");
+  if(mwWrap) mwWrap.style.display=id==="ads"?"block":"none";
+}
 
 function prevFile(inp,boxId,isLogo){
   const f=inp.files[0];if(!f)return;
@@ -1114,7 +1167,6 @@ function prevFile(inp,boxId,isLogo){
   };
   r.readAsDataURL(f);
 }
-
 async function submitReq(){
   const name=document.getElementById("f-name").value.trim();
   const phone=document.getElementById("f-phone").value.trim();
@@ -1129,11 +1181,23 @@ async function submitReq(){
   try{
     await fetch(SUPA_URL+"/rest/v1/submission_requests",{method:"POST",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({
       business_name:name, category:formCatId, phone,
-      whatsapp:document.getElementById("f-wa").value.trim()||null,
-      location:document.getElementById("f-loc").value.trim()||null,
-      description:document.getElementById("f-desc").value.trim()||null,
-      maps_url:document.getElementById("f-maps").value.trim()||null,
-      owner_email:email, logo_data:formLogoData||null, status:"pending"
+      whatsapp:document.getElementById("f-wa")?.value.trim()||null,
+      location:document.getElementById("f-loc")?.value.trim()||null,
+      description:document.getElementById("f-desc")?.value.trim()||null,
+      maps_url:document.getElementById("f-maps")?.value.trim()||null,
+      owner_email:email,
+      instagram:document.getElementById("f-ig")?.value.trim()||null,
+      twitter:document.getElementById("f-tw")?.value.trim()||null,
+      snapchat:document.getElementById("f-sc")?.value.trim()||null,
+      tiktok:document.getElementById("f-tt")?.value.trim()||null,
+      website:document.getElementById("f-web")?.value.trim()||null,
+      mawthooq_license:document.getElementById("f-mawthooq")?.value.trim()||null,
+      maaroof_license:document.getElementById("f-maaroof")?.value.trim()||null,
+      freelance_license:document.getElementById("f-freelance")?.value.trim()||null,
+      wants_promoted:document.getElementById("f-promo")?.checked||false,
+      logo_data:formLogoData||null,
+      img_data:formImgData||null,
+      status:"pending"
     })});
     sendConfirmEmail(email,name,name);
     document.getElementById("form-body").innerHTML=`<div style="text-align:center;padding:32px 16px"><div style="font-size:56px;margin-bottom:14px">🎉</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">تم إرسال طلبك!</div><div style="font-size:13px;color:var(--muted)">سيتم مراجعته والتواصل معك خلال 24 ساعة</div></div>`;
