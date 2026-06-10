@@ -731,8 +731,6 @@ async function checkLucky(){
       document.getElementById("sidebar-lucky").style.display="block";
       const mobBanner=document.getElementById("mob-lucky-banner");
       if(mobBanner) mobBanner.style.display="flex";
-      // أضف lucky chip في شريط التصنيفات
-      buildCatsBar();
     }
   }catch(e){}
 }
@@ -752,8 +750,7 @@ function buildCatsBar(){
 
 function scrollCats(dir){
   const bar=document.getElementById("cats-bar");
-  // RTL: اتجاه السحب معكوس
-  bar.scrollBy({left:-dir*200,behavior:"smooth"});
+  bar.scrollBy({left:dir*200,behavior:"smooth"});
 }
 
 function updateCatsArrows(){
@@ -761,10 +758,19 @@ function updateCatsArrows(){
   const arrowR=document.getElementById("cats-arrow-r");
   const arrowL=document.getElementById("cats-arrow-l");
   if(!bar||!arrowR||!arrowL)return;
-  const scrollLeft=Math.abs(bar.scrollLeft);
-  const maxScroll=bar.scrollWidth-bar.clientWidth;
-  arrowR.classList.toggle("hidden", scrollLeft>=maxScroll-2);
-  arrowL.classList.toggle("hidden", scrollLeft<=2);
+  const max=bar.scrollWidth-bar.clientWidth;
+  if(max<=0){arrowR.classList.add("hidden");arrowL.classList.add("hidden");return;}
+  // RTL: scroll يبدأ من اليمين — في بداية الصفحة scrollLeft=0 أو max حسب المتصفح
+  const sl=bar.scrollLeft;
+  // نعمل مع القيمة المطلقة ونحدد الاتجاه
+  const absLeft=Math.round(Math.abs(sl));
+  // في RTL: scrollLeft=0 = أقصى اليمين (البداية)، scrollLeft=-max أو max = أقصى اليسار
+  const atStart=absLeft<=2;
+  const atEnd=absLeft>=max-2;
+  // سهم اليسار (للانتقال يساراً = نحو نهاية القائمة)
+  arrowL.classList.toggle("hidden", atEnd);
+  // سهم اليمين (للرجوع يميناً = نحو بداية القائمة)
+  arrowR.classList.toggle("hidden", atStart);
 }
 
 function selectCat(cat,el){
