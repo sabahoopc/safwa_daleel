@@ -749,8 +749,10 @@ function buildCatsBar(){
 }
 
 function scrollCats(dir){
+  // dir: -1 = يمين (رجوع)، 1 = يسار (تقدم)
+  // في RTL scrollLeft يصبح سالباً عند التحرك يساراً
   const bar=document.getElementById("cats-bar");
-  bar.scrollBy({left:dir*200,behavior:"smooth"});
+  bar.scrollBy({left: -dir*200, behavior:"smooth"});
 }
 
 function updateCatsArrows(){
@@ -760,17 +762,11 @@ function updateCatsArrows(){
   if(!bar||!arrowR||!arrowL)return;
   const max=bar.scrollWidth-bar.clientWidth;
   if(max<=0){arrowR.classList.add("hidden");arrowL.classList.add("hidden");return;}
-  // RTL: scroll يبدأ من اليمين — في بداية الصفحة scrollLeft=0 أو max حسب المتصفح
-  const sl=bar.scrollLeft;
-  // نعمل مع القيمة المطلقة ونحدد الاتجاه
-  const absLeft=Math.round(Math.abs(sl));
-  // في RTL: scrollLeft=0 = أقصى اليمين (البداية)، scrollLeft=-max أو max = أقصى اليسار
-  const atStart=absLeft<=2;
-  const atEnd=absLeft>=max-2;
-  // سهم اليسار (للانتقال يساراً = نحو نهاية القائمة)
-  arrowL.classList.toggle("hidden", atEnd);
-  // سهم اليمين (للرجوع يميناً = نحو بداية القائمة)
-  arrowR.classList.toggle("hidden", atStart);
+  const sl=bar.scrollLeft; // في RTL: 0=أقصى اليمين، -max=أقصى اليسار (أو max في بعض المتصفحات)
+  const atRight = sl >= -2 && sl <= 2;   // في بداية الصفحة = أقصى يمين
+  const atLeft  = Math.abs(sl) >= max-2; // في نهاية الصفحة = أقصى يسار
+  arrowR.classList.toggle("hidden", atRight); // اليمين مخفي عند البداية
+  arrowL.classList.toggle("hidden", atLeft);  // اليسار مخفي عند النهاية
 }
 
 function selectCat(cat,el){
