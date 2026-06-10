@@ -742,33 +742,29 @@ function buildCatsBar(){
   const bar=document.getElementById("cats-bar");
   const usedCats=CATS.filter(c=>ALL.some(b=>b.category===c.id));
   let html=`<span class="cat-chip active" onclick="selectCat('all',this)">🗂️ الكل (${ALL.length})</span>`;
-  // Lucky chip
-  if(document.getElementById("sidebar-lucky")?.style.display!=="none"){
-    html+=`<span class="cat-chip lucky-chip" onclick="location.href='lucky.html'">🎁 جرّب حظك</span>`;
-  }
   usedCats.forEach(c=>{
     const n=ALL.filter(b=>b.category===c.id).length;
     html+=`<span class="cat-chip" onclick="selectCat('${c.id}',this)">${c.icon} ${c.label} (${n})</span>`;
   });
   bar.innerHTML=html;
-  // تحديث السهمين بعد الرسم
   setTimeout(updateCatsArrows, 50);
 }
 
 function scrollCats(dir){
   const bar=document.getElementById("cats-bar");
-  bar.scrollBy({left:dir*200,behavior:"smooth"});
+  // RTL: اتجاه السحب معكوس
+  bar.scrollBy({left:-dir*200,behavior:"smooth"});
 }
+
 function updateCatsArrows(){
   const bar=document.getElementById("cats-bar");
   const arrowR=document.getElementById("cats-arrow-r");
   const arrowL=document.getElementById("cats-arrow-l");
   if(!bar||!arrowR||!arrowL)return;
-  // في RTL: scrollLeft سالب في بعض المتصفحات
   const scrollLeft=Math.abs(bar.scrollLeft);
   const maxScroll=bar.scrollWidth-bar.clientWidth;
-  arrowR.classList.toggle("hidden", scrollLeft<=2);
-  arrowL.classList.toggle("hidden", scrollLeft>=maxScroll-2);
+  arrowR.classList.toggle("hidden", scrollLeft>=maxScroll-2);
+  arrowL.classList.toggle("hidden", scrollLeft<=2);
 }
 
 function selectCat(cat,el){
