@@ -498,6 +498,7 @@ button{font-family:"Cairo",sans-serif;cursor:pointer}
       <div class="sidebar-card-body">
         <div class="sidebar-title">📧 النشرة البريدية</div>
         <div class="sidebar-sub">اشترك وكن أول من يعرف عن الجديد</div>
+        <input class="nl-input" id="nl-name" placeholder="اسمك...">
         <input class="nl-input" id="nl-email" placeholder="بريدك الإلكتروني...">
         <button class="nl-btn" onclick="subscribeNewsletter()">اشتراك مجاني</button>
       </div>
@@ -1031,13 +1032,18 @@ async function trackVisit(){
 
 // ── Newsletter ────────────────────────────
 async function subscribeNewsletter(){
+  const name=document.getElementById("nl-name").value.trim();
   const email=document.getElementById("nl-email").value.trim();
+  if(!name){toast("⚠️ أدخل اسمك");return;}
   if(!email||!email.includes("@")){toast("⚠️ أدخل بريد إلكتروني صحيح");return;}
   try{
-    await fetch(SUPA_URL+"/rest/v1/newsletter_subscribers",{method:"POST",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({email})});
+    const res=await fetch(SUPA_URL+"/rest/v1/newsletter_subscribers",{method:"POST",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({name,email})});
+    if(res.status===409){toast("⚠️ هذا البريد مسجّل مسبقاً");return;}
+    if(!res.ok){toast("⚠️ تعذّر الاشتراك، حاول مجدداً");return;}
+    document.getElementById("nl-name").value="";
     document.getElementById("nl-email").value="";
     toast("✅ تم الاشتراك في النشرة البريدية");
-  }catch(e){toast("⚠️ هذا البريد مسجّل مسبقاً");}
+  }catch(e){toast("⚠️ تعذّر الاشتراك، تحقق من الاتصال");}
 }
 
 // ── Form ──────────────────────────────────
