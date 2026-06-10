@@ -1134,7 +1134,7 @@ async function submitReq(){
       description:document.getElementById("f-desc").value.trim()||null,
       maps_url:document.getElementById("f-maps").value.trim()||null,
       owner_email:email, logo_data:formLogoData||null, status:"pending"
-    }));
+    })});
     sendConfirmEmail(email,name,name);
     document.getElementById("form-body").innerHTML=`<div style="text-align:center;padding:32px 16px"><div style="font-size:56px;margin-bottom:14px">🎉</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">تم إرسال طلبك!</div><div style="font-size:13px;color:var(--muted)">سيتم مراجعته والتواصل معك خلال 24 ساعة</div></div>`;
   }catch(e){btn.disabled=false;btn.textContent="📤 إرسال الطلب";errEl.style.display="block";errEl.textContent="⚠️ تعذّر الإرسال، حاول مجدداً";}
