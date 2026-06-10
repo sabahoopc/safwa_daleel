@@ -1128,12 +1128,13 @@ async function submitReq(){
   btn.disabled=true;btn.textContent="⏳ جاري الإرسال...";
   try{
     await fetch(SUPA_URL+"/rest/v1/submission_requests",{method:"POST",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({
-      name,category:formCatId,phone,whatsapp:document.getElementById("f-wa").value.trim()||null,
+      business_name:name, category:formCatId, phone,
+      whatsapp:document.getElementById("f-wa").value.trim()||null,
       location:document.getElementById("f-loc").value.trim()||null,
       description:document.getElementById("f-desc").value.trim()||null,
       maps_url:document.getElementById("f-maps").value.trim()||null,
-      email,logo_data:formLogoData||null,status:"pending"
-    })});
+      owner_email:email, logo_data:formLogoData||null, status:"pending"
+    }));
     sendConfirmEmail(email,name,name);
     document.getElementById("form-body").innerHTML=`<div style="text-align:center;padding:32px 16px"><div style="font-size:56px;margin-bottom:14px">🎉</div><div style="font-size:18px;font-weight:700;margin-bottom:8px">تم إرسال طلبك!</div><div style="font-size:13px;color:var(--muted)">سيتم مراجعته والتواصل معك خلال 24 ساعة</div></div>`;
   }catch(e){btn.disabled=false;btn.textContent="📤 إرسال الطلب";errEl.style.display="block";errEl.textContent="⚠️ تعذّر الإرسال، حاول مجدداً";}
