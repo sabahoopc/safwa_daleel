@@ -664,14 +664,13 @@ async function load(){
   const [bizData,customCats,statsData]=await Promise.all([
     fetch(SUPA_URL+"/rest/v1/businesses?select=id,name,category,phone,whatsapp,location,maps_url,description,tags,website,instagram,twitter,snapchat,tiktok,promoted,badge,ad_text,ad_grad,likes_count,mawthooq_license,maaroof_license,freelance_license&hidden=eq.false&order=promoted.desc,created_at.desc",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
     fetch(SUPA_URL+"/rest/v1/custom_categories?select=*",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()),
-    fetch(SUPA_URL+"/rest/v1/site_stats?select=*",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()).catch(()=>[]),
+    fetch(SUPA_URL+"/rest/v1/site_stats?select=visits&id=eq.main",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json()).catch(()=>[]),
   ]);
 
   ALL=bizData||[];
   if(customCats?.length) CATS=[...DEF_CATS,...customCats.map(c=>({id:String(c.id),label:c.label,icon:c.icon||"📌"}))];
 
-  const statsRow=(statsData||[]).find(x=>x.key==="visitor_count")||(statsData||[])[0];
-  const visitCount=parseInt(statsRow?.value||"0");
+  const visitCount=parseInt(statsData?.[0]?.visits||"0");
   const fmt=n=>n>=1000?(n/1000).toFixed(1)+"k":n;
   document.getElementById("visitor-count").textContent=fmt(visitCount);
   document.getElementById("hero-biz-count").textContent=ALL.length;
@@ -1024,9 +1023,15 @@ async function trackVisit(){
   if(localStorage.getItem(key))return;
   localStorage.setItem(key,"1");
   try{
-    const r=await fetch(SUPA_URL+"/rest/v1/site_stats?key=eq.visitor_count",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json());
-    const cur=parseInt(r?.[0]?.value||"625");
-    await fetch(SUPA_URL+"/rest/v1/site_stats?key=eq.visitor_count",{method:"PATCH",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},body:JSON.stringify({value:String(cur+1)})});
+    const r=await fetch(SUPA_URL+"/rest/v1/site_stats?select=visits&id=eq.main",{headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY}}).then(r=>r.json());
+    const cur=parseInt(r?.[0]?.visits||"0");
+    await fetch(SUPA_URL+"/rest/v1/site_stats?id=eq.main",{method:"PATCH",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json"},body:JSON.stringify({visits:cur+1})});
+    // تحديث العداد في الصفحة
+    const fmt=n=>n>=1000?(n/1000).toFixed(1)+"k":n;
+    ["visitor-count","hero-visit-count","mob-visit-n"].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent=fmt(cur+1);
+    });
   }catch(e){}
 }
 
