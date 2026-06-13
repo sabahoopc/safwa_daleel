@@ -980,9 +980,58 @@ window.renderClients = function renderClients() {
         <div style="display:flex;gap:6px">
           ${r.owner_phone ? `<a href="https://wa.me/966${(r.owner_phone||"").replace(/^0/,"")}" target="_blank" class="btn btn-green btn-sm">💬</a>` : ""}
           ${r.owner_email ? `<a href="mailto:${esc(r.owner_email)}" class="btn btn-ghost btn-sm">✉️</a>` : ""}
+          <button type="button" class="btn btn-ghost btn-sm" onclick="openEditClient(${r.id})">✏️</button>
         </div>
       </td>
     </tr>`).join("");
+}
+
+// ── Edit Client ───────────────────────────
+window.openEditClient = function openEditClient(id){
+  const r = REQUESTS.find(x=>x.id===id); if(!r) return;
+  document.getElementById("ec-id").value = id;
+  document.getElementById("ec-business").value = r.business_name||"";
+  document.getElementById("ec-owner").value = r.owner_name||"";
+  document.getElementById("ec-phone").value = r.owner_phone||"";
+  document.getElementById("ec-email").value = r.owner_email||"";
+  document.getElementById("ec-whatsapp").value = r.whatsapp||"";
+  document.getElementById("ec-location").value = r.location||"";
+  document.getElementById("ec-err").style.display = "none";
+  openM("edit-client");
+}
+
+window.saveEditClient = async function saveEditClient(){
+  const id = parseInt(document.getElementById("ec-id").value);
+  const business_name = document.getElementById("ec-business").value.trim();
+  const owner_name = document.getElementById("ec-owner").value.trim();
+  const owner_phone = document.getElementById("ec-phone").value.trim();
+  const owner_email = document.getElementById("ec-email").value.trim();
+  const whatsapp = document.getElementById("ec-whatsapp").value.trim();
+  const location = document.getElementById("ec-location").value.trim();
+  const errEl = document.getElementById("ec-err");
+  errEl.style.display = "none";
+  if(!business_name||!owner_name||!owner_phone){
+    errEl.style.display="block";
+    errEl.textContent="⚠️ اسم المشروع، اسم العميل، والجوال مطلوبة";
+    return;
+  }
+  try{
+    await supa("submission_requests?id=eq."+id,"PATCH",{
+      business_name, owner_name, owner_phone,
+      owner_email: owner_email||null,
+      whatsapp: whatsapp||null,
+      location: location||null,
+    });
+    // حدّث محلياً
+    const r = REQUESTS.find(x=>x.id===id);
+    if(r){ Object.assign(r,{business_name,owner_name,owner_phone,owner_email,whatsapp,location}); }
+    closeM("edit-client");
+    renderClients();
+    toast("✅ تم حفظ التعديلات");
+  }catch(e){
+    errEl.style.display="block";
+    errEl.textContent="❌ فشل: "+e.message;
+  }
 }
 
 const RESEND_KEY = "re_7NuZzFFt_2FfyWgU5uMwD6ZMVRPWRfLg5";
@@ -2373,6 +2422,33 @@ tr:hover td{background:rgba(242,101,34,.04)}
 </div>
 
 <!-- Clients -->
+<!-- Edit Client Modal -->
+<div class="overlay" id="modal-edit-client" onclick="if(event.target===this)closeM('edit-client')">
+  <div class="modal" style="max-width:480px">
+    <div class="mh"><div class="mh-title">✏️ تعديل بيانات العميل</div><button type="button" style="background:none;border:none;color:var(--mu);font-size:17px;cursor:pointer" onclick="closeM('edit-client')">✕</button></div>
+    <div class="mc">
+      <input type="hidden" id="ec-id">
+      <label class="flabel">اسم المشروع <span class="req">*</span></label>
+      <input class="finput" id="ec-business">
+      <label class="flabel">اسم صاحب المشروع <span class="req">*</span></label>
+      <input class="finput" id="ec-owner">
+      <label class="flabel">جوال صاحب المشروع <span class="req">*</span></label>
+      <input class="finput" id="ec-phone" dir="ltr">
+      <label class="flabel">البريد الإلكتروني</label>
+      <input class="finput" id="ec-email" dir="ltr">
+      <label class="flabel">واتساب المشروع</label>
+      <input class="finput" id="ec-whatsapp" dir="ltr">
+      <label class="flabel">الموقع / الحي</label>
+      <input class="finput" id="ec-location">
+      <div id="ec-err" style="color:var(--re);font-size:12px;display:none;margin-bottom:8px"></div>
+    </div>
+    <div class="mf">
+      <button type="button" class="btn btn-or" onclick="saveEditClient()">💾 حفظ التعديلات</button>
+      <button type="button" class="btn btn-ghost" onclick="closeM('edit-client')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="page-clients">
   <div class="ph">
     <div><div class="ph-title">بيانات العملاء</div><div class="ph-sub">معلومات التواصل مع أصحاب المشاريع المقبولة — سرية لا تُنشر</div></div>
