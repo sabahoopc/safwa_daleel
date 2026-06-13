@@ -1069,6 +1069,12 @@ function renderForm(){
       </div>
     </div>
 
+    <label class="flabel">اسمك الكامل <span style="color:var(--orange)">*</span></label>
+    <input class="finput" id="f-owner-name" placeholder="الاسم الكامل لصاحب المشروع">
+
+    <label class="flabel">جوالك الشخصي <span style="color:var(--orange)">*</span></label>
+    <input class="finput" id="f-owner-phone" type="tel" dir="ltr" placeholder="05xxxxxxxx">
+
     <label class="flabel">اسم المشروع <span style="color:var(--orange)">*</span></label>
     <input class="finput" id="f-name" placeholder="مطعم الأصيل...">
 
@@ -1179,18 +1185,22 @@ function prevFile(inp,boxId,isLogo){
   r.readAsDataURL(f);
 }
 async function submitReq(){
+  const ownerName=document.getElementById("f-owner-name").value.trim();
+  const ownerPhone=document.getElementById("f-owner-phone").value.trim();
   const name=document.getElementById("f-name").value.trim();
   const phone=document.getElementById("f-phone").value.trim();
   const email=document.getElementById("f-email").value.trim();
   const agree=document.getElementById("f-agree").checked;
   const errEl=document.getElementById("f-err");
   errEl.style.display="none";
+  if(!ownerName||!ownerPhone){errEl.style.display="block";errEl.textContent="⚠️ يرجى تعبئة اسمك وجوالك الشخصي";return;}
   if(!name||!phone||!formCatId||!email){errEl.style.display="block";errEl.textContent="⚠️ يرجى تعبئة الحقول المطلوبة";return;}
   if(!agree){errEl.style.display="block";errEl.textContent="⚠️ يجب الموافقة على الشروط والأحكام";return;}
   const btn=document.querySelector("#form-body .btn-or");
   btn.disabled=true;btn.textContent="⏳ جاري الإرسال...";
   try{
     await fetch(SUPA_URL+"/rest/v1/submission_requests",{method:"POST",headers:{"apikey":SUPA_KEY,"Authorization":"Bearer "+SUPA_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({
+      owner_name:ownerName, owner_phone:ownerPhone,
       business_name:name, category:formCatId, phone,
       whatsapp:document.getElementById("f-wa")?.value.trim()||null,
       location:document.getElementById("f-loc")?.value.trim()||null,
